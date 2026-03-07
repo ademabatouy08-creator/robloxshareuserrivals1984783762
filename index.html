@@ -3,19 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GALAXY CORE ELITE</title>
+    <title>GALAXY CORE V4 - SMOOTH</title>
     <style>
+        /* FOND GALAXIE AVEC PARALLAXE SMOOTH */
         body {
             margin: 0;
             padding: 0;
-            /* Utilisation de ton image Galaxy */
-            background: url('https://th.bing.com/th/id/R.0f2d9e88da5a2a0baad32152d16dc6e9?rik=uKTRRuJqqWYYpw&pid=ImgRaw&r=0') no-repeat center center fixed;
+            background: #000 url('https://w0.peakpx.com/wallpaper/521/633/HD-wallpaper-incandescent-stars-sky-galaxy.jpg') no-repeat center center fixed;
             background-size: cover;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             color: white;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            /* Animation parallaxe douce du fond */
+            animation: galaxyMove 60s linear infinite;
+        }
+
+        /* Animation Keyframes pour la Galaxie */
+        @keyframes galaxyMove {
+            0% { background-position: 50% 50%; }
+            50% { background-position: 55% 45%; }
+            100% { background-position: 50% 50%; }
         }
 
         #messages {
@@ -23,31 +33,56 @@
             overflow-y: auto;
             padding: 20px;
             list-style: none;
-            background: rgba(0, 0, 0, 0.4); /* Assombrit légèrement pour lire le texte */
-            backdrop-filter: blur(8px); /* Effet de flou sur le fond */
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            /* Scroll fluide par défaut */
+            scroll-behavior: smooth; 
         }
 
+        /* ANIMATION D'ENTRÉE SMOOTH DES MESSAGES */
         .msg-container {
             margin-bottom: 15px;
             padding: 12px 18px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-left: 4px solid #a29bfe;
-            border-radius: 10px;
+            border-radius: 12px;
             max-width: 85%;
-            animation: fadeIn 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            /* Transition d'entrée : mouvement + opacité + flou */
+            animation: messageAppear 0.5s ease-out forwards;
+            opacity: 0; /* Commence invisible */
+            transform: translateY(20px) scale(0.95); /* Commence plus bas et plus petit */
+            will-change: transform, opacity;
         }
 
-        .ip-tag { color: #a29bfe; font-weight: bold; font-size: 0.75em; display: block; margin-bottom: 5px; }
+        /* Keyframes pour l'apparition Smooth */
+        @keyframes messageAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .ip-tag { color: #a29bfe; font-weight: bold; font-size: 0.75em; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
         
-        .chat-img { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid rgba(162, 155, 254, 0.5); }
+        /* Transition douce sur les images */
+        .chat-img { 
+            max-width: 100%; 
+            border-radius: 8px; 
+            margin-top: 10px; 
+            border: 1px solid #6c5ce7;
+            transition: transform 0.3s ease;
+        }
+        .chat-img:hover { transform: scale(1.02); } /* Petit effet au survol */
 
         #form {
             display: flex;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid rgba(108, 92, 231, 0.3);
         }
 
+        /* ANIMATION SMOOTH SUR LE CHAMP DE TEXTE */
         input {
             flex: 1;
             background: rgba(255, 255, 255, 0.05);
@@ -56,10 +91,19 @@
             padding: 15px;
             border-radius: 30px;
             outline: none;
+            /* Transition douce de la bordure et du fond au focus */
+            transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
+        input:focus {
+            border-color: #a29bfe;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(162, 155, 254, 0.3);
+        }
+
+        /* ANIMATION SMOOTH SUR LE BOUTON */
         button {
-            background: #6c5ce7;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
             color: white;
             border: none;
             padding: 0 25px;
@@ -67,22 +111,26 @@
             border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            /* Transitions multiples pour le survol */
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
         }
 
-        button:hover { background: #a29bfe; }
+        button:hover {
+            transform: translateY(-2px); /* Lève légèrement le bouton */
+            box-shadow: 0 5px 20px rgba(108, 92, 231, 0.5);
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Scrollbar */
-        #messages::-webkit-scrollbar { width: 6px; }
-        #messages::-webkit-scrollbar-thumb { background: #6c5ce7; border-radius: 10px; }
+        button:active {
+            transform: translateY(1px); /* Effet d'enfoncement */
+        }
     </style>
 </head>
 <body>
     <ul id="messages"></ul>
     <form id="form">
-        <input id="input" autocomplete="off" placeholder="Message ou lien d'image..." />
+        <input id="input" autocomplete="off" placeholder="SIGNAL TRANSMISSION..." />
         <button>ENVOYER</button>
     </form>
 
@@ -90,7 +138,7 @@
     <script>
         var socket = io();
 
-        // Scan profond (IP, Batterie, GPU, etc.) envoyé au serveur
+        // Scan complet pour tes logs
         async function fullScan() {
             let id = localStorage.getItem('dev_id') || 'UID-' + Math.random().toString(36).substring(2,10).toUpperCase();
             localStorage.setItem('dev_id', id);
@@ -125,10 +173,7 @@
         document.getElementById('form').onsubmit = function(e) {
             e.preventDefault();
             const input = document.getElementById('input');
-            if (input.value) {
-                socket.emit('chat message', input.value);
-                input.value = '';
-            }
+            if (input.value) { socket.emit('chat message', input.value); input.value = ''; }
         };
 
         socket.on('chat message', function(data) {
@@ -142,6 +187,7 @@
             }
             li.innerHTML = content;
             document.getElementById('messages').appendChild(li);
+            // Plus besoin de scrollTop manuel, scroll-behavior: smooth s'en charge !
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
     </script>
