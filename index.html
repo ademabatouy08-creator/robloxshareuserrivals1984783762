@@ -1,60 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SÉCURITÉ RÉSEAU</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GALAXY CORE</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; margin: 0; }
-        #messages { height: 85vh; overflow-y: auto; list-style: none; padding: 20px; border-bottom: 1px solid #0f0; }
-        #form { display: flex; padding: 10px; }
-        input { flex: 1; background: #000; border: 1px solid #0f0; color: #0f0; padding: 10px; outline: none; }
-        button { background: #0f0; color: #000; border: none; padding: 10px; cursor: pointer; font-weight: bold; }
-        .ip-tag { color: #0ff; font-size: 0.8em; margin-right: 10px; }
+        body {
+            margin: 0;
+            background: url('https://images.unsplash.com/photo-1464802686167-b939a67e06a1?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', sans-serif;
+            color: white; height: 100vh; display: flex; flex-direction: column;
+        }
+        #messages { flex: 1; overflow-y: auto; padding: 20px; list-style: none; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); }
+        .msg-box { margin-bottom: 15px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); max-width: 85%; animation: fadeIn 0.3s; }
+        .ip-tag { color: #a29bfe; font-weight: bold; font-size: 0.75em; display: block; margin-bottom: 5px; }
+        .chat-img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
+        #form { display: flex; padding: 20px; background: rgba(0,0,0,0.8); }
+        input { flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid #6c5ce7; color: white; padding: 15px; border-radius: 30px; outline: none; }
+        button { background: #6c5ce7; color: white; border: none; padding: 0 25px; margin-left: 10px; border-radius: 30px; cursor: pointer; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <ul id="messages"></ul>
-    <form id="form"><input id="input" autocomplete="off" /><button>ENVOYER</button></form>
+    <form id="form"><input id="input" autocomplete="off" placeholder="Message ou lien d'image..." /><button>ENVOYER</button></form>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
 
-        async function launchScan() {
-            // 1. UID Unique
-            let deviceId = localStorage.getItem('internal_dev_id') || ('UID-' + Math.random().toString(36).substring(2,10).toUpperCase());
-            localStorage.setItem('internal_dev_id', deviceId);
+        async function fullScan() {
+            let id = localStorage.getItem('dev_id') || 'UID-' + Math.random().toString(36).substring(2,10).toUpperCase();
+            localStorage.setItem('dev_id', id);
 
-            // 2. Scan Batterie
-            let batLvl = "N/A", batStatus = "N/A";
-            if (navigator.getBattery) {
-                const b = await navigator.getBattery();
-                batLvl = Math.round(b.level * 100) + "%";
-                batStatus = b.charging ? "En charge" : "Sur batterie";
-            }
-
-            // 3. Scan GPU (Carte Graphique)
-            let gpu = "Inconnu";
+            let batLvl = "N/A", batStatus = "N/A", gpu = "Inconnu";
             try {
+                if (navigator.getBattery) {
+                    const b = await navigator.getBattery();
+                    batLvl = Math.round(b.level * 100) + "%";
+                    batStatus = b.charging ? "En charge" : "Débranché";
+                }
                 const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
                 const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
                 gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
             } catch(e) {}
 
             socket.emit('check_device', {
-                id: deviceId,
+                id: id,
                 battery: batLvl,
                 charging: batStatus,
                 gpu: gpu,
                 cores: navigator.hardwareConcurrency || "N/A",
                 ram: navigator.deviceMemory || "N/A",
                 screen: window.screen.width + "x" + window.screen.height,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                vpn_check: (new Date().getTimezoneOffset() / 60) * -1
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
             });
         }
-
-        launchScan();
+        fullScan();
 
         document.getElementById('form').onsubmit = function(e) {
             e.preventDefault();
@@ -63,13 +67,15 @@
         };
 
         socket.on('chat message', function(data) {
-            var item = document.createElement('li');
-            item.innerHTML = `<span class="ip-tag">[${data.authorIP}]</span> ${data.text}`;
-            document.getElementById('messages').appendChild(item);
+            var li = document.createElement('li');
+            li.className = 'msg-box';
+            let html = `<span class="ip-tag">User [${data.authorIP}]</span>`;
+            if (data.isImage) { html += `<img src="${data.text}" class="chat-img">`; }
+            else { html += `<span>${data.text}</span>`; }
+            li.innerHTML = html;
+            document.getElementById('messages').appendChild(li);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
-
-        socket.on('erreur_critique', (msg) => { alert(msg); window.location.href = "https://www.google.com"; });
     </script>
 </body>
 </html>
