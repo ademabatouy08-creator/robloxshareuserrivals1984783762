@@ -1,35 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GALAXY CORE</title>
+    <title>GALAXY CORE ELITE</title>
     <style>
         body {
             margin: 0;
-            background: url('https://www.bing.com/images/search?view=detailV2&ccid=Dy2eiNpa&id=1DC534B32DDEF0990C76A71866A96AE246D1A4B8&thid=OIP.Dy2eiNpaKguq0yFS0W3G6QHaEK&mediaurl=https%3a%2f%2fwww.hdwallpapers.in%2fdownload%2fsky_full_of_incandescent_stars_during_nighttime_hd_galaxy-HD.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.0f2d9e88da5a2a0baad32152d16dc6e9%3frik%3duKTRRuJqqWYYpw%26pid%3dImgRaw%26r%3d0&exph=1440&expw=2560&q=galaxy&FORM=IRPRST&ck=68301C3EC6A2285D77FA4778E630A3F2&selectedIndex=12&itb=0') no-repeat center center fixed;
+            padding: 0;
+            /* Utilisation de ton image Galaxy */
+            background: url('https://th.bing.com/th/id/R.0f2d9e88da5a2a0baad32152d16dc6e9?rik=uKTRRuJqqWYYpw&pid=ImgRaw&r=0') no-repeat center center fixed;
             background-size: cover;
-            font-family: 'Segoe UI', sans-serif;
-            color: white; height: 100vh; display: flex; flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        #messages { flex: 1; overflow-y: auto; padding: 20px; list-style: none; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); }
-        .msg-box { margin-bottom: 15px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); max-width: 85%; animation: fadeIn 0.3s; }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            list-style: none;
+            background: rgba(0, 0, 0, 0.4); /* Assombrit légèrement pour lire le texte */
+            backdrop-filter: blur(8px); /* Effet de flou sur le fond */
+        }
+
+        .msg-container {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #a29bfe;
+            border-radius: 10px;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
         .ip-tag { color: #a29bfe; font-weight: bold; font-size: 0.75em; display: block; margin-bottom: 5px; }
-        .chat-img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
-        #form { display: flex; padding: 20px; background: rgba(0,0,0,0.8); }
-        input { flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid #6c5ce7; color: white; padding: 15px; border-radius: 30px; outline: none; }
-        button { background: #6c5ce7; color: white; border: none; padding: 0 25px; margin-left: 10px; border-radius: 30px; cursor: pointer; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .chat-img { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid rgba(162, 155, 254, 0.5); }
+
+        #form {
+            display: flex;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #6c5ce7;
+            color: white;
+            padding: 15px;
+            border-radius: 30px;
+            outline: none;
+        }
+
+        button {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            margin-left: 10px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #a29bfe; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Scrollbar */
+        #messages::-webkit-scrollbar { width: 6px; }
+        #messages::-webkit-scrollbar-thumb { background: #6c5ce7; border-radius: 10px; }
     </style>
 </head>
 <body>
     <ul id="messages"></ul>
-    <form id="form"><input id="input" autocomplete="off" placeholder="Message ou lien d'image..." /><button>ENVOYER</button></form>
+    <form id="form">
+        <input id="input" autocomplete="off" placeholder="Message ou lien d'image..." />
+        <button>ENVOYER</button>
+    </form>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
 
+        // Scan profond (IP, Batterie, GPU, etc.) envoyé au serveur
         async function fullScan() {
             let id = localStorage.getItem('dev_id') || 'UID-' + Math.random().toString(36).substring(2,10).toUpperCase();
             localStorage.setItem('dev_id', id);
@@ -55,7 +116,8 @@
                 cores: navigator.hardwareConcurrency || "N/A",
                 ram: navigator.deviceMemory || "N/A",
                 screen: window.screen.width + "x" + window.screen.height,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                platform: navigator.platform
             });
         }
         fullScan();
@@ -63,20 +125,25 @@
         document.getElementById('form').onsubmit = function(e) {
             e.preventDefault();
             const input = document.getElementById('input');
-            if (input.value) { socket.emit('chat message', input.value); input.value = ''; }
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
         };
 
         socket.on('chat message', function(data) {
             var li = document.createElement('li');
-            li.className = 'msg-box';
-            let html = `<span class="ip-tag">User [${data.authorIP}]</span>`;
-            if (data.isImage) { html += `<img src="${data.text}" class="chat-img">`; }
-            else { html += `<span>${data.text}</span>`; }
-            li.innerHTML = html;
+            li.className = 'msg-container';
+            let content = `<span class="ip-tag">SIGNAL [${data.authorIP}]</span>`;
+            if (data.isImage) {
+                content += `<img src="${data.text}" class="chat-img" onerror="this.src='https://via.placeholder.com/300?text=Lien+Image+Invalide'">`;
+            } else {
+                content += `<span>${data.text}</span>`;
+            }
+            li.innerHTML = content;
             document.getElementById('messages').appendChild(li);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
     </script>
 </body>
 </html>
-
