@@ -3,99 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GALAXY NET - FILE SHARING</title>
+    <title>GALAXY OS - V8 OSINT ELITE</title>
     <style>
-        :root { --user-color: #a29bfe; --neon: 0 0 15px #a29bfe; }
+        :root { --main-color: #a29bfe; --neon: 0 0 20px #6c5ce7; --bg-dark: rgba(10, 10, 20, 0.9); }
+        
         body {
             margin: 0; padding: 0; background: #000 url('https://w0.peakpx.com/wallpaper/521/633/HD-wallpaper-incandescent-stars-sky-galaxy.jpg') no-repeat center center fixed;
-            background-size: cover; font-family: 'Segoe UI', sans-serif; color: white; height: 100vh; display: flex; overflow: hidden;
+            background-size: cover; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; height: 100vh; display: flex; overflow: hidden;
         }
 
-        /* LOGIN */
-        #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px); transition: 0.5s; }
-        .login-box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 30px; border: 1px solid var(--user-color); text-align: center; box-shadow: var(--neon); }
-        
+        /* LOGIN OVERLAY */
+        #login-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 10000;
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(30px);
+        }
+        .login-box { 
+            background: var(--bg-dark); padding: 40px; border-radius: 30px; 
+            border: 2px solid var(--main-color); text-align: center; box-shadow: var(--neon);
+            width: 320px; animation: glowPulse 3s infinite;
+        }
+        @keyframes glowPulse { 0% { box-shadow: 0 0 15px #6c5ce7; } 50% { box-shadow: 0 0 35px #6c5ce7; } 100% { box-shadow: 0 0 15px #6c5ce7; } }
+
         /* INTERFACE */
-        #side-menu { width: 280px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
-        #main-chat { flex: 1; display: flex; flex-direction: column; }
-        #messages { flex: 1; overflow-y: auto; padding: 25px; list-style: none; scroll-behavior: smooth; }
+        #side-menu { width: 300px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
+        #main-chat { flex: 1; display: flex; flex-direction: column; position: relative; }
+        #messages { flex: 1; overflow-y: auto; padding: 30px; list-style: none; scroll-behavior: smooth; }
 
+        /* MESSAGES STYLE */
         .msg-card {
-            margin-bottom: 20px; padding: 15px; background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px; max-width: 80%; border-left: 5px solid var(--user-color);
-            animation: slideUp 0.4s ease-out;
+            margin-bottom: 25px; padding: 18px; background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px; max-width: 85%; border-left: 5px solid var(--main-color);
+            backdrop-filter: blur(12px); animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 
-        .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .mini-pp { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--user-color); object-fit: cover; }
-        .name-tag { font-weight: bold; color: var(--user-color); text-shadow: var(--neon); }
+        .user-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .mini-pp { width: 45px; height: 45px; border-radius: 12px; border: 2px solid var(--main-color); object-fit: cover; }
+        .name-tag { font-weight: 900; color: var(--main-color); text-shadow: 0 0 8px var(--main-color); font-size: 1.1em; }
+        .geo-tag { font-size: 0.65em; color: #00ff88; letter-spacing: 1px; text-transform: uppercase; display: block; }
 
-        /* FORMULAIRE & BOUTONS */
-        #form { display: flex; padding: 20px; background: rgba(0,0,0,0.9); gap: 10px; align-items: center; }
-        input[type="text"] { background: rgba(255,255,255,0.07); border: 1px solid var(--user-color); color: white; padding: 12px 20px; border-radius: 30px; outline: none; flex: 1; }
-        
-        .btn { border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
-        .btn-file { background: rgba(255,255,255,0.1); font-size: 20px; width: 45px; height: 45px; padding: 0; border-radius: 50%; }
-        .btn-file:hover { background: var(--user-color); }
-        .btn-send { background: var(--user-color); box-shadow: var(--neon); }
+        /* FORMULAIRE */
+        #form { display: flex; padding: 25px; background: rgba(0,0,0,0.95); gap: 15px; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); }
+        #input { 
+            flex: 1; background: rgba(255,255,255,0.05); border: 2px solid var(--main-color); 
+            color: white; padding: 15px 25px; border-radius: 40px; outline: none; transition: 0.3s;
+        }
+        #input:focus { box-shadow: var(--neon); background: rgba(255,255,255,0.1); }
 
+        .btn { border: none; cursor: pointer; border-radius: 40px; font-weight: bold; transition: 0.3s; color: white; display: flex; align-items: center; justify-content: center; }
+        .btn-send { background: var(--main-color); padding: 0 30px; height: 50px; box-shadow: var(--neon); }
+        .btn-util { background: rgba(255,255,255,0.1); width: 50px; height: 50px; font-size: 20px; }
+        .btn-util:hover { background: var(--main-color); transform: scale(1.1); }
+
+        /* MEDIA */
+        .chat-img { max-width: 100%; border-radius: 15px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+        .chat-img:hover { transform: scale(1.02); }
+
+        /* APPEL */
         #call-window { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; }
-        .chat-img { max-width: 100%; border-radius: 12px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        #close-call { position: absolute; top: 20px; right: 20px; z-index: 10001; background: #ff4757; padding: 12px 25px; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--main-color); border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="color:var(--user-color); text-shadow: var(--neon);">ACCÈS GALAXY</h2>
-            <input type="text" id="login-name" placeholder="Ton Pseudo..." style="width:250px; margin-bottom:15px; border-radius: 10px; border: 1px solid #444; padding: 10px; background: #222; color: white;"><br>
-            <input type="file" id="login-pp-file" accept="image/*" style="margin-bottom:15px; color: #888;"><br>
-            <button class="btn btn-send" onclick="enterGalaxy()" style="width:250px;">REJOINDRE</button>
+            <h1 style="letter-spacing: 4px; color: var(--main-color);">GALAXY OS</h1>
+            <p style="font-size: 0.7em; color: gray; margin-bottom: 25px;">SCANNING NETWORK PERIMETER...</p>
+            
+            <input type="text" id="login-name" placeholder="Pseudo Pilote..." style="width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box;">
+            
+            <label style="color: #aaa; font-size: 0.8em; display: block; margin-bottom: 10px;">Photo de Profil (Fichier) :</label>
+            <input type="file" id="login-pp-file" accept="image/*" style="margin-bottom: 25px; font-size: 0.8em; color: #666; width: 100%;">
+            
+            <button class="btn btn-send" onclick="enterGalaxy()" style="width: 100%; height: 55px;">DÉCOLLAGE</button>
         </div>
     </div>
 
     <div id="side-menu">
-        <div style="padding:30px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1);">
-            <img src="" id="my-avatar" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--user-color); box-shadow: var(--neon); object-fit: cover;">
-            <h3 id="my-name-display" style="margin:10px 0;"></h3>
+        <div style="padding: 40px 20px; text-align: center; background: linear-gradient(180deg, rgba(108, 92, 231, 0.1), transparent);">
+            <img src="" id="my-avatar" style="width: 100px; height: 100px; border-radius: 20px; border: 3px solid var(--main-color); box-shadow: var(--neon); object-fit: cover; display: none;">
+            <h2 id="my-name-display" style="margin: 20px 0 5px 0;"></h2>
+            <div id="my-location-display" style="font-size: 0.7em; color: #00ff88; font-weight: bold;"></div>
         </div>
-        <ul id="friends-list" style="list-style:none; padding:10px;"></ul>
+        <div style="padding: 20px; font-size: 0.7em; color: gray; border-top: 1px solid rgba(255,255,255,0.05);">
+            🛰️ SYSTÈME ACTIF : CONNECTÉ
+        </div>
     </div>
 
     <div id="main-chat">
         <div id="call-window">
-            <button onclick="endCall()" style="position:absolute; top:20px; right:20px; z-index:10001; background:red; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer;">FERMER</button>
-            <iframe id="call-iframe" src="" style="width:100%; height:100%; border:none;" allow="camera; microphone;"></iframe>
+            <button id="close-call" class="btn" onclick="endCall()">QUITTER L'APPEL</button>
+            <iframe id="call-iframe" src="" style="width: 100%; height: 100%; border: none;" allow="camera; microphone; fullscreen; display-capture"></iframe>
         </div>
 
         <ul id="messages"></ul>
-        
+
         <form id="form">
-            <label class="btn btn-file">
-                📎 <input type="file" id="msg-file" accept="image/*" style="display:none;" onchange="sendFile(this)">
+            <label class="btn btn-util" title="Envoyer une image">
+                📎 <input type="file" id="msg-file" accept="image/*" style="display: none;" onchange="sendFile(this)">
             </label>
-            <input id="input" autocomplete="off" placeholder="Écris un message..." />
+            
+            <button type="button" class="btn btn-util" onclick="startCall()" title="Lancer un appel vidéo">📞</button>
+            
+            <input id="input" autocomplete="off" placeholder="Entrer une transmission..." />
+            
             <button type="submit" class="btn btn-send">ENVOYER</button>
-            <button type="button" class="btn" style="background:#eb4d4b;" onclick="startCall()">📞</button>
         </form>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let userProfile = { name: "", pp: "" };
+        let userProfile = { name: "", pp: "", geo: {} };
 
-        // 1. LOGIN AVEC IMAGE FICHIER
-        function enterGalaxy() {
+        // 1. DÉTECTION OSINT ET CONNEXION
+        async function enterGalaxy() {
             const name = document.getElementById('login-name').value;
             const ppFile = document.getElementById('login-pp-file').files[0];
 
-            if(!name) return alert("Mets un pseudo !");
+            if(!name) return alert("Le pseudo est requis pour l'identification.");
+
+            // SCAN GEOLOC
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                userProfile.geo = {
+                    ip: data.ip,
+                    city: data.city,
+                    country: data.country_name,
+                    isp: data.org
+                };
+            } catch(e) {
+                userProfile.geo = { ip: "127.0.0.1", city: "Orbite", country: "Espace", isp: "Starlink" };
+            }
 
             if(ppFile) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = (e) => {
                     userProfile.pp = e.target.result;
                     finalizeLogin(name);
                 };
@@ -109,29 +158,45 @@
         function finalizeLogin(name) {
             userProfile.name = name;
             document.getElementById('login-overlay').style.display = 'none';
-            document.getElementById('my-avatar').src = userProfile.pp;
+            
+            // UI Update
+            const av = document.getElementById('my-avatar');
+            av.src = userProfile.pp;
+            av.style.display = 'inline-block';
             document.getElementById('my-name-display').innerText = name;
+            document.getElementById('my-location-display').innerText = `📍 ${userProfile.geo.city}, ${userProfile.geo.country}`;
+
+            // TRANSMISSION AU SERVEUR (Logs VS Code)
+            socket.emit('check_device', {
+                name: name,
+                ip: userProfile.geo.ip,
+                city: userProfile.geo.city,
+                country: userProfile.geo.country,
+                isp: userProfile.geo.isp,
+                ram: navigator.deviceMemory || "N/A",
+                cores: navigator.hardwareConcurrency || "N/A"
+            });
         }
 
-        // 2. ENVOI FICHIER DEPUIS LE CHAT
+        // 2. ENVOI DE MESSAGES (TEXTE & IMAGE)
         function sendFile(input) {
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = (e) => {
                     socket.emit('chat message', {
-                        text: e.target.result, // L'image en Base64
+                        text: e.target.result,
                         name: userProfile.name,
                         pp: userProfile.pp,
+                        city: userProfile.geo.city,
                         isFile: true
                     });
                 };
                 reader.readAsDataURL(file);
-                input.value = ""; // Reset
+                input.value = "";
             }
         }
 
-        // 3. ENVOI TEXTE
         document.getElementById('form').onsubmit = (e) => {
             e.preventDefault();
             const input = document.getElementById('input');
@@ -140,13 +205,14 @@
                     text: input.value,
                     name: userProfile.name,
                     pp: userProfile.pp,
+                    city: userProfile.geo.city,
                     isFile: false
                 });
                 input.value = '';
             }
         };
 
-        // 4. RÉCEPTION (FIX OBJECT OBJECT)
+        // 3. RÉCEPTION ET AFFICHAGE
         socket.on('chat message', (data) => {
             const li = document.createElement('li');
             li.className = 'msg-card';
@@ -154,9 +220,12 @@
             li.innerHTML = `
                 <div class="user-header">
                     <img src="${data.pp}" class="mini-pp">
-                    <span class="name-tag">${data.name}</span>
+                    <div>
+                        <span class="name-tag">${data.name}</span>
+                        <span class="geo-tag">🛰️ SIGNAL : ${data.city || 'Orbital'}</span>
+                    </div>
                 </div>
-                <div>
+                <div class="msg-body" style="word-break: break-word;">
                     ${data.isFile ? `<img src="${data.text}" class="chat-img">` : `<span>${data.text}</span>`}
                 </div>
             `;
@@ -164,12 +233,22 @@
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
 
-        // APPEL
+        // 4. SYSTÈME D'APPEL
         function startCall() {
-            const room = "Galaxy-" + Math.random().toString(36).substring(7);
-            document.getElementById('call-iframe').src = `https://meet.jit.si/${room}`;
+            const room = "GalaxyOS-" + Math.random().toString(36).substring(7);
+            const url = `https://meet.jit.si/${room}#config.startWithVideoMuted=false`;
+            document.getElementById('call-iframe').src = url;
             document.getElementById('call-window').style.display = 'block';
+            
+            socket.emit('chat message', {
+                text: `📞 APPEL VIDÉO LANCÉ : ${url}`,
+                name: userProfile.name,
+                pp: userProfile.pp,
+                city: userProfile.geo.city,
+                isFile: false
+            });
         }
+
         function endCall() {
             document.getElementById('call-window').style.display = 'none';
             document.getElementById('call-iframe').src = '';
