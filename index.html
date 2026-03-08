@@ -2,219 +2,260 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEBULA SUPREME</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEBULA X</title>
     <style>
-        :root { --nebula: #0f0c29; --accent: #8e2de2; --glass: rgba(255, 255, 255, 0.05); }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s cubic-bezier(0.1, 0.9, 0.2, 1); }
-        body { margin: 0; background: #000; color: white; height: 100vh; display: flex; overflow: hidden; }
+        :root { --main: #8e2de2; --glass: rgba(255,255,255,0.05); --bg: #050508; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Roboto, sans-serif; }
+        
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            background: var(--bg); color: white; overflow: hidden;
+        }
 
-        /* --- FOND ÉTOILÉ --- */
-        #stars { position: fixed; inset: 0; background: linear-gradient(135deg, #0f0c29, #1a1a3a); z-index: -1; }
+        /* FOND ANIMÉ */
+        #nebula-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1a1a3a 0%, #050508 100%);
+        }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.3; animation: blink 3s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; } }
 
-        /* --- NAVIGATION --- */
-        #nav { width: 80px; background: rgba(0,0,0,0.4); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-        .nav-btn { width: 50px; height: 50px; border-radius: 15px; background: var(--glass); margin-bottom: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .nav-btn:hover { background: var(--accent); transform: scale(1.1); }
+        /* LAYOUT PRINCIPAL */
+        #app { display: flex; height: 100vh; width: 100vw; transition: 0.5s cubic-bezier(0.1, 0.9, 0.2, 1); }
 
-        /* --- SIDEBARS --- */
-        #sidebar { width: 300px; background: rgba(0,0,0,0.2); backdrop-filter: blur(30px); border-right: 1px solid rgba(255,255,255,0.05); overflow-y: auto; }
-        .section-title { padding: 20px; font-size: 0.7em; letter-spacing: 3px; color: var(--accent); font-weight: bold; }
+        /* SIDEBAR (Responsive) */
+        #sidebar { 
+            width: 320px; background: rgba(0,0,0,0.4); backdrop-filter: blur(30px);
+            border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column;
+            transition: 0.4s ease; z-index: 100;
+        }
 
-        .u-item { padding: 12px 20px; display: flex; align-items: center; cursor: pointer; border-radius: 15px; margin: 5px 10px; }
-        .u-item:hover { background: var(--glass); }
-        .pp { width: 40px; height: 40px; border-radius: 12px; margin-right: 12px; border: 2px solid var(--accent); }
+        /* MAIN CONTENT */
+        #content { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; }
 
-        /* --- CHAT AREAS --- */
-        #main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        #chat-title { padding: 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: bold; }
-        #messages { flex: 1; overflow-y: auto; padding: 20px; }
-        .bubble { background: var(--glass); padding: 12px 18px; border-radius: 20px; margin-bottom: 10px; max-width: 80%; border: 1px solid rgba(255,255,255,0.05); }
-        .me { align-self: flex-end; border-color: var(--accent); background: rgba(142, 45, 226, 0.1); }
+        /* MOBILE ADAPTATION */
+        @media (max-width: 768px) {
+            #sidebar { position: absolute; left: -100%; height: 100%; width: 85%; }
+            #sidebar.open { left: 0; }
+            .mobile-nav { display: flex !important; }
+        }
 
-        /* --- FENÊTRE APPEL FLOTTANTE --- */
-        #call-ui { display: none; position: fixed; top: 20px; right: 20px; width: 250px; background: rgba(10,10,25,0.9); backdrop-filter: blur(20px); border-radius: 25px; border: 1px solid var(--accent); padding: 20px; z-index: 10000; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .mobile-nav {
+            display: none; height: 60px; padding: 0 20px; align-items: center;
+            background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--glass);
+        }
 
-        /* --- MODAL PERSONNALISATION --- */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 20000; align-items: center; justify-content: center; }
-        .modal-box { background: #161625; padding: 30px; border-radius: 25px; width: 350px; border: 1px solid var(--accent); }
+        /* LISTE UTILISATEURS */
+        .u-card {
+            margin: 8px 15px; padding: 12px; border-radius: 18px;
+            background: var(--glass); display: flex; align-items: center;
+            cursor: pointer; transform: translateZ(0); will-change: transform;
+        }
+        .u-card:active { transform: scale(0.95); }
+        .u-pp { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--main); margin-right: 12px; }
 
-        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 10px; color: white; margin-bottom: 10px; outline: none; }
-        .btn { padding: 10px 20px; border-radius: 12px; border: none; background: var(--accent); color: white; cursor: pointer; width: 100%; font-weight: bold; }
+        /* MESSAGES */
+        #msg-flow { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; scroll-behavior: smooth; }
+        .bubble {
+            max-width: 85%; padding: 12px 18px; border-radius: 20px;
+            margin-bottom: 12px; line-height: 1.4; backdrop-filter: blur(10px);
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .msg-in { background: var(--glass); align-self: flex-start; border-bottom-left-radius: 5px; }
+        .msg-out { background: var(--main); align-self: flex-end; border-bottom-right-radius: 5px; }
+        @keyframes pop { from { opacity: 0; transform: scale(0.8) translateY(20px); } }
+
+        /* INPUT AREA */
+        #input-area { padding: 15px; display: flex; gap: 10px; background: rgba(0,0,0,0.3); }
+        input { 
+            flex: 1; border: none; background: var(--glass); color: white; 
+            padding: 12px 20px; border-radius: 25px; outline: none;
+        }
+        .btn-round { 
+            width: 45px; height: 45px; border-radius: 50%; border: none;
+            background: var(--main); color: white; cursor: pointer;
+        }
+
+        /* CALL UI (FLOATING) */
+        #call-box {
+            display: none; position: fixed; top: 20px; right: 20px; left: 20px;
+            background: rgba(10,10,30,0.95); backdrop-filter: blur(30px);
+            border: 1px solid var(--main); border-radius: 25px; padding: 20px;
+            z-index: 2000; text-align: center;
+        }
+        @media (min-width: 768px) { #call-box { left: auto; width: 300px; } }
+
+        /* MODALS */
+        .modal { 
+            display: none; position: fixed; inset: 0; z-index: 5000;
+            background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
+        }
+        .modal-body { background: #111; padding: 30px; border-radius: 30px; width: 90%; max-width: 400px; border: 1px solid var(--main); }
     </style>
 </head>
 <body>
 
-    <div id="stars"></div>
+    <div id="nebula-bg"></div>
 
-    <div id="nav">
-        <div class="nav-btn" onclick="switchTab('global')">🌌</div>
-        <div class="nav-btn" onclick="openModal('profile-modal')">🎨</div>
-    </div>
-
-    <div id="sidebar">
-        <div class="section-title">UTILISATEURS</div>
-        <div id="user-list"></div>
-    </div>
-
-    <div id="main">
-        <div id="chat-title">CANAL GÉNÉRAL</div>
-        <div id="messages" style="display: flex; flex-direction: column;"></div>
-        <div style="padding: 20px; display: flex; gap: 10px;">
-            <input id="msg-in" placeholder="Votre message..." style="margin:0;">
-            <button class="btn" style="width: 80px;" onclick="send()">➤</button>
-        </div>
-    </div>
-
-    <div id="call-ui">
-        <img id="c-pp" src="" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent);">
-        <div id="c-name" style="margin: 10px 0; font-weight: bold;">Pseudo</div>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <button class="btn" style="background: #ff4757;" onclick="location.reload()">✕</button>
-            <button id="c-accept" class="btn" style="background: #00ff88; display: none;">📞</button>
+    <div id="call-box">
+        <img id="c-img" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--main);">
+        <h3 id="c-name" style="margin:10px 0;">Appel...</h3>
+        <div style="display:flex; gap:15px; justify-content:center;">
+            <button class="btn-round" style="background:#ff4757;" onclick="location.reload()">✕</button>
+            <button id="c-pick" class="btn-round" style="background:#2ed573; display:none;">📞</button>
         </div>
         <audio id="remote-audio" autoplay></audio>
         <audio id="ring" loop src="https://assets.mixkit.co/sfx/preview/mixkit-phone-ringing-bell-590.mp3"></audio>
     </div>
 
-    <div id="profile-modal" class="modal">
-        <div class="modal-box">
-            <h3>Customiser mon Profil</h3>
-            <label>Couleur d'Aura (Hex)</label>
-            <input type="color" id="p-aura" value="#8e2de2">
-            <label>Bio Nebula</label>
-            <textarea id="p-bio" placeholder="Je viens d'une autre galaxie..."></textarea>
-            <button class="btn" onclick="saveProfile()">SAUVEGARDER</button>
+    <div id="app">
+        <div id="sidebar">
+            <div style="padding:25px; font-weight:bold; color:var(--main); letter-spacing:3px;">NEBULA X</div>
+            <div id="u-list" style="flex:1; overflow-y:auto;"></div>
+            <div style="padding:15px;">
+                <button class="btn-round" style="width:100%; border-radius:15px;" onclick="openProfile()">PROFIL</button>
+            </div>
+        </div>
+
+        <div id="content">
+            <div class="mobile-nav">
+                <button class="btn-round" style="background:none; font-size:24px;" onclick="toggleSidebar()">☰</button>
+                <div id="chat-header" style="margin-left:15px; font-weight:bold;">Global</div>
+            </div>
+            
+            <div id="msg-flow"></div>
+
+            <form id="input-area" onsubmit="event.preventDefault(); sendMsg();">
+                <input id="msg-in" placeholder="Message..." autocomplete="off">
+                <button type="submit" class="btn-round">➤</button>
+            </form>
         </div>
     </div>
 
-    <div id="login-screen" class="modal" style="display: flex;">
-        <div class="modal-box">
-            <h2 style="text-align: center; color: var(--accent);">NEBULA SUPREME</h2>
-            <input id="nick" placeholder="Choisir un pseudo...">
-            <button class="btn" onclick="startApp()">LANCER LA SESSION</button>
+    <div id="login-modal" class="modal" style="display:flex;">
+        <div class="modal-body">
+            <h2 style="text-align:center;">BIENVENUE</h2>
+            <input id="my-name" placeholder="Votre pseudo..." style="width:100%; margin-bottom:20px;">
+            <button class="btn-round" style="width:100%; border-radius:15px;" onclick="initApp()">ACCÉDER</button>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let me = { name: "", pp: "https://i.imgur.com/6VBx3io.png", aura: "#8e2de2", bio: "" };
-        let currentPeer = "global"; 
+        let me = { name: "", pp: "https://i.imgur.com/6VBx3io.png", aura: "#8e2de2" };
+        let activeChat = "global";
         let pc, myStream;
 
-        // --- SESSION FIX (No more re-prompts) ---
-        function startApp() {
-            const n = document.getElementById('nick').value;
-            if(!n) return alert("Pseudo requis !");
+        // --- STARS ---
+        const bg = document.getElementById('nebula-bg');
+        for(let i=0; i<80; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            s.style.width = s.style.height = Math.random()*3+'px';
+            s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
+            bg.appendChild(s);
+        }
+
+        // --- CORE LOGIC ---
+        function initApp() {
+            const n = document.getElementById('my-name').value;
+            if(!n) return;
             me.name = n;
-            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('login-modal').style.display = 'none';
             socket.emit('init_user', me);
         }
 
-        function saveProfile() {
-            me.aura = document.getElementById('p-aura').value;
-            me.bio = document.getElementById('p-bio').value;
-            socket.emit('init_user', me); // Update
-            closeModal('profile-modal');
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+        function sendMsg() {
+            const t = document.getElementById('msg-in').value;
+            if(!t) return;
+            if(activeChat === "global") {
+                socket.emit('chat_global', { text: t, name: me.name });
+            } else {
+                socket.emit('chat_private', { text: t, to: activeChat });
+            }
+            document.getElementById('msg-in').value = "";
         }
 
-        // --- NAVIGATION & PRIVATE CHAT ---
-        function switchTab(targetSid, name = "CANAL GÉNÉRAL") {
-            currentPeer = targetSid;
-            document.getElementById('chat-title').innerText = name;
-            document.getElementById('messages').innerHTML = ""; // Clear for privacy
-        }
-
-        // --- VOIP FIXED ---
-        async function startCall(sid) {
-            document.getElementById('call-ui').style.display = 'block';
-            document.getElementById('ring').play();
-            myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-            myStream.getTracks().forEach(t => pc.addTrack(t, myStream));
-            pc.ontrack = e => document.getElementById('remote-audio').srcObject = e.streams[0];
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            socket.emit('call_request', { to: sid, signal: offer });
-        }
-
-        socket.on('incoming_call', async (d) => {
-            document.getElementById('call-ui').style.display = 'block';
-            document.getElementById('c-pp').src = d.pp;
-            document.getElementById('c-name').innerText = d.name;
-            document.getElementById('ring').play();
-            document.getElementById('c-accept').style.display = 'block';
-            document.getElementById('c-accept').onclick = async () => {
-                document.getElementById('ring').pause();
-                document.getElementById('c-accept').style.display = 'none';
-                myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-                myStream.getTracks().forEach(t => pc.addTrack(t, myStream));
-                pc.ontrack = e => document.getElementById('remote-audio').srcObject = e.streams[0];
-                await pc.setRemoteDescription(new RTCSessionDescription(d.signal));
-                const answer = await pc.createAnswer();
-                await pc.setLocalDescription(answer);
-                socket.emit('call_accept', { to: d.from, signal: answer });
-            };
-        });
-
-        socket.on('call_finalized', s => pc.setRemoteDescription(new RTCSessionDescription(s)));
-
-        // --- UI SYNC ---
-        socket.on('update_users', (list) => {
-            const container = document.getElementById('user-list');
-            container.innerHTML = '';
+        // --- RENDER ---
+        socket.on('sync_users', list => {
+            const container = document.getElementById('u-list');
+            container.innerHTML = `<div class="u-card" onclick="setChat('global')"><b># Général</b></div>`;
             list.forEach(u => {
                 if(u.sid === socket.id) return;
                 const div = document.createElement('div');
-                div.className = 'u-item';
-                div.style.boxShadow = `inset 0 0 10px ${u.aura}22`;
-                div.onclick = () => switchTab(u.sid, "MESSAGE PRIVÉ : " + u.name);
+                div.className = 'u-card';
+                div.onclick = () => setChat(u.sid, u.name);
                 div.innerHTML = `
-                    <img src="${u.pp}" class="pp" style="border-color:${u.aura}">
-                    <div style="flex:1">
-                        <b>${u.name}</b><br>
-                        <small style="opacity:0.5; font-size:0.7em;">${u.bio || 'Nebula User'}</small>
-                    </div>
-                    <button class="nav-btn" style="width:30px; height:30px; font-size:12px; margin:0;" onclick="event.stopPropagation(); startCall('${u.sid}')">📞</button>
+                    <img src="${u.pp}" class="u-pp" style="border-color:${u.aura}">
+                    <div style="flex:1"><b>${u.name}</b><br><small style="opacity:0.5">${u.ip}</small></div>
+                    <button class="btn-round" style="width:30px; height:30px; font-size:12px;" onclick="event.stopPropagation(); startCall('${u.sid}')">📞</button>
                 `;
                 container.appendChild(div);
             });
         });
 
-        // --- MESSAGERIE ---
-        function send() {
-            const t = document.getElementById('msg-in').value;
-            if(!t) return;
-            if(currentPeer === "global") {
-                socket.emit('chat_msg', { text: t, name: me.name });
-            } else {
-                socket.emit('private_msg', { text: t, to: currentPeer });
-            }
-            document.getElementById('msg-in').value = "";
+        function setChat(id, name = "Global") {
+            activeChat = id;
+            document.getElementById('chat-header').innerText = name;
+            document.getElementById('msg-flow').innerHTML = "";
+            if(window.innerWidth < 768) toggleSidebar();
         }
 
-        socket.on('chat_msg', d => {
-            if(currentPeer !== "global") return;
-            renderMsg(d);
-        });
+        socket.on('msg_global', d => { if(activeChat === "global") renderBubble(d); });
+        socket.on('msg_private', d => { if(activeChat === d.from || d.from === socket.id) renderBubble(d); });
 
-        socket.on('private_msg', d => {
-            if(currentPeer === "global") return;
-            renderMsg(d);
-        });
-
-        function renderMsg(d) {
-            const m = document.createElement('div');
-            m.className = 'bubble' + (d.name === me.name ? ' me' : '');
-            m.innerHTML = `<small style="color:var(--accent)">${d.name}</small><br>${d.text}`;
-            document.getElementById('messages').appendChild(m);
-            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        function renderBubble(d) {
+            const b = document.createElement('div');
+            b.className = 'bubble ' + (d.from === socket.id ? 'msg-out' : 'msg-in');
+            b.innerHTML = `<small style="font-weight:bold; opacity:0.7">${d.name}</small><br>${d.text}`;
+            document.getElementById('msg-flow').appendChild(b);
+            document.getElementById('msg-flow').scrollTop = document.getElementById('msg-flow').scrollHeight;
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        // --- VOIP (ADAPTED & SMOOTH) ---
+        async function startCall(sid) {
+            const box = document.getElementById('call-box');
+            box.style.display = 'block';
+            document.getElementById('ring').play();
+            myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+            myStream.getTracks().forEach(t => pc.addTrack(t, myStream));
+            pc.onicecandidate = e => e.candidate && socket.emit('ice', { to: sid, candidate: e.candidate });
+            pc.ontrack = e => document.getElementById('remote-audio').srcObject = e.streams[0];
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            socket.emit('call_offer', { to: sid, signal: offer });
+        }
+
+        socket.on('call_offer', async (d) => {
+            const box = document.getElementById('call-box');
+            box.style.display = 'block';
+            document.getElementById('c-img').src = d.pp;
+            document.getElementById('c-name').innerText = d.name;
+            document.getElementById('ring').play();
+            const btn = document.getElementById('c-pick');
+            btn.style.display = 'block';
+            btn.onclick = async () => {
+                document.getElementById('ring').pause();
+                btn.style.display = 'none';
+                myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+                myStream.getTracks().forEach(t => pc.addTrack(t, myStream));
+                pc.onicecandidate = e => e.candidate && socket.emit('ice', { to: d.from, candidate: e.candidate });
+                pc.ontrack = e => document.getElementById('remote-audio').srcObject = e.streams[0];
+                await pc.setRemoteDescription(new RTCSessionDescription(d.signal));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                socket.emit('call_answer', { to: d.from, signal: answer });
+            };
+        });
+
+        socket.on('call_answer', s => pc.setRemoteDescription(new RTCSessionDescription(s)));
+        socket.on('ice', c => pc && pc.addIceCandidate(new RTCIceCandidate(c)));
     </script>
 </body>
 </html>
