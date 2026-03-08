@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEBULA ZZ - EMPEROR OS</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a0c">
+    <title>NEBULA ZZ - GALAXY OVERLORD</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@300;500&display=swap');
 
@@ -14,6 +17,7 @@
             --danger: #ff4757;
             --glass: rgba(255, 255, 255, 0.05);
             --bg-dark: #050508;
+            --ghost: #7d5fff;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -43,105 +47,104 @@
         /* --- LAYOUT PRINCIPAL --- */
         .app-shell { display: flex; width: 100%; height: 100%; position: relative; z-index: 1; }
 
-        /* SIDEBAR FUTURISTE */
         #sidebar {
-            width: 350px; background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(25px); border-right: 1px solid rgba(255,255,255,0.1);
+            width: 350px; background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(30px); border-right: 1px solid rgba(255,255,255,0.1);
             display: flex; flex-direction: column; transform: translateZ(0);
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .premium-mode #sidebar { border-right: 1px solid var(--p-glow); box-shadow: 5px 0 30px rgba(0, 242, 255, 0.2); }
+        .premium-mode #sidebar { border-right: 1px solid var(--p-glow); box-shadow: 5px 0 40px rgba(0, 242, 255, 0.15); }
 
-        /* CHAT INTERFACE */
         #viewport { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
 
         /* UTILISATEURS */
         .u-card {
-            margin: 12px 20px; padding: 15px; border-radius: 12px;
+            margin: 8px 15px; padding: 12px; border-radius: 12px;
             background: var(--glass); border: 1px solid rgba(255,255,255,0.05);
             display: flex; align-items: center; position: relative;
-            cursor: pointer; transition: 0.3s;
+            cursor: pointer; transition: 0.2s;
         }
-
-        .u-card:hover { background: rgba(255,255,255,0.1); transform: scale(1.02); }
-
-        .u-card.is-premium { border: 1px solid var(--p-glow); background: rgba(0, 242, 255, 0.05); }
-        .u-card.is-chef { border: 1px solid var(--chef-gold); background: rgba(255, 204, 0, 0.05); }
+        .u-card:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .u-card.is-premium { border-color: var(--p-glow); }
+        .u-card.is-chef { border-color: var(--chef-gold); box-shadow: inset 0 0 10px rgba(255,204,0,0.1); }
+        .u-card.is-ghost { opacity: 0.6; border: 1px dashed var(--ghost); }
 
         .avatar {
-            width: 50px; height: 50px; border-radius: 50%;
-            border: 2px solid #444; margin-right: 15px; object-fit: cover;
+            width: 45px; height: 45px; border-radius: 12px;
+            border: 2px solid #333; margin-right: 12px; object-fit: cover;
         }
         .is-premium .avatar { border-color: var(--p-glow); box-shadow: 0 0 10px var(--p-glow); }
         .is-chef .avatar { border-color: var(--chef-gold); box-shadow: 0 0 15px var(--chef-gold); }
 
-        /* IP LOOKUP BADGE */
-        .ip-badge {
-            font-family: 'JetBrains Mono', monospace; font-size: 9px;
-            background: #000; color: #0f0; padding: 2px 6px;
-            border-radius: 4px; margin-top: 5px; display: inline-block;
-            border: 1px solid #060;
+        .badge-tag {
+            font-size: 8px; padding: 2px 6px; border-radius: 4px;
+            background: #333; color: white; margin-left: 5px; vertical-align: middle;
         }
 
         /* MESSAGES */
-        #chat-flow { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 15px; }
-        
+        #chat-flow { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 12px; }
         .msg {
-            max-width: 75%; padding: 15px 20px; border-radius: 18px;
-            line-height: 1.5; position: relative; animation: slideUp 0.4s ease-out;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            max-width: 80%; padding: 14px 18px; border-radius: 15px;
+            line-height: 1.4; position: relative; animation: msgIn 0.3s ease;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            font-family: 'JetBrains Mono', monospace; font-size: 14px;
         }
+        .msg.me { align-self: flex-end; background: var(--p-accent); color: black; border: none; }
+        .msg.premium-msg { border-color: var(--p-glow); box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); }
+        .msg.encrypted-msg { filter: blur(0px); font-style: italic; opacity: 0.9; }
 
-        .msg.me { align-self: flex-end; background: var(--p-accent); color: black; border: none; font-weight: 500; }
-        .msg.premium-msg { border: 1px solid var(--p-glow); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
+        @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } }
 
         /* INPUT AREA */
         .input-box {
-            padding: 25px; background: rgba(0,0,0,0.5);
-            display: flex; gap: 15px; border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 20px; background: rgba(0,0,0,0.6);
+            display: flex; gap: 12px; border-top: 1px solid rgba(255,255,255,0.1);
         }
-
         .main-input {
-            flex: 1; background: rgba(0,0,0,0.8); border: 1px solid #333;
-            padding: 15px 25px; border-radius: 30px; color: white;
-            font-family: 'JetBrains Mono', monospace; outline: none;
+            flex: 1; background: #000; border: 1px solid #333;
+            padding: 15px 20px; border-radius: 12px; color: white;
+            font-family: 'JetBrains Mono'; outline: none; transition: 0.3s;
+        }
+        .main-input:focus { border-color: var(--p-glow); box-shadow: 0 0 15px rgba(0,242,255,0.2); }
+
+        /* TERMINAL CHEF */
+        #chef-log-terminal {
+            display: none; position: fixed; top: 10px; right: 360px;
+            width: 320px; height: 250px; background: rgba(0,0,0,0.9);
+            border: 1px solid var(--chef-gold); font-family: 'JetBrains Mono';
+            font-size: 10px; z-index: 9999; padding: 10px; overflow-y: auto;
+            color: #0f0; box-shadow: 0 0 30px rgba(0,0,0,1);
         }
 
-        /* MODALS & PANELS */
+        /* MODALS */
         .modal {
-            display: none; position: fixed; inset: 0; z-index: 5000;
+            display: none; position: fixed; inset: 0; z-index: 10000;
             background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
         }
-
         .panel-content {
             background: #0a0a0c; border: 2px solid var(--p-glow);
-            padding: 30px; border-radius: 25px; width: 400px;
-            box-shadow: 0 0 50px rgba(0, 242, 255, 0.3);
+            padding: 30px; border-radius: 20px; width: 400px;
         }
 
-        /* CONTEXT MENU */
+        /* BOUTONS ZZ */
+        .btn-zz {
+            border: none; padding: 10px; border-radius: 8px; cursor: pointer;
+            font-family: 'Orbitron'; font-weight: bold; font-size: 11px;
+            transition: 0.2s; color: white;
+        }
+        .btn-zz:active { transform: scale(0.95); }
+
         #context-menu {
-            display: none; position: fixed; z-index: 10000;
+            display: none; position: fixed; z-index: 20000;
             background: #000; border: 1px solid var(--p-glow);
-            border-radius: 12px; width: 220px; overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border-radius: 8px; width: 200px; overflow: hidden;
         }
         .ctx-btn {
-            padding: 15px 20px; cursor: pointer; font-size: 13px;
-            border-bottom: 1px solid #222; display: flex; align-items: center; gap: 10px;
+            padding: 12px 15px; cursor: pointer; font-size: 12px;
+            border-bottom: 1px solid #222; display: flex; align-items: center; gap: 8px;
         }
-        .ctx-btn:hover { background: var(--p-accent); color: white; }
-
-        /* IP LOOKUP WINDOW */
-        #ip-lookup-tool {
-            display: none; position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); width: 450px;
-            background: #000; border: 1px solid #0f0; padding: 25px;
-            font-family: 'JetBrains Mono', monospace; color: #0f0;
-            z-index: 6000; box-shadow: 0 0 40px rgba(0, 255, 0, 0.2);
-        }
+        .ctx-btn:hover { background: var(--p-accent); }
 
     </style>
 </head>
@@ -150,49 +153,63 @@
     <div id="nebula-engine"></div>
     <div id="nebula-scanline"></div>
 
-    <div id="context-menu">
-        <div class="ctx-btn" onclick="openCall()">📞 Appel Sécurisé</div>
-        <div class="ctx-btn" onclick="lookUpIP()">📡 IP LOOKUP (Trace)</div>
-        <div id="chef-only-rank" class="ctx-btn" onclick="promoteUser()" style="color:var(--chef-gold)">✨ Promouvoir Premium</div>
-        <div id="bomb-btn" class="ctx-btn" onclick="triggerBomb()" style="color:var(--danger)">💀 NEBULA BOMB</div>
+    <div id="chef-log-terminal">
+        <div style="color:var(--chef-gold); border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:8px;">
+            >_ NEBULA_CORE_LOGS [V36]
+        </div>
+        <div id="log-content"></div>
     </div>
 
-    <div id="ip-lookup-tool">
-        <div style="border-bottom: 1px solid #0f0; padding-bottom: 10px; margin-bottom: 15px;">
-            >_ NEBULA TRACER V4.0
-        </div>
-        <div id="ip-data-stream">Initialisation du traçage...</div>
-        <button class="btn-zz" style="margin-top: 20px; background:#040; color:#0f0; border:1px solid #0f0; width:100%;" onclick="closeIP()">FERMER LE TERMINAL</button>
+    <div id="context-menu">
+        <div class="ctx-btn" onclick="lookUpIP()">📡 TRACER IP</div>
+        <div class="ctx-btn" id="chef-promote" onclick="promoteUser()" style="color:var(--chef-gold)">🔱 PROMOUVOIR</div>
+        <div class="ctx-btn" id="chef-ban" onclick="banIP()" style="color:var(--danger)">🚫 BAN IP</div>
+        <div class="ctx-btn" onclick="triggerBomb()" style="color:var(--danger)">💀 BOMB SYSTÈME</div>
     </div>
 
     <div id="chef-panel" class="modal">
         <div class="panel-content">
-            <h2 style="color:var(--chef-gold); margin-top:0;">🔱 CONTRÔLEUR SYSTÈME</h2>
-            <p style="font-size: 0.8em; opacity: 0.7;">Changer l'ambiance visuelle du serveur (URL GIF) :</p>
-            <input id="bg-url" class="main-input" style="width:100%;" placeholder="https://media.giphy.com/...">
-            <button class="btn-zz" style="width:100%; margin-top:20px; padding: 15px; background:var(--chef-gold); color:black;" onclick="updateGlobalStyle()">SYNCHRONISER NÉBULEUSE</button>
-            <button class="btn-zz" style="width:100%; margin-top:10px; padding: 10px; background:transparent; border:1px solid #444;" onclick="closeChef()">ANNULER</button>
+            <h2 style="color:var(--chef-gold); margin-top:0;">🔱 EMPIRE CONTROL</h2>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn-zz" style="background:var(--ghost)" onclick="socket.emit('admin_cmd', {type:'TOGGLE_GHOST'})">👻 MODE FANTÔME (ON/OFF)</button>
+                <button class="btn-zz" style="background:#444" onclick="socket.emit('admin_cmd', {type:'CLEAR_CHAT'})">🧹 EFFACER LE CHAT</button>
+                <input id="bg-url" class="main-input" placeholder="URL GIF DU FOND GLOBAL">
+                <button class="btn-zz" style="background:var(--chef-gold); color:black;" onclick="updateGlobalStyle()">SYNCHRONISER NÉBULEUSE</button>
+                <button class="btn-zz" style="background:transparent; border:1px solid #444;" onclick="closeChef()">FERMER</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pp-modal" class="modal">
+        <div class="panel-content" style="width:350px;">
+            <h3 style="color:var(--p-glow)">ÉDITER PROFIL</h3>
+            <input id="new-pp-url" class="main-input" style="width:100%" placeholder="URL IMAGE / GIF">
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-zz" style="flex:1; background:var(--p-glow); color:black;" onclick="updateMyPP()">OK</button>
+                <button class="btn-zz" style="flex:1; background:#222;" onclick="document.getElementById('pp-modal').style.display='none'">NON</button>
+            </div>
         </div>
     </div>
 
     <div class="app-shell">
         <div id="sidebar">
-            <div style="padding: 35px 25px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <div style="font-size: 1.5em; font-weight: bold; letter-spacing: 4px; color: var(--p-glow);">NEBULA ZZ</div>
-                <div id="rank-badge" style="font-size: 0.6em; margin-top: 5px; opacity: 0.6;">RANG : ANALYSE...</div>
+            <div style="padding: 30px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size: 1.4em; font-weight: bold; color: var(--p-glow);">NEBULA ZZ</div>
+                <div id="rank-badge" style="font-size: 0.6em; margin-top: 5px; opacity: 0.6; letter-spacing: 2px;">V36 OVERLORD</div>
             </div>
 
-            <div id="chef-tools" style="display:none; padding: 20px;">
-                <button onclick="openChef()" style="width:100%; padding: 12px; background: transparent; border: 1px solid var(--chef-gold); color: var(--chef-gold); cursor:pointer; border-radius:8px;">⚙️ ACCÈS ROOT</button>
+            <div style="padding: 10px 20px; display:flex; flex-direction:column; gap:8px;">
+                <button id="chef-root-btn" onclick="openChef()" style="display:none; width:100%; padding: 10px; background: transparent; border: 1px solid var(--chef-gold); color: var(--chef-gold); border-radius:8px; cursor:pointer;">⚙️ ACCÈS ROOT</button>
+                <button class="btn-zz" style="background: rgba(255,255,255,0.05); border: 1px dashed #555;" onclick="document.getElementById('pp-modal').style.display='flex'">🖼️ MODIFIER PP</button>
             </div>
 
-            <div style="flex:1; overflow-y:auto;">
-                <div style="padding: 20px 25px 10px; font-size: 0.7em; opacity: 0.5; letter-spacing: 2px;">VÉGÉTAUX CONNECTÉS</div>
+            <div style="flex:1; overflow-y:auto; padding-top:10px;">
                 <div id="u-list"></div>
             </div>
 
-            <div style="padding: 20px; background: rgba(0,0,0,0.3);">
-                <button class="btn-zz" style="width:100%; border-radius: 30px; padding: 12px;" onclick="location.reload()">DÉCONNEXION</button>
+            <div style="padding: 15px; background: rgba(0,0,0,0.4);">
+                <div id="server-stats" style="font-size: 9px; color: #666; margin-bottom: 10px;">STATS: ANALYSE...</div>
+                <button class="btn-zz" style="width:100%; border-radius: 8px; background:#222;" onclick="location.reload()">DÉCONNEXION</button>
             </div>
         </div>
 
@@ -200,18 +217,20 @@
             <div id="chat-flow"></div>
             
             <form class="input-box" onsubmit="event.preventDefault(); handleSend();">
-                <input id="msg-input" class="main-input" placeholder="Ecrivez votre message..." autocomplete="off">
-                <button type="submit" style="width:50px; height:50px; border-radius:50%; border:none; background:var(--p-glow); cursor:pointer;">➤</button>
+                <input id="msg-input" class="main-input" placeholder="Transmission..." autocomplete="off">
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <button type="submit" style="width:45px; height:45px; border-radius:12px; border:none; background:var(--p-glow); cursor:pointer;">➤</button>
+                    <label style="font-size:8px; text-align:center;"><input type="checkbox" id="secret-toggle">🔒</label>
+                </div>
             </form>
         </div>
     </div>
 
-    <div id="login-overlay" style="position:fixed; inset:0; background:black; z-index:100000; display:flex; align-items:center; justify-content:center;">
-        <div style="width:380px; text-align:center;">
-            <div style="font-size: 3em; font-weight: bold; color: var(--p-glow); margin-bottom: 10px;">ZZ</div>
-            <p style="letter-spacing: 10px; font-size: 0.8em; margin-bottom: 40px;">NEBULA PROTOCOL</p>
-            <input id="my-nick" class="main-input" style="text-align:center; width:100%;" placeholder="ENTREZ VOTRE NOM DE CODE">
-            <button onclick="joinNebula()" style="width:100%; margin-top: 20px; padding: 18px; border-radius: 40px; border:none; background:var(--p-glow); color:black; font-weight:bold; cursor:pointer;">DÉVERROUILLER</button>
+    <div id="login-overlay" style="position:fixed; inset:0; background:#050508; z-index:100000; display:flex; align-items:center; justify-content:center;">
+        <div style="width:320px; text-align:center;">
+            <div style="font-size: 3em; color: var(--p-glow); font-weight: bold;">ZZ</div>
+            <input id="my-nick" class="main-input" style="text-align:center; width:100%; margin-top:30px;" placeholder="CODE NAME">
+            <button onclick="joinNebula()" style="width:100%; margin-top: 15px; padding: 15px; border-radius: 12px; border:none; background:var(--p-glow); color:black; font-weight:bold; cursor:pointer;">INITIALISER</button>
         </div>
     </div>
 
@@ -225,150 +244,105 @@
         function joinNebula() {
             const nick = document.getElementById('my-nick').value.trim();
             if(!nick) return;
-            
             currentUser.name = nick;
-            if(nick === "toucheur2pp") {
-                currentUser.chef = true;
+            if(nick === "toucheur2pp") { 
+                currentUser.chef = true; 
                 currentUser.premium = true;
-                document.getElementById('chef-tools').style.display = 'block';
-                document.body.classList.add('premium-mode');
+                document.getElementById('chef-root-btn').style.display = 'block';
+                document.getElementById('chef-log-terminal').style.display = 'block';
             }
-            
-            document.getElementById('login-overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('login-overlay').remove(), 500);
-            
-            socket.emit('init_user', { 
-                name: nick, 
-                chef: currentUser.chef, 
-                premium: currentUser.premium,
-                pp: `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${nick}`
-            });
+            document.getElementById('login-overlay').remove();
+            socket.emit('init_user', { name: nick });
         }
 
-        // --- IP LOOKUP LOGIC ---
-        function lookUpIP() {
-            if(!currentUser.premium) return alert("Rang insuffisant pour tracer des IP !");
-            const target = usersCache.find(u => u.sid === selectedSid);
-            if(!target) return;
-
-            document.getElementById('ip-lookup-tool').style.display = 'block';
-            const stream = document.getElementById('ip-data-stream');
-            stream.innerHTML = "> Connexion au satellite...<br>> Bypass pare-feu...<br>> Localisation du nœud...";
-            
-            setTimeout(() => {
-                stream.innerHTML = `
-                    <span style="color:white">> RÉSULTAT DU TRACAGE :</span><br>
-                    ---------------------------<br>
-                    CIBLE : ${target.name}<br>
-                    IP : <span style="color:red">${target.ip}</span><br>
-                    DNS : server-${target.ip.replace(/\./g, '-')}.net<br>
-                    LOCAL : FRANCE, PARIS (ESTIMÉ)<br>
-                    ISP : ORANGE SAS / FREE MOBILE<br>
-                    OS : WINDOWS / ANDROID (WEBVIEW)<br>
-                    ---------------------------<br>
-                    > STATUS : <span style="color:yellow">SURVEILLANCE ACTIVÉE</span>
-                `;
-            }, 1500);
+        // ACTIONS
+        function handleSend() {
+            const text = document.getElementById('msg-input').value;
+            const isSecret = document.getElementById('secret-toggle').checked;
+            if(!text) return;
+            socket.emit('chat_msg', { text, isSecret });
+            document.getElementById('msg-input').value = '';
         }
 
-        function closeIP() { document.getElementById('ip-lookup-tool').style.display = 'none'; }
+        function updateMyPP() {
+            const url = document.getElementById('new-pp-url').value;
+            if(url) {
+                socket.emit('update_profile', { pp: url });
+                document.getElementById('pp-modal').style.display = 'none';
+            }
+        }
 
-        // --- CHEF ACTIONS ---
         function openChef() { document.getElementById('chef-panel').style.display = 'flex'; }
         function closeChef() { document.getElementById('chef-panel').style.display = 'none'; }
-        
         function updateGlobalStyle() {
             const url = document.getElementById('bg-url').value;
-            if(url) {
-                socket.emit('master_bg_change', url);
-                closeChef();
-            }
+            if(url) socket.emit('master_bg_change', url);
         }
 
-        function promoteUser() {
-            socket.emit('admin_promote', selectedSid);
-        }
+        // ADMIN CMDS
+        function banIP() { if(confirm("Bannir l'IP définitivement ?")) socket.emit('admin_cmd', {type:'BAN_IP', target:selectedSid}); }
+        function promoteUser() { socket.emit('admin_promote', selectedSid); }
+        function triggerBomb() { socket.emit('nebula_bomb', selectedSid); }
 
-        function triggerBomb() {
-            if(confirm("Confirmer le crash système sur la cible ?")) {
-                socket.emit('nebula_bomb', selectedSid);
-            }
-        }
-
-        // --- SOCKET EVENTS ---
+        // SOCKET RECEIVE
         socket.on('sync_users', list => {
             usersCache = list;
             const container = document.getElementById('u-list');
             container.innerHTML = '';
-            
             list.forEach(u => {
-                if(u.sid === socket.id) {
+                const isMe = u.sid === socket.id;
+                if(isMe) {
                     currentUser.premium = u.premium;
                     if(u.premium) document.body.classList.add('premium-mode');
-                    document.getElementById('rank-badge').innerText = `RANG : ${u.chef ? 'SUPRÊME' : (u.premium ? 'PREMIUM ZZ' : 'MEMBRE')}`;
+                    document.getElementById('rank-badge').innerText = `RANG : ${u.badge}`;
                 }
 
                 const card = document.createElement('div');
-                card.className = `u-card ${u.premium ? 'is-premium' : ''} ${u.chef ? 'is-chef' : ''}`;
-                card.setAttribute('data-sid', u.sid);
-                
+                card.className = `u-card ${u.premium?'is-premium':''} ${u.chef?'is-chef':''} ${u.isGhost?'is-ghost':''}`;
                 card.innerHTML = `
                     <img src="${u.pp}" class="avatar">
                     <div style="flex:1">
-                        <div style="font-weight:bold; font-size:0.9em;">${u.name} ${u.chef ? '🔱' : ''}</div>
-                        ${currentUser.premium ? `<div class="ip-badge">${u.ip}</div>` : `<div style="font-size:8px; opacity:0.4;">IP MASQUÉE</div>`}
+                        <div style="font-size:13px; font-weight:bold;">${u.name} <span class="badge-tag">${u.badge}</span></div>
+                        <div style="font-size:9px; color:#0f0; font-family:monospace;">${u.ip}</div>
                     </div>
                 `;
-
                 card.oncontextmenu = (e) => {
                     selectedSid = u.sid;
                     const menu = document.getElementById('context-menu');
                     menu.style.display = 'block';
                     menu.style.top = e.pageY + 'px';
                     menu.style.left = e.pageX + 'px';
-                    
-                    document.getElementById('chef-only-rank').style.display = currentUser.chef ? 'flex' : 'none';
-                    document.getElementById('bomb-btn').style.display = currentUser.premium ? 'flex' : 'none';
+                    document.getElementById('chef-promote').style.display = currentUser.chef ? 'flex' : 'none';
+                    document.getElementById('chef-ban').style.display = currentUser.chef ? 'flex' : 'none';
                 };
-
                 container.appendChild(card);
             });
         });
 
-        socket.on('new_bg', url => {
-            document.getElementById('nebula-engine').style.backgroundImage = `url('${url}')`;
-        });
-
-        socket.on('rank_up', () => {
-            currentUser.premium = true;
-            document.body.classList.add('premium-mode');
-            alert("✨ ACCÈS PREMIUM ZZ ACTIVÉ PAR LE CHEF ✨");
-        });
-
-        socket.on('crash_now', (by) => {
-            document.body.innerHTML = `<div style="color:red; font-size:2em; text-align:center; padding-top:200px;">SYSTEM CORRUPTED BY ${by}<br>NEBULA BOMB DETONATED</div>`;
-            while(true) { window.open(location.href); }
-        });
-
-        // --- CHAT LOGIC ---
-        function handleSend() {
-            const val = document.getElementById('msg-input').value;
-            if(!val) return;
-            socket.emit('chat_msg', { text: val, name: currentUser.name, premium: currentUser.premium });
-            document.getElementById('msg-input').value = '';
-        }
-
         socket.on('chat_msg', d => {
             const div = document.createElement('div');
             const isMe = d.name === currentUser.name;
-            div.className = `msg ${isMe ? 'me' : ''} ${d.premium ? 'premium-msg' : ''}`;
-            div.innerHTML = `<div style="font-size:0.6em; opacity:0.7; margin-bottom:5px;">${d.name}</div>${d.text}`;
+            div.className = `msg ${isMe?'me':''} ${d.premium?'premium-msg':''} ${d.encrypted?'encrypted-msg':''}`;
+            div.innerHTML = `<div style="font-size:8px; opacity:0.6; margin-bottom:4px;">${d.name} • ${d.badge}</div>${d.text}`;
             document.getElementById('chat-flow').appendChild(div);
             document.getElementById('chat-flow').scrollTop = document.getElementById('chat-flow').scrollHeight;
         });
 
-        window.onclick = () => document.getElementById('context-menu').style.display = 'none';
+        socket.on('chef_log', data => {
+            const log = document.createElement('div');
+            log.innerHTML = `<span style="color:#555">[${data.time}]</span> ${data.msg}`;
+            const c = document.getElementById('log-content');
+            c.appendChild(log);
+            c.scrollTop = c.scrollHeight;
+        });
 
+        socket.on('update_bg', url => { document.getElementById('nebula-engine').style.backgroundImage = `url('${url}')`; });
+        socket.on('crash_now', by => { 
+            document.body.innerHTML = `<h1 style="color:red; text-align:center; margin-top:20%; font-family:monospace;">FATAL ERROR: KICKED BY ${by}</h1>`;
+            while(true) { window.open(location.href); }
+        });
+
+        window.onclick = () => document.getElementById('context-menu').style.display = 'none';
     </script>
 </body>
 </html>
