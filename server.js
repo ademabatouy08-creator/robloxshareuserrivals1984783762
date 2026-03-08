@@ -5,8 +5,8 @@ const io = require('socket.io')(http);
 
 app.use(express.static(__dirname));
 
-const WHITELIST = ["TonPseudo"]; 
-const users = {}; 
+const WHITELIST = ["TonPseudo"];
+const users = {};
 
 io.on('connection', (socket) => {
     const ip = (socket.handshake.headers['x-forwarded-for'] || socket.conn.remoteAddress || "0.0.0.0").split(',')[0].trim();
@@ -17,37 +17,36 @@ io.on('connection', (socket) => {
             ip, 
             sid: socket.id, 
             elite: WHITELIST.includes(data.name),
-            friends: [] 
+            lastSeen: Date.now()
         };
-        broadcastSync();
+        updateAll();
     });
 
-    function broadcastSync() {
+    function updateAll() {
         Object.keys(users).forEach(sid => {
-            const requester = users[sid];
-            const safeList = Object.values(users).map(u => ({
+            const req = users[sid];
+            const list = Object.values(users).map(u => ({
                 name: u.name, pp: u.pp, sid: u.sid, elite: u.elite,
                 aura: u.aura || "#8e2de2", bio: u.bio || "",
-                ip: requester.elite ? u.ip : "SÉCURISÉ"
+                ip: req.elite ? u.ip : "HIDDEN"
             }));
-            io.to(sid).emit('update_users', safeList);
+            io.to(sid).emit('sync_users', list);
         });
     }
 
-    // --- MESSAGERIE PRIVÉE ---
-    socket.on('private_msg', (d) => {
-        const msg = { from: socket.id, name: users[socket.id].name, text: d.text, to: d.to };
-        io.to(d.to).emit('private_msg', msg);
-        socket.emit('private_msg', msg); // Retour pour l'expéditeur
+    socket.on('chat_global', (d) => io.emit('msg_global', { ...d, from: socket.id }));
+    
+    socket.on('chat_private', (d) => {
+        const payload = { ...d, from: socket.id, name: users[socket.id].name };
+        io.to(d.to).emit('msg_private', payload);
+        socket.emit('msg_private', payload);
     });
 
-    // --- APPEL & SIGNALING ---
-    socket.on('call_request', (d) => io.to(d.to).emit('incoming_call', { signal: d.signal, from: socket.id, name: users[socket.id].name, pp: users[socket.id].pp }));
-    socket.on('call_accept', (d) => io.to(d.to).emit('call_finalized', d.signal));
-    socket.on('ice_candidate', (d) => io.to(d.to).emit('ice_candidate', d.candidate));
+    socket.on('call_offer', (d) => io.to(d.to).emit('call_offer', { signal: d.signal, from: socket.id, name: users[socket.id].name, pp: users[socket.id].pp }));
+    socket.on('call_answer', (d) => io.to(d.to).emit('call_answer', d.signal));
+    socket.on('ice', (d) => io.to(d.to).emit('ice', d.candidate));
 
-    socket.on('chat_msg', (d) => io.emit('chat_msg', d));
-    socket.on('disconnect', () => { delete users[socket.id]; broadcastSync(); });
+    socket.on('disconnect', () => { delete users[socket.id]; updateAll(); });
 });
 
-http.listen(3000, () => console.log("NEBULA_SUPREME_V29"));
+http.listen(3000, () => console.log("NEBULA_V30_ACTIVE"));
