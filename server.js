@@ -6,7 +6,7 @@ const io = require('socket.io')(http);
 app.use(express.static(__dirname));
 
 const users = {}; 
-const ADMIN_NAME = "TonPseudo"; // ⚠️ CHANGE CA PAR TON PSEUDO POUR VOIR LES IPs
+const ADMIN_NAME = "toucheur2pp";
 
 io.on('connection', (socket) => {
     const ip = (socket.handshake.headers['x-forwarded-for'] || socket.conn.remoteAddress || "0.0.0.0").split(',')[0].trim();
@@ -47,3 +47,4 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => console.log("NEON_PREMIUM_V25_READY"));
+
