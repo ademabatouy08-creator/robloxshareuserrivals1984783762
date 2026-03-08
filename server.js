@@ -5,8 +5,7 @@ const io = require('socket.io')(http);
 
 app.use(express.static(__dirname));
 
-const users = {}; // { sid: { name, pp, ip, friends: [], bio } }
-const groups = { "Général": { members: [] } };
+const users = {}; 
 const bannedIPs = new Set();
 
 io.on('connection', (socket) => {
@@ -14,34 +13,9 @@ io.on('connection', (socket) => {
     if (bannedIPs.has(ip)) socket.emit('CORE_MELTDOWN');
 
     socket.on('init_user', (data) => {
-        users[socket.id] = { ...data, ip, sid: socket.id, friends: [], bio: "Nouvel utilisateur" };
+        users[socket.id] = { ...data, ip, sid: socket.id };
+        console.log(`[SYNAPSE] ${data.name} connecté via ${ip}`);
         io.emit('update_users', Object.values(users));
-    });
-
-    // --- SYSTÈME D'AMIS ---
-    socket.on('add_friend', (targetSid) => {
-        if(users[targetSid]) {
-            users[socket.id].friends.push(targetSid);
-            io.to(targetSid).emit('notification', `${users[socket.id].name} vous a ajouté en ami !`);
-        }
-    });
-
-    // --- SYSTÈME DE GROUPES ---
-    socket.on('create_group', (groupName) => {
-        if(!groups[groupName]) {
-            groups[groupName] = { members: [socket.id] };
-            io.emit('update_groups', Object.keys(groups));
-        }
-    });
-
-    // --- APPEL SYNCHRONISÉ ---
-    socket.on('call_user', (toSid) => {
-        if(users[toSid]) {
-            // On envoie le signal à la cible
-            io.to(toSid).emit('incoming_call', { fromName: users[socket.id].name, fromPP: users[socket.id].pp, fromSid: socket.id });
-            // On confirme à l'appelant que ça sonne
-            socket.emit('calling_state', { toName: users[toSid].name, toPP: users[toSid].pp });
-        }
     });
 
     socket.on('chat_msg', (data) => {
@@ -54,8 +28,15 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('call_signal', (toSid) => {
+        if(users[toSid]) {
+            io.to(toSid).emit('incoming_call', { fromName: users[socket.id].name, fromPP: users[socket.id].pp, fromSid: socket.id });
+            socket.emit('calling_state', { toName: users[toSid].name, toPP: users[toSid].pp });
+        }
+    });
+
     socket.on('disconnect', () => { delete users[socket.id]; io.emit('update_users', Object.values(users)); });
 });
 
 const PORT = process.env.PORT || 3000;
-http.listen(PORT, () => console.log("OMNIVERSE_V21_READY"));
+http.listen(PORT, () => console.log("NEON_V22_READY"));
