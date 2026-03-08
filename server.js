@@ -43,7 +43,6 @@ io.on('connection', (socket) => {
     });
     // État global du serveur
 let currentNebulaBG = "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJpZzR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l0HlMG1W8f2U08I5G/giphy.gif";
-
 io.on('connection', (socket) => {
     // Envoyer le fond actuel à la connexion
     socket.emit('change_bg', currentNebulaBG);
@@ -85,4 +84,5 @@ io.on('connection', (socket) => {
 });
 
 http.listen(3000, () => console.log("NEBULA_ZZ_ULTIMATE_READY"));
+
 
