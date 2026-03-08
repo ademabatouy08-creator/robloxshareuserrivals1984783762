@@ -2,35 +2,29 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
+app.use(express.static(__dirname));
 
 io.on('connection', (socket) => {
-    const rawIP = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-    const userIP = rawIP.split(',')[0].trim();
-
-    socket.on('check_device', async (data) => {
-        let operator = "Recherche...";
-        try {
-            const res = await fetch(`http://ip-api.com/json/${userIP}`);
-            const geo = await res.json();
-            operator = geo.isp || "Inconnu";
-        } catch (e) { operator = "Serveur occupé"; }
-
-        console.log("\x1b[35m%s\x1b[0m", "🌌 INTERCEPTION GALACTIQUE 🌌");
-        console.log(`🌐 IP : ${userIP} | 📡 OPÉRATEUR : ${operator}`);
-        console.log(`🔋 BATT : ${data.battery} (${data.charging})`);
-        console.log(`⚙️  CPU : ${data.cores} Coeurs | 📟 RAM : ${data.ram}GB`);
-        console.log(`🎮 GPU : ${data.gpu}`);
-        console.log(`🖥️  ECRAN : ${data.screen} | 🌍 ZONE : ${data.timezone}`);
-        console.log("\x1b[35m%s\x1b[0m", "--------------------------------");
+    // Quand le client envoie son rapport de scan
+    socket.on('check_device', (info) => {
+        console.log(`
+        ╔════════ TRANSMISSION REÇUE ════════╗
+        ║ NOM    : ${info.name}
+        ║ VILLE  : ${info.city} (${info.country})
+        ║ IP     : ${info.ip}
+        ║ RÉSEAU : ${info.isp}
+        ║ MATOS  : ${info.ram}GB RAM | ${info.cores} Cores
+        ╚════════════════════════════════════╝
+        `);
     });
 
-    socket.on('chat message', (msg) => {
-        const isImg = /https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp)/i.test(msg);
-        io.emit('chat message', { text: msg, authorIP: userIP, isImage: isImg });
+    socket.on('chat message', (data) => {
+        io.emit('chat message', data);
     });
 });
 
-http.listen(process.env.PORT || 3000, () => { console.log("🚀 STATION GALAXY READY"); });
+const PORT = process.env.PORT || 3000;
+http.listen(PORT, () => {
+    console.log(`🚀 SERVEUR GALAXY ACTIF SUR LE PORT ${PORT}`);
+});
