@@ -1,13 +1,13 @@
 {
-  "name": "punch-requiem",
-  "version": "1.0.0",
+  "name": "shadow-chat-v20",
+  "version": "20.0.0",
+  "description": "Network Secure Chat with IP Interceptor",
   "main": "server.js",
-  "dependencies": {
-    "express": "^4.18.2",
-    "socket.io": "^4.7.2",
-    "axios": "^1.6.2"
-  },
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
   }
 }
