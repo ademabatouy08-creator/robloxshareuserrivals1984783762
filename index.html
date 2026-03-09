@@ -2,318 +2,272 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAAAA-POUUUUUUF | Command Center</title>
+    <title>HEAVEN GATE | ShadowChat Command</title>
     <style>
-        /* --- CONFIGURATION DES COULEURS & SMOOTHING --- */
         :root {
-            --bg: #050505;
-            --primary: #ff003c;
-            --secondary: #00f2ff;
-            --accent: #bc00ff;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
+            --heaven-blue: #00d2ff;
+            --heaven-white: #f0faff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
 
         body {
-            background: var(--bg);
-            background-image: 
-                radial-gradient(circle at 50% 50%, #1a0a1a 0%, transparent 80%),
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 100%, 100% 4px, 3px 100%;
+            background: #020205;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            color: #fff;
+            color: var(--heaven-white);
         }
 
-        /* --- ANIMATION DE FOND --- */
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
-        body::after {
+        /* Effet d'aura en arrière-plan */
+        body::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(255, 0, 60, 0.1), transparent);
-            animation: scanline 8s linear infinite;
-            pointer-events: none;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--heaven-blue) 0%, transparent 70%);
+            top: -100px; right: -100px;
+            opacity: 0.15;
+            filter: blur(80px);
         }
 
-        /* --- CONTAINER PRINCIPAL (GLASSMORPHISM) --- */
-        .deck {
-            position: relative;
-            width: 900px;
-            height: 600px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.05);
+        /* --- CONTAINER PRINCIPAL --- */
+        .heaven-container {
+            width: 1000px;
+            height: 700px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
             display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 30px;
-            z-index: 10;
+            grid-template-columns: 300px 1fr;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: fadeIn 1.2s ease-out;
         }
 
-        /* --- HEADER --- */
-        .header {
-            grid-column: 1 / span 2;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- SIDEBAR (NETWORK STATUS) --- */
+        .sidebar {
+            background: rgba(0, 0, 0, 0.2);
+            border-right: 1px solid var(--glass-border);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            letter-spacing: 10px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px var(--primary));
+        .brand { font-size: 1.2rem; font-weight: 800; letter-spacing: 2px; color: var(--heaven-blue); margin-bottom: 20px; }
+
+        .ip-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            transition: 0.3s;
+            border-left: 2px solid transparent;
         }
 
-        /* --- SECTION INFOS IP --- */
-        .ip-section {
+        .ip-card:hover { background: rgba(255, 255, 255, 0.1); border-left: 2px solid var(--heaven-blue); }
+
+        .ip-label { font-size: 0.7rem; text-transform: uppercase; color: #888; margin-bottom: 5px; }
+        .ip-address { font-family: 'Consolas', monospace; font-size: 1rem; color: #fff; }
+
+        /* --- CHAT AREA --- */
+        .chat-area { display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.01); }
+
+        .chat-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            background: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            scrollbar-width: none;
         }
 
-        .card {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 4px solid var(--secondary);
-            transform: translateX(-20px);
-            opacity: 0;
-            animation: slideIn 0.8s forwards;
-        }
+        /* --- MESSAGE STYLES --- */
+        .msg { max-width: 80%; padding: 12px 18px; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; animation: msgSlide 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
 
-        .card:nth-child(2) { animation-delay: 0.2s; border-left-color: var(--accent); }
-        .card:nth-child(3) { animation-delay: 0.4s; border-left-color: var(--primary); }
+        @keyframes msgSlide { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        @keyframes slideIn {
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .card h3 {
+        .msg.received { background: rgba(255, 255, 255, 0.07); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg.system { 
+            background: linear-gradient(90deg, rgba(0, 210, 255, 0.1), transparent); 
+            border-left: 3px solid var(--heaven-blue);
+            align-self: center;
+            width: 100%;
+            text-align: center;
+            border-radius: 8px;
+            color: var(--heaven-blue);
             font-size: 0.8rem;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 10px;
         }
 
-        .ip-value {
-            font-family: 'Consolas', monospace;
-            font-size: 1.4rem;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
-        }
-
-        /* --- MONITORING VISUEL --- */
-        .monitor {
-            background: rgba(0,0,0,0.4);
-            border-radius: 15px;
-            padding: 20px;
+        /* --- INPUT AREA --- */
+        .input-box {
+            padding: 25px 30px;
+            background: rgba(0,0,0,0.2);
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border: 1px solid var(--border);
+            gap: 15px;
         }
 
-        .cpu-graph {
-            height: 150px;
-            width: 100%;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: flex-end;
-            gap: 5px;
-        }
-
-        .bar {
+        input {
             flex: 1;
-            background: var(--primary);
-            height: 20%;
-            animation: pulse 2s ease-in-out infinite;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
         }
 
-        @keyframes pulse {
-            0%, 100% { height: 20%; }
-            50% { height: 80%; }
-        }
+        input:focus { border-color: var(--heaven-blue); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
 
-        .terminal {
-            background: #000;
-            height: 200px;
-            border-radius: 10px;
-            padding: 15px;
-            font-family: 'Consolas', monospace;
-            font-size: 0.85rem;
-            color: var(--secondary);
-            overflow-y: auto;
-            border: 1px solid rgba(0, 242, 255, 0.2);
-        }
-
-        .log-entry { margin-bottom: 5px; }
-        .log-entry::before { content: "> "; }
-
-        /* --- BOUTON SMOOTH --- */
-        .btn-launch {
-            margin-top: 20px;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
+        .btn-blast {
+            background: var(--heaven-blue);
+            color: #000;
             border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-weight: bold;
-            text-transform: uppercase;
+            padding: 0 25px;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 0, 60, 0.3);
+            transition: 0.3s;
         }
 
-        .btn-launch:hover {
-            transform: scale(1.02) translateY(-5px);
-            box-shadow: 0 15px 30px rgba(255, 0, 60, 0.5);
-        }
+        .btn-blast:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--heaven-blue); }
 
-        .btn-launch:active { transform: scale(0.98); }
-
-        /* --- STATUTS --- */
-        .footer-stats {
-            grid-column: 1 / span 2;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.3);
-            padding-top: 20px;
-        }
-
-        .status-dot {
-            height: 8px;
-            width: 8px;
-            background: #00ff00;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
-            box-shadow: 0 0 10px #00ff00;
-        }
+        /* --- i7-6700 MONITOR --- */
+        .core-monitor { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--glass-border); }
+        .core-label { font-size: 0.65rem; color: #555; display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .progress-bg { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--heaven-blue); width: 0%; transition: width 2s ease; }
     </style>
 </head>
 <body>
 
-    <div class="deck">
-        <header class="header">
-            <h1>KAAAA-POUUUUUUF V60</h1>
-        </header>
-
-        <section class="ip-section">
-            <div class="card">
-                <h3>[01] Striker Network (Moi)</h3>
-                <div id="my-ip" class="ip-value">0.0.0.0</div>
-            </div>
-            <div class="card">
-                <h3>[02] Ghost Server (Host)</h3>
-                <div id="server-ip" class="ip-value">ShadowChat_SRV</div>
-            </div>
-            <div class="card" style="border-left-color: var(--primary);">
-                <h3>[03] Target Entry (Victime)</h3>
-                <div id="target-ip" class="ip-value" style="color: var(--primary);">En attente...</div>
-            </div>
+    <div class="heaven-container">
+        <aside class="sidebar">
+            <div class="brand">HEAVEN GATE</div>
             
-            <button class="btn-launch" onclick="triggerBlast()">Initialiser le Strike</button>
-        </section>
-
-        <section class="monitor">
-            <div class="cpu-graph" id="graph">
-                </div>
-            <div class="terminal" id="terminal">
-                <div class="log-entry">Initialisation des protocoles...</div>
-                <div class="log-entry">Détection du processeur i7-6700... [OK]</div>
-                <div class="log-entry">En attente d'une IP cible...</div>
+            <div class="ip-card">
+                <div class="ip-label">Striker Connection</div>
+                <div id="my-ip" class="ip-address">Loading...</div>
             </div>
-        </section>
 
-        <footer class="footer-stats">
-            <div><span class="status-dot"></span> ENCRYPTED CONNECTION : AES-256</div>
-            <div>i7-6700 | 8 CORES | 16GB RAM</div>
-            <div id="clock">00:00:00</div>
-        </footer>
+            <div class="ip-card">
+                <div class="ip-label">Shadow Server</div>
+                <div id="srv-ip" class="ip-address">shadowchat.io</div>
+            </div>
+
+            <div class="ip-card" id="target-card">
+                <div class="ip-label">Victim Entry</div>
+                <div id="target-ip" class="ip-address" style="color: var(--heaven-blue);">Scanning...</div>
+            </div>
+
+            <div class="core-monitor">
+                <div class="core-label"><span>i7-6700 CORES</span> <span id="cpu-load">0%</span></div>
+                <div class="progress-bg"><div id="cpu-bar" class="progress-fill"></div></div>
+            </div>
+        </aside>
+
+        <main class="chat-area">
+            <header class="chat-header">
+                <div>
+                    <div style="font-weight: 700;">#General-Infiltration</div>
+                    <div style="font-size: 0.75rem; color: #666;">Channel Encrypted by Heaven-Protocol</div>
+                </div>
+                <div class="status-badge">CONNECTED</div>
+            </header>
+
+            <div class="messages-container" id="chat-msgs">
+                <div class="msg system">Bienvenue dans l'interface Heaven Gate V60.</div>
+                <div class="msg received">Connexion établie avec le serveur ShadowChat.</div>
+                <div class="msg received">En attente d'une victime sur le port 80/443...</div>
+            </div>
+
+            <div class="input-box">
+                <input type="text" id="user-input" placeholder="Entrez une commande ou une IP...">
+                <button class="btn-blast" onclick="launchHeaven()">STRIKE</button>
+            </div>
+        </main>
     </div>
 
     <script>
-        // --- LOGIQUE DE RÉCUPÉRATION IP ---
-        async function fetchIPs() {
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
+        // Simulation de logs et de mouvement
+        const chat = document.getElementById('chat-msgs');
+        
+        function addMsg(text, type = 'received') {
+            const div = document.createElement('div');
+            div.className = `msg ${type}`;
+            div.innerText = text;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // Récupération IP
+        fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => {
                 document.getElementById('my-ip').innerText = data.ip;
-                addLog("Ma connexion publique identifiée : " + data.ip);
-            } catch (e) {
-                addLog("Erreur de récupération IP.");
-            }
-            
-            document.getElementById('server-ip').innerText = window.location.hostname || "104.21.75.12";
-        }
+                addMsg(`Votre IP ${data.ip} a été masquée par le protocole Heaven.`, 'system');
+            });
 
-        // --- GESTION DU TERMINAL ---
-        function addLog(text) {
-            const term = document.getElementById('terminal');
-            const entry = document.createElement('div');
-            entry.className = "log-entry";
-            entry.innerText = "[" + new Date().toLocaleTimeString() + "] " + text;
-            term.appendChild(entry);
-            term.scrollTop = term.scrollHeight;
-        }
+        // Fonction Strike
+        function launchHeaven() {
+            const target = document.getElementById('user-input').value;
+            if(!target) return;
 
-        // --- GÉNÉRATION DU GRAPHE ANIMÉ ---
-        const graph = document.getElementById('graph');
-        for(let i=0; i<30; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'bar';
-            bar.style.animationDelay = (i * 0.1) + "s";
-            graph.appendChild(bar);
-        }
-
-        // --- EFFET DE "BLAST" ---
-        function triggerBlast() {
-            addLog("Lancement du protocole de fragmentation...");
-            addLog("Chargement des 8 cœurs du i7-6700...");
-            document.querySelector('.btn-launch').innerText = "KAAAAA...";
+            addMsg(`Ciblage de l'IP : ${target}...`, 'received');
             
             setTimeout(() => {
-                document.querySelector('.btn-launch').innerText = "POUUUUUUF !!!";
-                document.querySelector('.btn-launch').style.background = "white";
-                document.querySelector('.btn-launch').style.color = "black";
-                addLog("STRIKE EN COURS SUR LA CIBLE.");
-                
-                // Simulation capture IP cible
-                document.getElementById('target-ip').innerText = "82.45.12.190";
-                document.getElementById('target-ip').style.textShadow = "0 0 20px red";
-            }, 1500);
+                addMsg(`KAAAA...`, 'system');
+                document.getElementById('cpu-bar').style.width = "95%";
+                document.getElementById('cpu-load').innerText = "95%";
+                document.getElementById('target-ip').innerText = target;
+            }, 1000);
+
+            setTimeout(() => {
+                addMsg(`POUUUUUUUUUF !!! Strike envoyé par i7-6700.`, 'system');
+                addMsg(`La box cible est saturée de fragments.`, 'received');
+            }, 2500);
         }
 
-        // --- HORLOGE ---
+        // Animation CPU légère
         setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
+            if(document.getElementById('cpu-load').innerText === "0%") {
+                let load = Math.floor(Math.random() * 15) + 5;
+                document.getElementById('cpu-bar').style.width = load + "%";
+                document.getElementById('cpu-load').innerText = load + "%";
+            }
+        }, 3000);
 
-        // Initialisation
-        fetchIPs();
+        // Détection Entrée
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') launchHeaven();
+        });
     </script>
 </body>
 </html>
